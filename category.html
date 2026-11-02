@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --page-accent: #f97316;
+      --page-accent-strong: #ea580c;
+      --page-hero-start: #0f172a;
+      --page-hero-end: #1d4f67;
+      --page-glow: rgba(249, 115, 22, 0.16);
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f6f7fb 0%, #eef4f8 100%);
+      color: #12263a;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .category-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .brand {
+      font-size: clamp(1.5rem, 3vw, 2.3rem);
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      color: #12263a;
+    }
+
+    .brand i {
+      color: #f97316;
+      margin-right: 8px;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #f97316;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .hero-panel {
+      background: linear-gradient(135deg, var(--page-hero-start) 0%, var(--page-hero-end) 48%, var(--page-accent) 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 30px 24px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.76rem;
+      letter-spacing: 0.17em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 12px;
+    }
+
+    .hero-panel h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      line-height: 1.1;
+    }
+
+    .hero-panel p {
+      margin-top: 12px;
+      max-width: 700px;
+      color: rgba(255,255,255,0.86);
+      line-height: 1.7;
+      font-size: 1.02rem;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .product-card {
+      position: relative;
+      background: white;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      transform: perspective(1200px) rotateX(2deg) translateY(0);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+
+    .product-card:hover {
+      transform: perspective(1200px) rotateX(0deg) rotateY(-4deg) translateY(-6px);
+      box-shadow: 0 26px 60px rgba(15, 23, 42, 0.14);
+    }
+
+    .product-image {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 160px;
+      font-size: 4rem;
+      background: linear-gradient(135deg, var(--page-glow), rgba(20,184,166,0.1));
+      border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+      background-size: cover;
+      background-position: center;
+      color: transparent;
+      transform: perspective(1000px) rotateX(6deg) rotateY(-6deg) scale(1.03);
+      transform-origin: center center;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), inset 0 -24px 40px rgba(15, 23, 42, 0.18);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25), inset 0 -12px 25px rgba(15, 23, 42, 0.12);
+    }
+
+    .product-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 28%, rgba(15,23,42,0.18) 100%);
+      pointer-events: none;
+    }
+
+    .product-info {
+      padding: 18px 16px 20px;
+    }
+
+    .product-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .product-rating {
+      color: #f59e0b;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .product-price {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #12263a;
+      margin-bottom: 12px;
+    }
+
+    .product-button {
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--page-accent) 0%, var(--page-accent-strong) 100%);
+      color: white;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="category-shell">
+    <div class="topbar">
+      <div class="brand"><i class="fas fa-shopping-bag"></i> CHUKA RODYX SHOP</div>
+      <a class="back-link" href="homepage.html"><i class="fas fa-arrow-left"></i> Back to store</a>
+    </div>
+
+    <section class="hero-panel">
+      <span class="eyebrow">Collection</span>
+      <h1 id="category-heading">Category</h1>
+      <p id="category-description">Explore curated products and discover items that match your needs.</p>
+    </section>
+
+    <section class="products-grid" id="category-products"></section>
+  </main>
+
+  <script>
+    const categoryMap = {
+      Fashion: {
+        description: 'Trendy essentials, everyday style, and polished looks for every moment.',
+        theme: { accent: '#f97316', accentStrong: '#ea580c', heroStart: '#0f172a', heroEnd: '#1d4f67', glow: 'rgba(249, 115, 22, 0.16)' },
+        products: [
+          { name: 'Premium Winter Jacket', icon: '👗', image: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (128)', price: 'KES 4,999' },
+          { name: 'Elegant Office Set', icon: '🧥', image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (74)', price: 'KES 6,200' },
+          { name: 'Casual Weekend Tee', icon: '👕', image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (189)', price: 'KES 1,499' }
+        ]
+      },
+      Electronics: {
+        description: 'Smart gadgets and tech upgrades built for convenience and performance.',
+        theme: { accent: '#22c55e', accentStrong: '#16a34a', heroStart: '#052e16', heroEnd: '#14532d', glow: 'rgba(34, 197, 94, 0.16)' },
+        products: [
+          { name: 'Smartphone Pro Max', icon: '📱', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (245)', price: 'KES 25,999' },
+          { name: 'Laptop i7 16GB RAM', icon: '💻', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (89)', price: 'KES 69,999' },
+          { name: 'Smart Watch Series 5', icon: '⌚', image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (234)', price: 'KES 8,999' }
+        ]
+      },
+      Home: {
+        description: 'Beautiful everyday essentials that make your home more comfortable and stylish.',
+        theme: { accent: '#a855f7', accentStrong: '#7e22ce', heroStart: '#2d1b69', heroEnd: '#581c87', glow: 'rgba(168, 85, 247, 0.18)' },
+        products: [
+          { name: 'Minimalist Lamp', icon: '💡', image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (64)', price: 'KES 3,450' },
+          { name: 'Cozy Home Decor Set', icon: '🛋️', image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (81)', price: 'KES 7,599' },
+          { name: 'Kitchen Essential Bundle', icon: '🍽️', image: 'https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (52)', price: 'KES 5,999' }
+        ]
+      },
+      Sports: {
+        description: 'Performance gear and active essentials for staying active and confident.',
+        theme: { accent: '#06b6d4', accentStrong: '#0f766e', heroStart: '#083344', heroEnd: '#0f766e', glow: 'rgba(6, 182, 212, 0.18)' },
+        products: [
+          { name: 'Sports Running Shoes', icon: '👟', image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (567)', price: 'KES 3,499' },
+          { name: 'Training Gym Kit', icon: '🏋️', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (113)', price: 'KES 5,650' },
+          { name: 'Performance Bottle', icon: '🚴', image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (91)', price: 'KES 1,299' }
+        ]
+      },
+      Gaming: {
+        description: 'High-energy gear for players who love immersive entertainment.',
+        theme: { accent: '#ef4444', accentStrong: '#b91c1c', heroStart: '#1f2937', heroEnd: '#7f1d1d', glow: 'rgba(239, 68, 68, 0.18)' },
+        products: [
+          { name: 'Wireless Gaming Controller', icon: '🎮', image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (145)', price: 'KES 4,250' },
+          { name: 'RGB Headset', icon: '🎧', image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (98)', price: 'KES 6,800' },
+          { name: 'Compact Gaming Setup', icon: '🕹️', image: 'https://images.unsplash.com/photo-1587202372775-98927b0f9d86?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (72)', price: 'KES 12,499' }
+        ]
+      },
+      Beauty: {
+        description: 'Self-care and personal care picks designed to help you feel your best.',
+        theme: { accent: '#ec4899', accentStrong: '#be185d', heroStart: '#3b0a2a', heroEnd: '#831843', glow: 'rgba(236, 72, 153, 0.18)' },
+        products: [
+          { name: 'Glow Kit Essentials', icon: '💄', image: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (206)', price: 'KES 2,799' },
+          { name: 'Hydration Care Set', icon: '🧴', image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (87)', price: 'KES 3,200' },
+          { name: 'Skincare Starter Pack', icon: '✨', image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (134)', price: 'KES 4,750' }
+        ]
+      },
+      Books: {
+        description: 'Thoughtful reads and inspiration for learning, creativity, and growth.',
+        theme: { accent: '#f59e0b', accentStrong: '#b45309', heroStart: '#3f2d13', heroEnd: '#78350f', glow: 'rgba(245, 158, 11, 0.18)' },
+        products: [
+          { name: 'Business Growth Guide', icon: '📘', image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (68)', price: 'KES 1,920' },
+          { name: 'Motivational Collection', icon: '📚', image: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (54)', price: 'KES 2,350' },
+          { name: 'Creative Journal Set', icon: '✍️', image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (77)', price: 'KES 1,599' }
+        ]
+      },
+      Food: {
+        description: 'Fresh favorites and tasty treats for everyday moments of comfort.',
+        theme: { accent: '#f97316', accentStrong: '#c2410c', heroStart: '#431407', heroEnd: '#9a4d00', glow: 'rgba(249, 115, 22, 0.18)' },
+        products: [
+          { name: 'Premium Snack Box', icon: '🍕', image: 'https://images.unsplash.com/photo-1548365328-9f547fb9587c?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (231)', price: 'KES 1,799' },
+          { name: 'Healthy Meal Pack', icon: '🥗', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐ (104)', price: 'KES 2,499' },
+          { name: 'Family Treat Bundle', icon: '🍰', image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=900&q=80', rating: '⭐⭐⭐⭐⭐ (128)', price: 'KES 3,699' }
+        ]
+      }
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const categoryName = params.get('category') || 'Fashion';
+    const selected = categoryMap[categoryName] || categoryMap.Fashion;
+    const theme = selected.theme;
+
+    document.documentElement.style.setProperty('--page-accent', theme.accent);
+    document.documentElement.style.setProperty('--page-accent-strong', theme.accentStrong);
+    document.documentElement.style.setProperty('--page-hero-start', theme.heroStart);
+    document.documentElement.style.setProperty('--page-hero-end', theme.heroEnd);
+    document.documentElement.style.setProperty('--page-glow', theme.glow);
+
+    document.getElementById('category-heading').textContent = categoryName;
+    document.getElementById('category-description').textContent = selected.description;
+
+    const container = document.getElementById('category-products');
+    const cartStorageKey = 'rodyx:guest:cart';
+
+    function readCart() {
+      try {
+        return JSON.parse(localStorage.getItem(cartStorageKey) || '[]');
+      } catch {
+        return [];
+      }
+    }
+
+    function addToCart(productName, productPrice) {
+      const cart = readCart();
+      const itemId = productName.toLowerCase();
+      const existing = cart.find(item => item.id === itemId);
+      if (existing) existing.quantity += 1;
+      else cart.push({ id: itemId, name: productName, price: Number(productPrice.replace(/[^\d.]/g, '')), quantity: 1 });
+      localStorage.setItem(cartStorageKey, JSON.stringify(cart));
+      alert(`${productName} added to cart.`);
+    }
+
+    selected.products.forEach(product => {
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      const productImage = document.createElement('div');
+      productImage.className = 'product-image';
+      productImage.textContent = product.icon;
+      if (product.image) {
+        productImage.style.backgroundImage = `url("${product.image}")`;
+      }
+      productImage.style.backgroundSize = 'cover';
+      productImage.style.backgroundPosition = 'center';
+
+      const info = document.createElement('div');
+      info.className = 'product-info';
+      info.innerHTML = `
+        <div class="product-name">${product.name}</div>
+        <div class="product-rating">${product.rating}</div>
+        <div class="product-price">${product.price}</div>
+      `;
+
+      const button = document.createElement('button');
+      button.className = 'product-button';
+      button.type = 'button';
+      button.textContent = 'Add to Cart';
+      button.addEventListener('click', () => addToCart(product.name, product.price));
+
+      info.appendChild(button);
+      card.append(productImage, info);
+      container.appendChild(card);
+    });
+  </script>
+</body>
+</html>

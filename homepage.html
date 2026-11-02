@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account Portal - Your Shopping Hub</title>
+  <title>CHUKA RODYX SHOP | Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     * {
@@ -170,6 +170,11 @@
       color: #FFD700;
     }
 
+    .navbar-item.active {
+      color: #FFD700;
+      font-weight: 800;
+    }
+
     /* HERO BANNER */
     .hero {
       background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
@@ -271,6 +276,29 @@
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
     }
+
+    .marketplace-choices { margin: 0 0 38px; }
+    .marketplace-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .marketplace-choice { display: flex; flex-direction: column; min-height: 220px; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--brand-orange); border-radius: 4px; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .07); }
+    .marketplace-choice:nth-child(2) { border-top-color: var(--brand-teal); }
+    .marketplace-choice h3 { margin: 0 0 8px; color: var(--ink); font-size: 19px; }
+    .marketplace-choice p { margin: 0 0 16px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .marketplace-choice-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+    .marketplace-choice-actions a { display: inline-flex; align-items: center; gap: 7px; padding: 10px 12px; border-radius: 3px; background: var(--brand-orange); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; }
+    .marketplace-choice:nth-child(2) .marketplace-choice-actions a { background: var(--brand-teal); }
+    .student-listing-badge { display: inline-block; margin-bottom: 8px; color: var(--brand-teal); font-size: 11px; font-weight: 800; text-transform: uppercase; }
+    @media (max-width: 600px) { .marketplace-choice-grid { grid-template-columns: 1fr; } }
+
+    .section-note { margin: -10px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .location-search { display: flex; gap: 8px; max-width: 520px; margin-bottom: 16px; }
+    .location-search input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 3px; padding: 11px 12px; color: var(--ink); font: inherit; }
+    .location-search button { border: 0; border-radius: 3px; padding: 0 16px; background: var(--brand-orange); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+    .seller-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .seller-card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-left: 4px solid var(--brand-orange); border-radius: 3px; background: #fff; }
+    .seller-card h3 { margin: 0 0 8px; color: var(--ink); font-size: 16px; overflow-wrap: anywhere; }
+    .seller-card p { margin: 5px 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+    .seller-card a { display: inline-block; margin-top: 9px; color: var(--brand-orange); font-size: 13px; font-weight: 700; text-decoration: none; }
+    .marketplace-note { padding: 20px; border: 1px dashed var(--line); color: var(--muted); font-size: 14px; }
 
     .product-card {
       background: white;
@@ -434,12 +462,36 @@
     }
 
     .footer-bottom {
+      position: relative;
       border-top: 1px solid #555;
       padding-top: 20px;
       text-align: center;
       color: #999;
       font-size: 14px;
     }
+
+    .admin-access-link {
+      position: absolute;
+      right: 0;
+      top: 18px;
+      display: inline-grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      color: #777;
+      font-size: 11px;
+      text-decoration: none;
+      opacity: .35;
+      transition: opacity .2s, color .2s;
+    }
+
+    .admin-access-link:hover,
+    .admin-access-link:focus-visible {
+      color: #FFD700;
+      opacity: 1;
+    }
+
+    .admin-access-link:focus-visible { outline: 2px solid #FFD700; outline-offset: 2px; }
 
     /* RESPONSIVE */
     @media (max-width: 768px) {
@@ -526,22 +578,6 @@
     }
 
     .header-right { gap: 20px; }
-
-    .token-balance {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      color: #fff;
-      background: rgba(24, 169, 153, .24);
-      border: 1px solid rgba(125, 226, 213, .45);
-      border-radius: 16px;
-      padding: 7px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .token-balance i { color: #7de2d5; }
 
     .header-icon { font-size: 11px; }
     .header-icon i { font-size: 18px; }
@@ -712,11 +748,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 50%;
-      background: var(--soft-teal);
-      color: var(--ink);
-      font-size: 27px;
-      box-shadow: inset 0 0 0 1px #b9e4df;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(14, 39, 59, .16);
+    }
+
+    .category-icon img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .product-image {
@@ -752,10 +793,10 @@
     .marketplace-note { color: var(--muted); font-size: 13px; margin: -5px 0 13px; }
     .seller-listing .product-image { height: 150px; }
     .seller-lock { color: var(--muted); font-size: 12px; margin: 8px 0 12px; }
-    .unlock-button { background: var(--brand-yellow); color: var(--ink); }
-    .unlock-button:hover { background: #128b7e; color: #fff; }
     .seller-contact { display: none; color: var(--ink); font-size: 12px; line-height: 1.6; margin: 8px 0 12px; }
     .seller-contact strong { color: var(--coral); }
+    .seller-contact a { display: inline-block; margin: 3px 8px 0 0; color: var(--brand-orange); font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+    .seller-contact a:hover { text-decoration: underline; }
     .cart-button { position: relative; border: 0; background: transparent; color: #e7f4f3; cursor: pointer; font: inherit; }
     .cart-button i { color: var(--brand-yellow); }
     .cart-count { position: absolute; top: -5px; right: -9px; min-width: 17px; padding: 2px 4px; border-radius: 10px; background: var(--brand-orange); color: #fff; font-size: 10px; font-weight: 700; }
@@ -776,19 +817,6 @@
     .wishlist-button[aria-pressed="true"] { color: var(--coral); }
     .cart-dialog-footer .product-button:disabled { opacity: .55; cursor: not-allowed; }
     .product-card[hidden] { display: none; }
-
-    .token-plans { margin-bottom: 28px; }
-    .token-plans-intro { color: var(--muted); font-size: 13px; margin: -5px 0 14px; }
-    .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
-    .plan-card { background: #fff; border: 1px solid var(--line); border-top: 4px solid var(--brand-yellow); border-radius: 4px; padding: 18px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); }
-    .plan-card.popular { border-top-color: var(--brand-orange); box-shadow: 0 5px 16px rgba(255, 107, 74, .18); }
-    .plan-card h3 { margin: 0 0 6px; color: var(--ink); font-size: 17px; }
-    .plan-tokens { color: var(--brand-orange); font-size: 24px; font-weight: 900; }
-    .plan-price { color: var(--ink); font-size: 14px; margin: 4px 0 13px; }
-    .plan-button { width: 100%; }
-    .plan-label { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-
-    @media (max-width: 600px) { .plans-grid { grid-template-columns: 1fr; } }
 
     .footer { background: #0e273b; }
     .footer-section h3 { color: #7de2d5; }
@@ -817,8 +845,6 @@
 
     .category-card:hover .category-icon {
       transform: translateY(-4px) rotate(-5deg);
-      background: var(--brand-orange);
-      color: #fff;
       box-shadow: 0 7px 14px rgba(255, 107, 74, .28);
     }
 
@@ -854,6 +880,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- HEADER -->
@@ -861,7 +888,7 @@
     <div class="header-content">
       <div class="logo">
         <i class="fas fa-shopping-bag"></i>
-        <span>RODYX</span>
+        <span>CHUKA RODYX SHOP</span>
       </div>
       
       <div class="search-bar">
@@ -870,7 +897,6 @@
       </div>
 
       <div class="header-right">
-        <button class="token-balance" type="button" title="Buy tokens" onclick="buyTokens()"><i class="fas fa-coins"></i><span><strong id="token-count">5</strong> tokens</span><i class="fas fa-plus-circle"></i></button>
         <button class="cart-button" type="button" aria-label="Open shopping cart" onclick="openCart()"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cart-count">0</span></button>
         <div class="header-icon">
           <i class="fas fa-phone"></i>
@@ -883,7 +909,6 @@
             <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> My Profile</a>
             <a href="#" onclick="viewOrders()"><i class="fas fa-box"></i> My Orders</a>
             <a href="#" onclick="viewWishlist()"><i class="fas fa-heart"></i> Wishlist</a>
-            <a href="admin.html"><i class="fas fa-chart-line"></i> Admin Dashboard</a>
             <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
           </div>
         </div>
@@ -897,16 +922,18 @@
       <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
       </button>
-      <div class="navbar-item" onclick="scrollToSection('featured')">Featured</div>
+      <div class="navbar-item active" aria-current="page" onclick="scrollToSection('home')">Home</div>
+      <div class="navbar-item" onclick="scrollToSection('products')">Explore</div>
       <div class="navbar-item" onclick="scrollToSection('categories')">Categories</div>
-      <div class="navbar-item" onclick="scrollToSection('products')">Products</div>
-      <div class="navbar-item" onclick="scrollToSection('deals')">Deals</div>
-      <a class="sell-nav-button" href="sell.html"><i class="fas fa-plus"></i> Sell an item</a>
+      <a class="navbar-item" href="services.html">Services</a>
+      <div class="navbar-item" onclick="scrollToSection('community-listings')">Wanted</div>
+      <div class="navbar-item">Messages</div>
+      <div class="navbar-item" onclick="event.stopPropagation(); toggleUserMenu()">My account</div>
     </div>
   </div>
 
   <!-- HERO BANNER -->
-  <div class="hero">
+  <div class="hero" id="home">
     <div class="hero-content">
       <h1>Welcome to Your Shopping Hub</h1>
       <p>Discover amazing products at incredible prices</p>
@@ -931,64 +958,95 @@
       <button class="edit-profile-btn" onclick="viewProfile()">Edit Profile</button>
     </div>
 
-    <section class="token-plans">
-      <h2 class="section-title">Token plans</h2>
-      <p class="token-plans-intro">Unlock seller contact details with tokens. Payments are sent to M-Pesa through IntaSend.</p>
-      <div class="plans-grid">
-        <article class="plan-card"><span class="plan-label">Starter</span><h3>5 tokens</h3><div class="plan-tokens">5</div><p class="plan-price">KES 100</p><button class="product-button plan-button" type="button" onclick="purchaseTokenPlan('starter', 100, 5)"><i class="fas fa-mobile-screen-button"></i> Pay with M-Pesa</button></article>
-        <article class="plan-card popular"><span class="plan-label">Most popular</span><h3>18 tokens</h3><div class="plan-tokens">18</div><p class="plan-price">KES 300</p><button class="product-button plan-button" type="button" onclick="purchaseTokenPlan('popular', 300, 18)"><i class="fas fa-mobile-screen-button"></i> Pay with M-Pesa</button></article>
-        <article class="plan-card"><span class="plan-label">Pro value</span><h3>35 tokens</h3><div class="plan-tokens">35</div><p class="plan-price">KES 500</p><button class="product-button plan-button" type="button" onclick="purchaseTokenPlan('pro', 500, 35)"><i class="fas fa-mobile-screen-button"></i> Pay with M-Pesa</button></article>
+    <section class="marketplace-choices" aria-labelledby="marketplace-choices-title">
+      <h2 class="section-title" id="marketplace-choices-title">Choose Your Marketplace</h2>
+      <div class="marketplace-choice-grid">
+        <article class="marketplace-choice">
+          <h3>Buy &amp; Sell</h3>
+          <p>Browse products or post an item for the community.</p>
+          <div class="marketplace-choice-actions">
+            <a href="buy-sell.html"><i class="fas fa-store" aria-hidden="true"></i> Browse products</a>
+            <a href="sell.html"><i class="fas fa-plus" aria-hidden="true"></i> Sell an item</a>
+          </div>
+        </article>
+        <article class="marketplace-choice">
+          <h3>Students Marketplace</h3>
+          <p>Find listings shared by sellers for the student community.</p>
+          <div class="marketplace-choice-actions">
+            <a href="students-marketplace.html"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Browse student listings</a>
+          </div>
+        </article>
       </div>
     </section>
 
     <!-- CATEGORIES SECTION -->
     <div class="categories-section" id="categories">
-      <h2 class="section-title">Shop by Category</h2>
+      <h2 class="section-title">Popular Categories</h2>
       <div class="categories-grid">
-        <div class="category-card">
-          <div class="category-icon">👗</div>
+        <a class="category-card" href="category.html?category=Fashion">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Fashion clothing" loading="lazy"></div>
           <div class="category-name">Fashion</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">📱</div>
+        </a>
+        <a class="category-card" href="category.html?category=Electronics">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Electronics smartphone" loading="lazy"></div>
           <div class="category-name">Electronics</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">🏠</div>
+        </a>
+        <a class="category-card" href="category.html?category=Home">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Home interior" loading="lazy"></div>
           <div class="category-name">Home</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">⚽</div>
+        </a>
+        <a class="category-card" href="category.html?category=Sports">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Sports running shoe" loading="lazy"></div>
           <div class="category-name">Sports</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">🎮</div>
+        </a>
+        <a class="category-card" href="category.html?category=Gaming">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Gaming controller" loading="lazy"></div>
           <div class="category-name">Gaming</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">💄</div>
+        </a>
+        <a class="category-card" href="category.html?category=Beauty">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Beauty products" loading="lazy"></div>
           <div class="category-name">Beauty</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">📚</div>
+        </a>
+        <a class="category-card" href="category.html?category=Books">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Books" loading="lazy"></div>
           <div class="category-name">Books</div>
-        </div>
-        <div class="category-card">
-          <div class="category-icon">🍕</div>
+        </a>
+        <a class="category-card" href="category.html?category=Food">
+          <div class="category-icon"><img src="https://images.unsplash.com/photo-1548365328-9f547fb9587c?auto=format&amp;fit=crop&amp;w=240&amp;h=240&amp;q=80" alt="Food" loading="lazy"></div>
           <div class="category-name">Food</div>
-        </div>
+        </a>
       </div>
     </div>
 
+    <section class="featured-products" id="nearby-products">
+      <h2 class="section-title">Products Near You</h2>
+      <p class="section-note" id="nearby-note">Enter your town or area to match listings with the area provided by the seller. Your location is not collected automatically.</p>
+      <form class="location-search" id="nearby-search-form">
+        <input id="nearby-location" type="search" aria-label="Your town or area" placeholder="Enter your town or area">
+        <button type="submit">Find products</button>
+      </form>
+      <div class="products-grid" id="nearby-products-list"></div>
+    </section>
+
     <section class="marketplace-section" id="community-listings">
-      <h2 class="section-title">Community Listings</h2>
-      <p class="marketplace-note">Use tokens to unlock a seller's full details and contact information.</p>
+      <h2 class="section-title">Recently Listed Products</h2>
       <div class="products-grid" id="seller-listings"></div>
+    </section>
+
+    <section class="marketplace-section" id="student-marketplace">
+      <h2 class="section-title">Students Marketplace</h2>
+      <p class="section-note">Student-focused items are marked by their sellers when listed.</p>
+      <div class="products-grid" id="student-listings"></div>
+    </section>
+
+    <section class="featured-products" id="recommended-sellers">
+      <h2 class="section-title">Recommended Sellers</h2>
+      <div class="seller-grid" id="recommended-seller-list"></div>
     </section>
 
     <!-- FEATURED PRODUCTS -->
     <div class="featured-products" id="products">
-      <h2 class="section-title">Featured Products</h2>
+      <h2 class="section-title">Explore Products</h2>
       <div class="products-grid">
         <div class="product-card">
           <div class="product-image">📱</div>
@@ -1054,7 +1112,7 @@
 
     <!-- DEALS SECTION -->
     <div class="featured-products" id="deals">
-      <h2 class="section-title">Special Deals</h2>
+      <h2 class="section-title">Trending Deals</h2>
       <div class="products-grid">
         <div class="product-card">
           <div class="product-image">🎁</div>
@@ -1097,6 +1155,12 @@
         </div>
       </div>
     </div>
+
+    <section class="featured-products" id="local-businesses">
+      <h2 class="section-title">Local Businesses</h2>
+      <p class="section-note">Business profiles appear when sellers add a business name to their listing.</p>
+      <div class="seller-grid" id="local-business-list"></div>
+    </section>
   </div>
 
   <!-- FOOTER -->
@@ -1105,13 +1169,13 @@
       <div class="footer-section">
         <h3>About Us</h3>
         <ul>
-          <li><a href="#">About RODYX</a></li>
+          <li><a href="#">About CHUKA RODYX SHOP</a></li>
           <li><a href="#">Careers</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Press</a></li>
         </ul>
       </div>
-      <div class="footer-section">
+      <div class="footer-section" id="services">
         <h3>Customer Service</h3>
         <ul>
           <li><a href="#">Help Center</a></li>
@@ -1140,7 +1204,8 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 RODYX - Your Shopping Hub. All rights reserved.</p>
+      <p>&copy; 2026 CHUKA RODYX SHOP - Your Shopping Hub. All rights reserved.</p>
+      <a class="admin-access-link" href="admin.html" title="Admin sign in" aria-label="Admin sign in"><i class="fas fa-user-shield" aria-hidden="true"></i></a>
     </div>
   </div>
 
@@ -1160,11 +1225,6 @@
     const API_BASE_URL = 'http://localhost:8000/api';
     // Get current user from localStorage
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-
-    // If no user is logged in, redirect to login page
-    if (!currentUser.email) {
-      window.location.href = 'index.html';
-    }
 
     // Display user information
     const displayFullname = currentUser.fullname || currentUser.email?.split('@')[0] || 'User';
@@ -1206,21 +1266,11 @@
     }
 
     const storagePrefix = `rodyx:${encodeURIComponent(currentUser.email)}`;
-    const tokenStorageKey = `${storagePrefix}:tokens`;
     const cartStorageKey = `${storagePrefix}:cart`;
     const wishlistStorageKey = `${storagePrefix}:wishlist`;
     const ordersStorageKey = `${storagePrefix}:orders`;
-    const unlockedListingsKey = `${storagePrefix}:unlockedListings`;
-    const storedTokenBalance = localStorage.getItem(tokenStorageKey);
-    let tokenBalance = storedTokenBalance === null ? 5 : Number(storedTokenBalance);
-    if (!Number.isFinite(tokenBalance)) tokenBalance = 5;
-    const tokenCount = document.getElementById('token-count');
     const sellerListings = document.getElementById('seller-listings');
-
-    function updateTokenBalance() {
-      tokenCount.textContent = tokenBalance;
-      localStorage.setItem(tokenStorageKey, tokenBalance);
-    }
+    const studentListings = document.getElementById('student-listings');
 
     function readStoredItems(key) {
       return JSON.parse(localStorage.getItem(key) || '[]');
@@ -1243,10 +1293,10 @@
         return;
       }
       const cart = readStoredItems(cartStorageKey);
-      const id = name.toLowerCase();
+      const id = card.dataset.listingId || name.toLowerCase();
       const existing = cart.find(item => item.id === id);
       if (existing) existing.quantity += 1;
-      else cart.push({ id, name, price, quantity: 1 });
+      else cart.push({ id, name, price, quantity: 1, sellerEmail: card.dataset.sellerEmail || '', sellerPhone: card.dataset.sellerPhone || '' });
       localStorage.setItem(cartStorageKey, JSON.stringify(cart));
       updateCartBadge();
     }
@@ -1349,7 +1399,7 @@
         'Wireless Bluetooth Headphones': 'Electronics'
       };
       if (productCategories[name]) card.dataset.category = productCategories[name];
-      const addButton = info.querySelector('.product-button:not(.unlock-button)');
+      const addButton = info.querySelector('.product-button');
       if (addButton) addButton.addEventListener('click', () => addToCart(card));
       if (card.classList.contains('seller-listing')) return;
       const wishlistButton = document.createElement('button');
@@ -1381,52 +1431,23 @@
       if (event.key === 'Enter') searchProducts();
     });
     document.querySelectorAll('.category-card').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (event) => {
         const category = card.querySelector('.category-name').textContent.trim();
-        productSearch.value = category;
-        filterProducts(category);
-        scrollToSection('community-listings');
+        const target = card.getAttribute('href');
+        if (target) {
+          window.location.href = target + `&categoryName=${encodeURIComponent(category)}`;
+          event.preventDefault();
+        }
       });
     });
 
-    async function buyTokens() {
-      const phoneNumber = prompt('Enter the M-Pesa number to receive the payment prompt (e.g. 254712345678):');
-      if (!phoneNumber) return;
-      purchaseTokenPlan('starter', 100, 5, phoneNumber);
-    }
-
-    async function purchaseTokenPlan(planId, amount, tokenAmount, providedPhone) {
-      const phoneNumber = providedPhone || prompt(`Enter the M-Pesa number for the KES ${amount} payment (e.g. 254712345678):`);
-      if (!phoneNumber) return;
-      try {
-        const token = localStorage.getItem('access_token');
-        if (!token) throw new Error('M-Pesa purchases require a connected API account. Local demo accounts cannot make payments.');
-        const response = await fetch(`${API_BASE_URL}/auth/mpesa_payment/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          body: JSON.stringify({ phone_number: phoneNumber, plan_id: planId })
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Payment could not be started.');
-        alert(`${data.message} Tokens will be added after payment confirmation.`);
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-
-    function loadSellerListings() {
-      const listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
-      if (!listings.length) {
-        sellerListings.innerHTML = '<p class="marketplace-note">No community listings yet.</p>';
-        return;
-      }
-      listings.forEach(listing => {
-        const listingId = listing.id || `${listing.title}-${listing.createdAt || listing.sellerEmail}`;
-        const unlockedListings = readStoredItems(unlockedListingsKey);
-        const isUnlocked = unlockedListings.includes(listingId);
+    function createSellerListingCard(listing) {
         const card = document.createElement('article');
         card.className = 'product-card seller-listing';
         card.dataset.category = listing.category || '';
+      card.dataset.listingId = listing.id || listing.title?.toLowerCase() || '';
+      card.dataset.sellerEmail = listing.sellerEmail || '';
+      card.dataset.sellerPhone = listing.sellerPhone || '';
         const image = document.createElement('div');
         image.className = 'product-image';
         image.textContent = listing.image ? '' : '🛍️';
@@ -1442,48 +1463,74 @@
         name.textContent = listing.title;
         const category = document.createElement('div');
         category.className = 'product-rating';
-        category.textContent = listing.category;
+        category.textContent = [listing.category, listing.town].filter(Boolean).join(' · ') || 'Community listing';
         const price = document.createElement('div');
         price.className = 'product-price';
         price.textContent = `KES ${Number(listing.price).toLocaleString()}`;
-        const lock = document.createElement('p');
-        lock.className = 'seller-lock';
-        lock.textContent = 'Details and seller contact locked (2 tokens)';
         const contact = document.createElement('p');
         contact.className = 'seller-contact';
-        contact.textContent = `Seller: ${listing.sellerName || 'Seller'} | Email: ${listing.sellerEmail || 'Not provided'} | Phone: ${listing.sellerPhone || 'Not provided'} | Details: ${listing.description}`;
-        const unlock = document.createElement('button');
-        unlock.className = 'product-button unlock-button';
-        unlock.type = 'button';
-        unlock.textContent = isUnlocked ? 'Details unlocked' : 'Unlock details (2 tokens)';
-        if (isUnlocked) {
-          lock.style.display = 'none';
-          contact.style.display = 'block';
-          unlock.disabled = true;
+        contact.style.display = 'block';
+        const sellerName = document.createElement('strong');
+        sellerName.textContent = `Seller: ${listing.businessName || listing.sellerName || 'Seller'}`;
+        contact.appendChild(sellerName);
+        if (listing.description) {
+          const description = document.createElement('span');
+          description.textContent = ` | ${listing.description}`;
+          contact.appendChild(description);
         }
-        unlock.addEventListener('click', () => {
-          if (tokenBalance < 2) {
-            lock.textContent = 'You need at least 2 tokens to unlock this seller.';
-            return;
-          }
-          tokenBalance -= 2;
-          updateTokenBalance();
-          unlockedListings.push(listingId);
-          localStorage.setItem(unlockedListingsKey, JSON.stringify(unlockedListings));
-          lock.style.display = 'none';
-          contact.style.display = 'block';
-          unlock.textContent = 'Details unlocked';
-          unlock.disabled = true;
-        });
-        info.append(name, category, price, lock, contact, unlock);
+        if (listing.sellerEmail) {
+          const email = document.createElement('a');
+          email.href = `mailto:${listing.sellerEmail}`;
+          email.textContent = listing.sellerEmail;
+          email.setAttribute('aria-label', `Email seller ${listing.sellerName || ''}`);
+          contact.appendChild(email);
+        }
+        if (listing.sellerPhone) {
+          const phone = document.createElement('a');
+          phone.href = `tel:${listing.sellerPhone}`;
+          phone.textContent = listing.sellerPhone;
+          phone.setAttribute('aria-label', `Call seller ${listing.sellerName || ''}`);
+          contact.appendChild(phone);
+        }
+        if (listing.studentMarketplace) {
+          const badge = document.createElement('span');
+          badge.className = 'student-listing-badge';
+          badge.textContent = 'Student listing';
+          info.appendChild(badge);
+        }
+        info.append(name, category, price, contact);
+        const addButton = document.createElement('button');
+        addButton.className = 'product-button';
+        addButton.type = 'button';
+        addButton.textContent = 'Add to Cart';
+        addButton.addEventListener('click', () => addToCart(card));
+        info.appendChild(addButton);
         card.append(image, info);
-        sellerListings.appendChild(card);
-      });
+        return card;
     }
 
-    updateTokenBalance();
+    function loadSellerListings() {
+      const listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+      sellerListings.replaceChildren();
+      studentListings.replaceChildren();
+      if (!listings.length) {
+        sellerListings.innerHTML = '<p class="marketplace-note">No recent products yet. <a href="sell.html">Post the first listing</a>.</p>';
+        studentListings.innerHTML = '<p class="marketplace-note">No student listings yet. Sellers can mark items for the student marketplace when posting.</p>';
+        return;
+      }
+      listings.sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0));
+      listings.slice(0, 8).forEach(listing => sellerListings.appendChild(createSellerListingCard(listing)));
+      const studentItems = listings.filter(listing => listing.studentMarketplace);
+      if (!studentItems.length) {
+        studentListings.innerHTML = '<p class="marketplace-note">No student listings yet. Sellers can mark items for the student marketplace when posting.</p>';
+        return;
+      }
+      studentItems.slice(0, 8).forEach(listing => studentListings.appendChild(createSellerListingCard(listing)));
+    }
+
     updateCartBadge();
     loadSellerListings();
+    if (new URLSearchParams(window.location.search).get('cart') === 'open') openCart();
 
     function viewProfile() {
       alert(`Profile Info:\nName: ${currentUser.fullname}\nEmail: ${currentUser.email}\nPhone: ${currentUser.phone}\nAccount Created: ${currentUser.createdAt}`);
