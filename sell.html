@@ -21,6 +21,9 @@
     label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; font-weight: 700; }
     input, select, textarea { width: 100%; padding: 12px; border: 1px solid #d7e7e8; border-radius: 3px; font: inherit; color: var(--navy); background: #fbfdfd; }
     textarea { min-height: 125px; resize: vertical; }
+    .student-listing-toggle { display: flex; align-items: center; gap: 10px; }
+    .student-listing-toggle input[type="checkbox"] { flex: 0 0 18px; width: 18px; height: 18px; margin: 0; padding: 0; }
+    .student-listing-toggle label { margin: 0; }
     input:focus, select:focus, textarea:focus { outline: 2px solid rgba(24, 169, 153, .25); border-color: var(--teal); }
     .wide { grid-column: 1 / -1; }
     .upload { display: flex; align-items: end; gap: 14px; }
@@ -45,7 +48,12 @@
       <form id="sell-form">
         <div><label for="title">Item name</label><input id="title" name="title" required maxlength="200" placeholder="e.g. Samsung Galaxy A54"></div>
         <div><label for="price">Price (KES)</label><input id="price" name="price" type="number" min="1" required placeholder="25000"></div>
-        <div><label for="category">Category</label><select id="category" name="category" required><option value="">Choose a category</option><option>Fashion</option><option>Electronics</option><option>Home</option><option>Sports</option><option>Gaming</option><option>Beauty</option><option>Books</option><option>Food</option></select></div>
+        <div><label for="category">Category</label><select id="category" name="category" required><option value="">Choose a category</option><optgroup label="Student marketplace"><option>Textbooks &amp; Revision Materials</option><option>Laptops &amp; Phones</option><option>Clothes &amp; Shoes</option><option>Furniture &amp; Hostel Essentials</option><option>Calculators &amp; Supplies</option><option>Other Student Essentials</option></optgroup><optgroup label="Other categories"><option>Fashion</option><option>Electronics</option><option>Home</option><option>Sports</option><option>Gaming</option><option>Beauty</option><option>Books</option><option>Food</option></optgroup></select></div>
+        <div><label for="town">Town or area (optional)</label><input id="town" name="town" maxlength="80" placeholder="e.g. Chuka"></div>
+        <div><label for="business-name">Business name (optional)</label><input id="business-name" name="businessName" maxlength="100" placeholder="Your shop or business"></div>
+        <div class="wide student-listing-toggle"><input id="student-marketplace" name="studentMarketplace" type="checkbox"><label for="student-marketplace">Include this item in the Students Marketplace</label></div>
+        <div><label for="seller-email">Contact email</label><input id="seller-email" name="sellerEmail" type="email" required></div>
+        <div><label for="seller-phone">Contact phone</label><input id="seller-phone" name="sellerPhone" type="tel" required></div>
         <div class="upload"><div><label for="image">Item image (up to 2 MB)</label><input id="image" name="image" type="file" accept="image/*"></div><img id="preview" alt="Selected item preview"></div>
         <div class="wide"><label for="description">Description</label><textarea id="description" name="description" required placeholder="Describe the condition, size, color, and important details"></textarea></div>
         <button class="wide" type="submit"><i class="fas fa-paper-plane"></i> Post item</button>
@@ -62,6 +70,11 @@
     const preview = document.getElementById('preview');
     const message = document.getElementById('message');
     const listingsKey = 'rodyxListings';
+    document.getElementById('seller-email').value = currentUser.email || '';
+    document.getElementById('seller-phone').value = currentUser.phone || '';
+    if (new URLSearchParams(window.location.search).get('audience') === 'students') {
+      document.getElementById('student-marketplace').checked = true;
+    }
 
     function readImageData(file) {
       if (!file) return Promise.resolve('');
@@ -108,11 +121,14 @@
         title: data.get('title'),
         price: data.get('price'),
         category: data.get('category'),
+        town: data.get('town').trim(),
+        businessName: data.get('businessName').trim(),
+        studentMarketplace: data.get('studentMarketplace') === 'on',
         description: data.get('description'),
         image: await readImageData(imageFile),
         sellerName: currentUser.fullname,
-        sellerEmail: currentUser.email,
-        sellerPhone: currentUser.phone
+        sellerEmail: data.get('sellerEmail').trim(),
+        sellerPhone: data.get('sellerPhone').trim()
       };
       const postData = new FormData();
       postData.append('title', listing.title);

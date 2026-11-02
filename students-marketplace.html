@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students Marketplace | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body data-marketplace="students" class="student">
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Marketplace navigation">
+      <a href="homepage.html">Home</a>
+      <a href="buy-sell.html">Buy &amp; Sell</a>
+      <a href="sell.html?audience=students">List a student item</a>
+      <a class="market-cart" href="homepage.html?cart=open"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart <span id="market-cart-count">0</span></a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro student">
+      <p class="market-eyebrow">For the student community</p>
+      <h1>Students Marketplace</h1>
+      <p>Trade textbooks and revision materials, laptops and phones, clothes and shoes, furniture and hostel essentials, calculators, and more. Search by product, category, seller, or area.</p>
+    </section>
+    <div class="market-controls">
+      <form class="market-filters" onsubmit="return false">
+        <input id="market-search" type="search" placeholder="Search student listings" aria-label="Search student listings">
+        <select id="market-category" aria-label="Filter by category">
+          <option value="">All student categories</option>
+          <option>Textbooks &amp; Revision Materials</option>
+          <option>Laptops &amp; Phones</option>
+          <option>Clothes &amp; Shoes</option>
+          <option>Furniture &amp; Hostel Essentials</option>
+          <option>Calculators &amp; Supplies</option>
+          <option>Other Student Essentials</option>
+          <option>Fashion</option><option>Electronics</option><option>Home</option><option>Sports</option><option>Gaming</option><option>Beauty</option><option>Books</option><option>Food</option>
+        </select>
+      </form>
+      <p class="market-result-count" id="market-result-count" aria-live="polite"></p>
+    </div>
+    <section class="market-products" id="market-products" aria-label="Student marketplace products"></section>
+    <div class="market-empty" id="market-empty" hidden>No student listings match your search yet. <a href="sell.html?audience=students">List the first student item</a>.</div>
+    <p class="market-status" id="market-status" role="status" aria-live="polite"></p>
+  </main>
+  <script src="marketplace-pages.js"></script>
+</body>
+</html>

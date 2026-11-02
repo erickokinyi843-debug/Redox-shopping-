@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body>
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Services navigation">
+      <a href="homepage.html">Home</a>
+      <a href="buy-sell.html">Buy &amp; Sell</a>
+      <a href="students-marketplace.html">Students Marketplace</a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro student">
+      <p class="market-eyebrow">Skills and local help</p>
+      <h1>Services Marketplace</h1>
+      <p>Advertise your skills or find local help: graphic design, website development, photography, laundry, hairdressing and barbering, tutoring, and custom services.</p>
+    </section>
+    <div class="services-layout">
+      <section class="service-panel" aria-labelledby="service-form-title">
+        <h2 id="service-form-title">Advertise a service</h2>
+        <form class="service-form" id="service-form">
+          <div>
+            <label for="service-category">Skill category</label>
+            <select id="service-category" name="category" required>
+              <option value="">Choose a skill</option>
+              <option>Graphic Design</option>
+              <option>Website Development</option>
+              <option>Photography</option>
+              <option>Laundry Services</option>
+              <option>Hairdressing &amp; Barbering</option>
+              <option>Tutoring</option>
+              <option value="custom">Other / specific skill</option>
+            </select>
+          </div>
+          <div id="custom-skill-field" hidden>
+            <label for="custom-skill">Your specific skill</label>
+            <input id="custom-skill" name="customSkill" maxlength="80" placeholder="e.g. Phone repair">
+          </div>
+          <div>
+            <label for="service-title">Service title</label>
+            <input id="service-title" name="title" maxlength="100" required placeholder="e.g. One-on-one biology tutoring">
+          </div>
+          <div>
+            <label for="service-description">Description</label>
+            <textarea id="service-description" name="description" maxlength="600" required placeholder="Describe your experience, availability, and what you offer"></textarea>
+          </div>
+          <div>
+            <label for="service-rate">Rate (optional)</label>
+            <input id="service-rate" name="rate" maxlength="80" placeholder="e.g. KES 500 per hour">
+          </div>
+          <div>
+            <label for="service-area">Town or area (optional)</label>
+            <input id="service-area" name="area" maxlength="80" placeholder="e.g. Chuka">
+          </div>
+          <div>
+            <label for="provider-name">Your name</label>
+            <input id="provider-name" name="providerName" maxlength="100" required>
+          </div>
+          <div>
+            <label for="provider-email">Contact email</label>
+            <input id="provider-email" name="email" type="email" required>
+          </div>
+          <div>
+            <label for="provider-phone">Contact phone</label>
+            <input id="provider-phone" name="phone" type="tel" required>
+          </div>
+          <button class="service-submit" type="submit">Publish service</button>
+          <p class="service-message" id="service-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="service-panel" aria-labelledby="service-list-title">
+        <h2 id="service-list-title">Find a service</h2>
+        <div class="service-search">
+          <input id="service-search" type="search" aria-label="Search services" placeholder="Search skills, providers, or areas">
+        </div>
+        <div class="service-listings" id="service-listings"></div>
+      </section>
+    </div>
+  </main>
+  <script src="services.js"></script>
+</body>
+</html>

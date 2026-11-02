@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buy &amp; Sell | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body data-marketplace="all">
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Marketplace navigation">
+      <a href="homepage.html">Home</a>
+      <a href="sell.html">Sell an item</a>
+      <a class="market-cart" href="homepage.html?cart=open"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Cart <span id="market-cart-count">0</span></a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro">
+      <p class="market-eyebrow">Community marketplace</p>
+      <h1>Buy &amp; Sell</h1>
+      <p>Find community-listed products, contact sellers directly, or post an item of your own.</p>
+    </section>
+    <div class="market-controls">
+      <form class="market-filters" onsubmit="return false">
+        <input id="market-search" type="search" placeholder="Search products, sellers, or areas" aria-label="Search products, sellers, or areas">
+        <select id="market-category" aria-label="Filter by category">
+          <option value="">All categories</option><option>Fashion</option><option>Electronics</option><option>Home</option><option>Sports</option><option>Gaming</option><option>Beauty</option><option>Books</option><option>Food</option>
+        </select>
+      </form>
+      <p class="market-result-count" id="market-result-count" aria-live="polite"></p>
+    </div>
+    <section class="market-products" id="market-products" aria-label="Products for sale"></section>
+    <div class="market-empty" id="market-empty" hidden>No listings match your search yet. <a href="sell.html">Post an item</a> to get started.</div>
+    <p class="market-status" id="market-status" role="status" aria-live="polite"></p>
+  </main>
+  <script src="marketplace-pages.js"></script>
+</body>
+</html>

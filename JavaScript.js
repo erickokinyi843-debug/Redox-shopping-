@@ -15,6 +15,18 @@ const signupButton = signupForm.querySelector('button[type="submit"]');
 const loginEmail = document.getElementById('login-email');
 const loginPassword = document.getElementById('login-password');
 
+document.querySelectorAll('[data-password-toggle]').forEach(button => {
+  button.addEventListener('click', () => {
+    const passwordInput = document.getElementById(button.dataset.passwordToggle);
+    const showPassword = passwordInput.type === 'password';
+    passwordInput.type = showPassword ? 'text' : 'password';
+    button.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
+    button.setAttribute('aria-pressed', String(showPassword));
+    button.title = showPassword ? 'Hide password' : 'Show password';
+    button.innerHTML = `<i class="fas fa-${showPassword ? 'eye-slash' : 'eye'}" aria-hidden="true"></i>`;
+  });
+});
+
 // API Configuration
 const API_BASE_URL = 'http://localhost:8000/api';
 
@@ -307,7 +319,7 @@ loginForm.addEventListener('submit', async (e) => {
       return;
     }
     
-    // Successful login - store tokens
+    // Successful login - store session info
     localStorage.setItem('access_token', data.access);
     localStorage.setItem('refresh_token', data.refresh);
     const localAccount = getLocalAccounts()[email];
