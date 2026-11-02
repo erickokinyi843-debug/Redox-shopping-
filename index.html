@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Portal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="auth-layout">
+    <section class="brand-panel" aria-labelledby="brand-title">
+      <p class="brand-name"><span class="brand-mark" aria-hidden="true">R</span> RODYX</p>
+      <p class="brand-eyebrow">YOUR SHOPPING HUB</p>
+      <h1 id="brand-title">Good finds. Great connections.</h1>
+      <p class="brand-description">
+        Discover products, explore community listings, and connect with local sellers.
+        RODYX brings your shopping and selling together in one easy place.
+      </p>
+      <div class="brand-highlights">
+        <div class="brand-highlight">
+          <span class="highlight-number">01</span>
+          <span><strong>Explore</strong><small>Shop across your favorite categories.</small></span>
+        </div>
+        <div class="brand-highlight">
+          <span class="highlight-number">02</span>
+          <span><strong>Connect</strong><small>Find great items from the community.</small></span>
+        </div>
+        <div class="brand-highlight">
+          <span class="highlight-number">03</span>
+          <span><strong>Share</strong><small>List your own items for others to discover.</small></span>
+        </div>
+      </div>
+      <p class="brand-note">A marketplace made for everyday discoveries.</p>
+    </section>
+
+    <section class="auth-container" aria-labelledby="form-title">
+      <div class="auth-header">
+        <p class="form-eyebrow">GET STARTED WITH RODYX</p>
+        <h2 id="form-title">Create Account</h2>
+        <p id="toggle-text">
+          Already have an account? <a href="#" id="toggle-btn">Sign In</a>
+        </p>
+      </div>
+
+      <!-- Sign Up Form (Visible by Default) -->
+      <form id="signup-form" class="auth-form">
+        <div class="input-group">
+          <label for="signup-fullname">Full Name</label>
+          <input type="text" id="signup-fullname" required placeholder="John Doe">
+        </div>
+        <div class="input-group">
+          <label for="signup-phone">Phone Number</label>
+          <input type="tel" id="signup-phone" required placeholder="+254 700 000 000">
+        </div>
+        <div class="input-group">
+          <label for="signup-email">Email Address</label>
+          <input type="email" id="signup-email" required placeholder="name@example.com">
+        </div>
+        <div class="input-group">
+          <label for="signup-password">New Password</label>
+          <input type="password" id="signup-password" required placeholder="••••••••">
+        </div>
+        <div class="input-group">
+          <label for="signup-confirm-password">Confirm Password</label>
+          <input type="password" id="signup-confirm-password" required placeholder="••••••••">
+        </div>
+        <div class="input-group checkbox-group">
+          <input type="checkbox" id="terms-check" required>
+          <label for="terms-check">I agree to the Terms & Conditions</label>
+        </div>
+        <button type="submit" class="btn">Sign Up</button>
+      </form>
+
+      <!-- Sign In Form (Hidden by Default) -->
+      <form id="login-form" class="auth-form hidden">
+        <div class="input-group">
+          <label for="login-email">Email Address</label>
+          <input type="email" id="login-email" required placeholder="name@example.com">
+        </div>
+        <div class="input-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="JavaScript.js"></script>
+</body>
+</html>
