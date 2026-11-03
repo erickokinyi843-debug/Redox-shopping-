@@ -1,3 +1,3 @@
 window.APP_CONFIG = {
-  apiBaseUrl: 'https://yourusername.pythonanywhere.com'
+  apiBaseUrl: 'https://rodyx.pythonanywhere.com'
 };
