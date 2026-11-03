@@ -1118,9 +1118,8 @@
       <div class="products-grid">
         <div class="product-card" style="grid-column: 1 / -1; padding: 28px;">
           <div class="product-info" style="padding: 0;">
-            <div class="product-name">No live products yet</div>
-            <div class="product-rating">This storefront is ready for real listings from your PythonAnywhere backend.</div>
-            <div class="product-price">Publish seller items to populate this section.</div>
+            <div class="product-name">Explore the marketplace</div>
+            <div class="product-rating">Browse recent community listings above or post an item of your own.</div>
           </div>
         </div>
       </div>
@@ -1132,7 +1131,7 @@
         <div class="product-card" style="grid-column: 1 / -1; padding: 28px;">
           <div class="product-info" style="padding: 0;">
             <div class="product-name">No current deals</div>
-            <div class="product-rating">Once the backend is connected, sales and promotions can be loaded here dynamically.</div>
+            <div class="product-rating">Deals and promotions are not available yet.</div>
           </div>
         </div>
       </div>
@@ -1747,7 +1746,11 @@
         if (!response.ok) throw new Error(`Listings API returned ${response.status}.`);
         listings = await response.json();
         if (!Array.isArray(listings)) throw new Error('Listings API returned an invalid response.');
-        localStorage.setItem('rodyxListings', JSON.stringify(listings));
+        try {
+          localStorage.setItem('rodyxListings', JSON.stringify(listings));
+        } catch (cacheError) {
+          console.warn('Shared listings loaded but could not be cached in this browser:', cacheError);
+        }
       } catch (error) {
         console.warn('Could not load shared listings; using this browser cache:', error);
         try {

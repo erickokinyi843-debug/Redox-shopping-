@@ -4,9 +4,9 @@ Redox Shopping is a static HTML/CSS/JavaScript marketplace with a Flask API. The
 
 ## What is shared by the API
 
-The Flask API stores marketplace listings, wanted posts, and orders as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, and order submission. Item listing images can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
+The Flask API stores marketplace listings, wanted posts, orders, and seller verification requests as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, order submission, and seller verification. Listing images and seller verification documents can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
 
-Other features—including sign-in, account records, the admin dashboard, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. The admin dashboard does not manage the API's shared records.
+Other features—including sign-in, account records, most of the admin dashboard, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. Seller verification requests and decisions are shared through the API. The admin dashboard requires the server's `ADMIN_API_KEY` to view and decide those requests.
 
 The JSON-file storage is a small-project starting point, not a production database. Back up `backend/data/`; use a database and server-side authentication before handling real accounts, sensitive data, payments, or high traffic.
 
@@ -47,10 +47,13 @@ The JSON-file storage is a small-project starting point, not a production databa
    # Replace this with your Vercel origin after the frontend is deployed.
    os.environ["CORS_ORIGINS"] = "https://your-project.vercel.app"
 
+   # Generate a unique secret in the PythonAnywhere console and keep it out of Git.
+   os.environ["ADMIN_API_KEY"] = "replace-with-a-long-random-secret"
+
    from app import app as application
    ```
 
-   The origin must be the exact website origin, with no trailing slash. For a custom domain, list both domains separated by a comma, for example `"https://your-project.vercel.app,https://shop.example.com"`.
+   Generate the secret with `python -c "import secrets; print(secrets.token_urlsafe(32))"` and replace the example value. Do not commit the real key or enter it in frontend files. The origin must be the exact website origin, with no trailing slash. For a custom domain, list both domains separated by a comma, for example `"https://your-project.vercel.app,https://shop.example.com"`.
 7. Click **Reload** in the PythonAnywhere Web tab. Open `https://yourusername.pythonanywhere.com/api/health`; a JSON response with `"status": "ok"` confirms the API is running.
 
 ## Deploy the frontend to Vercel
@@ -75,8 +78,9 @@ The JSON-file storage is a small-project starting point, not a production databa
    - `Sell an item`: post a listing, then confirm it appears on another browser/device.
    - `Wanted`: create and view a post.
    - Add an item to the cart and submit an order. Orders are recorded by the API, but the site does not process payments.
+   - Submit a seller verification request. In the admin dashboard, sign in, enter the server `ADMIN_API_KEY` in the seller verification panel, and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically. Previously saved applications in that admin browser are migrated to the API the first time it connects.
 
-If requests fail, first open the PythonAnywhere `/api/health` URL. Then check that the frontend's `config.js` has the correct API URL, `CORS_ORIGINS` exactly matches the Vercel origin, and the PythonAnywhere Web app was reloaded. The PythonAnywhere **Error log** is available from the Web tab.
+If requests fail, first open the PythonAnywhere `/api/health` URL. Then check that the frontend's `config.js` has the correct API URL, `CORS_ORIGINS` exactly matches the Vercel origin, `ADMIN_API_KEY` is set for verification administration, and the PythonAnywhere Web app was reloaded. The PythonAnywhere **Error log** is available from the Web tab.
 
 ## Local development
 
