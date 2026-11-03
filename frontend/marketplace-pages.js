@@ -16,7 +16,11 @@ async function loadListings() {
       if (response.ok) {
         const listings = await response.json();
         if (Array.isArray(listings)) {
-          localStorage.setItem('rodyxListings', JSON.stringify(listings));
+          try {
+            localStorage.setItem('rodyxListings', JSON.stringify(listings));
+          } catch (error) {
+            console.warn('Marketplace listings loaded but could not be cached in this browser:', error);
+          }
           return listings;
         }
       }

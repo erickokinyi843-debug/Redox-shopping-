@@ -371,7 +371,11 @@
         if (!response.ok) throw new Error(`Wanted posts API returned ${response.status}.`);
         const posts = await response.json();
         if (!Array.isArray(posts)) throw new Error('Wanted posts API returned an invalid response.');
-        localStorage.setItem(wantedKey, JSON.stringify(posts));
+        try {
+          localStorage.setItem(wantedKey, JSON.stringify(posts));
+        } catch (cacheError) {
+          console.warn('Wanted posts loaded from the API but could not be cached in this browser:', cacheError);
+        }
         renderWantedPosts(posts);
       } catch (error) {
         console.warn('Could not load shared wanted posts; using this browser cache:', error);
@@ -415,7 +419,11 @@
 
         const posts = readWantedPosts();
         posts.unshift(responseData);
-        localStorage.setItem(wantedKey, JSON.stringify(posts));
+        try {
+          localStorage.setItem(wantedKey, JSON.stringify(posts));
+        } catch (cacheError) {
+          console.warn('Wanted post was published, but could not be cached in this browser:', cacheError);
+        }
         form.reset();
         buyerEmailInput.value = currentUser.email || '';
         buyerPhoneInput.value = currentUser.phone || '';

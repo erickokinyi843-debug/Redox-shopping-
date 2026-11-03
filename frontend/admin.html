@@ -97,7 +97,7 @@
   </main>
   <main id="admin-dashboard" hidden>
     <div class="topline"><div><span class="admin-kicker">CHUKA RODYX SHOP MANAGEMENT CONSOLE</span><h1>Dashboard Overview</h1><p>Manage orders, customers, and marketplace listings.</p></div><button class="refresh" type="button" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-    <div class="notice" id="notice">This dashboard is configured for local development and should be backed by a secure server-side admin API before production hosting.</div>
+    <div class="notice" id="notice">Most dashboard data is local to this browser. Seller verification requests are shared and require the server admin API key.</div>
     <section class="stats">
       <div class="stat"><i class="fas fa-users"></i><strong id="users-count">0</strong><span>Customers</span></div>
       <div class="stat"><i class="fas fa-box-open"></i><strong id="products-count">0</strong><span>Product listings</span></div>
@@ -118,7 +118,16 @@
       </div>
       <div>
         <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-toolbar"><input class="search" id="customer-search" type="search" placeholder="Search customers" aria-label="Search customers"></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
-        <section class="panel"><h2><i class="fas fa-user-check"></i>Seller verification requests</h2><div class="table-toolbar"><input class="search" id="verification-search" type="search" placeholder="Search verification requests" aria-label="Search verification requests"></div><div class="table-wrap"><table><thead><tr><th>Seller</th><th>Email</th><th>Phone</th><th>Document</th><th>Status</th><th>Action</th></tr></thead><tbody id="seller-verification-table"></tbody></table></div></section>
+        <section class="panel">
+          <h2><i class="fas fa-user-check"></i>Seller verification requests</h2>
+          <form id="verification-api-form" class="table-toolbar">
+            <input class="search" id="verification-api-key" type="password" autocomplete="off" placeholder="Server admin API key" aria-label="Server admin API key" required>
+            <button class="refresh" type="submit">Connect</button>
+          </form>
+          <p id="verification-api-status" role="status" aria-live="polite"></p>
+          <div class="table-toolbar"><input class="search" id="verification-search" type="search" placeholder="Search verification requests" aria-label="Search verification requests"></div>
+          <div class="table-wrap"><table><thead><tr><th>Seller</th><th>Email</th><th>Phone</th><th>Document</th><th>Status</th><th>Action</th></tr></thead><tbody id="seller-verification-table"></tbody></table></div>
+        </section>
         <section class="panel"><h2><i class="fas fa-bolt"></i>Quick links</h2><div class="shortcuts"><a href="homepage.html"><i class="fas fa-store"></i>Storefront</a><a href="sell.html"><i class="fas fa-plus"></i>Post a listing</a></div></section>
       </div>
     </div>
@@ -137,6 +146,7 @@
       </div>
     </section>
   </main>
+  <script src="config.js"></script>
   <script>
     const adminAccountKey = 'rodyxAdminAccount';
     const adminSessionKey = 'rodyxAdminSession';
@@ -144,6 +154,8 @@
     const listingsKey = 'rodyxListings';
     const sellerVerificationKey = 'rodyxSellerVerification';
     const sellerVerificationApplicationsKey = 'rodyxSellerVerificationApplications';
+    const sellerVerificationAdminKey = 'rodyxSellerVerificationAdminKey';
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const managedCollections = [
       { type: 'Product', key: 'rodyxListings', title: item => item.title, owner: item => item.sellerName || item.sellerEmail, details: item => `${item.category || ''} ${item.description || ''}` },
       { type: 'Wanted', key: 'rodyxWantedPosts', title: item => item.title, owner: item => item.buyerName || item.buyerEmail, details: item => `${item.category || ''} ${item.town || ''} ${item.description || ''} Budget ${item.budget || ''}` },
@@ -209,6 +221,7 @@
 
     document.getElementById('admin-signout').addEventListener('click', () => {
       sessionStorage.removeItem(adminSessionKey);
+      sessionStorage.removeItem(sellerVerificationAdminKey);
       showAdminAccess('You have signed out of the admin panel.');
     });
 
@@ -476,10 +489,9 @@
       filterRows('listing-search', target);
     }
 
-    function renderSellerVerificationRequests() {
+    function renderSellerVerificationRequests(requests) {
       const target = document.getElementById('seller-verification-table');
       target.replaceChildren();
-      const requests = readJSON(sellerVerificationApplicationsKey, []);
 
       requests.forEach(request => {
         const row = document.createElement('tr');
@@ -503,14 +515,16 @@
         approve.type = 'button';
         approve.className = 'remove-listing';
         approve.textContent = 'Approve';
-        approve.addEventListener('click', () => approveSellerApplication(request.email));
+        approve.disabled = request.status === 'approved';
+        approve.addEventListener('click', () => updateSellerVerification(request.email, 'approved'));
 
         const reject = document.createElement('button');
         reject.type = 'button';
         reject.className = 'remove-user';
         reject.textContent = 'Reject';
         reject.style.marginLeft = '10px';
-        reject.addEventListener('click', () => rejectSellerApplication(request.email));
+        reject.disabled = request.status === 'rejected';
+        reject.addEventListener('click', () => updateSellerVerification(request.email, 'rejected'));
 
         actions.append(approve, reject);
         row.appendChild(actions);
@@ -523,6 +537,121 @@
         row.dataset.search = `${row.dataset.search} ${row.textContent}`.toLowerCase();
       });
       filterRows('verification-search', target);
+    }
+
+    async function loadSellerVerificationRequests() {
+      const status = document.getElementById('verification-api-status');
+      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      if (!apiBaseUrl) {
+        status.textContent = 'The API URL is not configured.';
+        renderSellerVerificationRequests([]);
+        return;
+      }
+      if (!adminKey) {
+        status.textContent = 'Enter the server ADMIN_API_KEY to load shared applications.';
+        renderSellerVerificationRequests([]);
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/admin/seller-verifications`, {
+          headers: { 'X-Admin-Key': adminKey }
+        });
+        let applications = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(applications.error || `The API returned ${response.status}.`);
+        if (!Array.isArray(applications)) throw new Error('The API returned an invalid application list.');
+
+        const migration = await migrateLegacySellerVerifications(applications, adminKey);
+        if (migration.migrated || migration.failed) {
+          const refreshedResponse = await fetch(`${apiBaseUrl}/api/admin/seller-verifications`, {
+            headers: { 'X-Admin-Key': adminKey }
+          });
+          applications = await refreshedResponse.json().catch(() => ({}));
+          if (!refreshedResponse.ok || !Array.isArray(applications)) {
+            throw new Error(applications.error || `The API returned ${refreshedResponse.status}.`);
+          }
+          status.textContent = migration.failed
+            ? `Connected; migrated ${migration.migrated} old request(s), but ${migration.failed} could not be migrated.`
+            : `Connected; migrated ${migration.migrated} old browser-saved request(s).`;
+        } else {
+          status.textContent = 'Connected to the shared seller verification service.';
+        }
+        document.getElementById('verification-api-key').value = adminKey;
+        renderSellerVerificationRequests(applications);
+        document.getElementById('verification-count').textContent = applications.filter(item => item.status === 'pending').length;
+      } catch (error) {
+        status.textContent = `Could not load shared verification requests. ${error.message}`;
+        renderSellerVerificationRequests([]);
+        console.error('Seller verification requests could not be loaded:', error);
+      }
+    }
+
+    async function migrateLegacySellerVerifications(serverApplications, adminKey) {
+      const localApplications = readJSON(sellerVerificationApplicationsKey, []);
+      if (!Array.isArray(localApplications) || !localApplications.length) return { migrated: 0, failed: 0 };
+      const localStatuses = readJSON(sellerVerificationKey, {});
+      const knownEmails = new Set(serverApplications.map(item => String(item.email || '').toLowerCase()));
+      const localStatusFor = email => Object.entries(localStatuses)
+        .find(([storedEmail]) => storedEmail.toLowerCase() === email)?.[1]?.status;
+      let migrated = 0;
+      let failed = 0;
+
+      for (const application of localApplications) {
+        const email = String(application.email || '').trim().toLowerCase();
+        if (!email || knownEmails.has(email)) continue;
+        try {
+          const createResponse = await fetch(`${apiBaseUrl}/api/seller-verifications`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              fullName: application.fullName || '',
+              shopName: application.shopName || '',
+              phone: application.phone || '',
+              notes: application.notes || '',
+              documentName: application.documentName || 'Supporting document',
+              documentType: application.documentType || '',
+              documentData: application.documentData || ''
+            })
+          });
+          const created = await createResponse.json().catch(() => ({}));
+          if (!createResponse.ok) throw new Error(created.error || `The API returned ${createResponse.status}.`);
+
+          knownEmails.add(email);
+          migrated += 1;
+          const oldStatus = String(localStatusFor(email) || application.status || 'pending').toLowerCase();
+          if (oldStatus === 'approved' || oldStatus === 'rejected') {
+            const decisionResponse = await fetch(`${apiBaseUrl}/api/admin/seller-verifications/${encodeURIComponent(email)}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+              body: JSON.stringify({ status: oldStatus })
+            });
+            const decision = await decisionResponse.json().catch(() => ({}));
+            if (!decisionResponse.ok) throw new Error(decision.error || `The API returned ${decisionResponse.status}.`);
+          }
+        } catch (error) {
+          failed += 1;
+          console.error(`Could not migrate the old seller verification request for ${email}:`, error);
+        }
+      }
+      return { migrated, failed };
+    }
+
+    async function updateSellerVerification(email, decision) {
+      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/admin/seller-verifications/${encodeURIComponent(email)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+          body: JSON.stringify({ status: decision })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+        document.getElementById('verification-api-status').textContent = `Seller ${email} marked ${decision}.`;
+        await loadSellerVerificationRequests();
+      } catch (error) {
+        document.getElementById('verification-api-status').textContent = `Could not update seller verification. ${error.message}`;
+        console.error('Seller verification decision failed:', error);
+      }
     }
 
     function getManagedContent() {
@@ -591,48 +720,6 @@
       });
       if (!target.children.length) emptyRow(target, 6, 'No community content has been posted yet.');
       filterRows('content-search', target);
-    }
-
-    function approveSellerApplication(email) {
-      const applications = readJSON(sellerVerificationApplicationsKey, []);
-      const verificationState = readJSON(sellerVerificationKey, {});
-      const selected = applications.find(item => item.email.toLowerCase() === String(email).toLowerCase());
-      if (!selected) return;
-
-      selected.status = 'approved';
-      verificationState[selected.email] = {
-        email: selected.email,
-        status: 'approved',
-        name: selected.fullName || selected.email,
-        phone: selected.phone || '',
-        approvedAt: new Date().toISOString(),
-        approvedBy: 'admin'
-      };
-
-      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(applications));
-      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
-      loadDashboard();
-    }
-
-    function rejectSellerApplication(email) {
-      const applications = readJSON(sellerVerificationApplicationsKey, []);
-      const verificationState = readJSON(sellerVerificationKey, {});
-      const selected = applications.find(item => item.email.toLowerCase() === String(email).toLowerCase());
-      if (!selected) return;
-
-      selected.status = 'rejected';
-      verificationState[selected.email] = {
-        email: selected.email,
-        status: 'rejected',
-        name: selected.fullName || selected.email,
-        phone: selected.phone || '',
-        rejectedAt: new Date().toISOString(),
-        rejectedBy: 'admin'
-      };
-
-      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(applications));
-      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
-      loadDashboard();
     }
 
     function removeListing(id) {
@@ -719,7 +806,6 @@
       const accommodation = readJSON('rodyxAccommodation', []);
       const events = readJSON('rodyxEvents', []);
       const reviews = readJSON('rodyxReviews', []);
-      const verificationRequests = readJSON(sellerVerificationApplicationsKey, []);
       const orders = getOrders();
       const openOrders = orders.filter(order => !['Delivered', 'Cancelled'].includes(order.status));
       const revenue = orders.filter(order => order.status !== 'Cancelled').reduce((total, order) => total + Number(order.total || 0), 0);
@@ -731,14 +817,14 @@
       document.getElementById('rental-count').textContent = rentals.length + accommodation.length;
       document.getElementById('events-count').textContent = events.length;
       document.getElementById('reviews-count').textContent = reviews.length;
-      document.getElementById('verification-count').textContent = verificationRequests.filter(request => request.status === 'pending').length;
+      document.getElementById('verification-count').textContent = '…';
       document.getElementById('revenue-count').textContent = money(revenue);
       document.getElementById('stock-count').textContent = openOrders.length;
 
       renderOrders(orders);
       renderListings(listings);
       renderMarketplaceContent();
-      renderSellerVerificationRequests();
+      loadSellerVerificationRequests();
       renderSupportInbox();
 
       const users = document.getElementById('users-table');
@@ -768,6 +854,13 @@
     document.getElementById('content-search').addEventListener('input', () => filterRows('content-search', document.getElementById('content-table')));
     document.getElementById('customer-search').addEventListener('input', () => filterRows('customer-search', document.getElementById('users-table')));
     document.getElementById('verification-search').addEventListener('input', () => filterRows('verification-search', document.getElementById('seller-verification-table')));
+    document.getElementById('verification-api-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const adminKey = document.getElementById('verification-api-key').value.trim();
+      if (!adminKey) return;
+      sessionStorage.setItem(sellerVerificationAdminKey, adminKey);
+      loadSellerVerificationRequests();
+    });
     if (readJSON(adminAccountKey, null) && sessionStorage.getItem(adminSessionKey) === 'authenticated') openAdminDashboard();
     else showAdminAccess();
   </script>

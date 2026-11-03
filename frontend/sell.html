@@ -70,7 +70,7 @@
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser.email) window.location.href = 'index.html';
-    const apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.apiBaseUrl ? window.APP_CONFIG.apiBaseUrl.replace(/\/$/, '') : 'http://localhost:5000');
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const form = document.getElementById('sell-form');
     const imageInput = document.getElementById('image');
     const maxImageSizeBytes = 5 * 1024 * 1024;
@@ -78,7 +78,6 @@
     const message = document.getElementById('message');
     const verificationBanner = document.getElementById('verification-banner');
     const listingsKey = 'rodyxListings';
-    const verificationKey = 'rodyxSellerVerification';
 
     function readJSON(key, fallback) {
       try {
@@ -89,10 +88,12 @@
       }
     }
 
-    function getSellerVerificationStatus(email) {
-      const statuses = readJSON(verificationKey, {});
-      const status = statuses[email || ''];
-      return status && status.status === 'approved' ? status : null;
+    async function getSellerVerificationStatus(email) {
+      if (!apiBaseUrl) throw new Error('The API URL is not configured.');
+      const response = await fetch(`${apiBaseUrl}/api/seller-verifications/status?email=${encodeURIComponent(email || '')}`);
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+      return result.status?.status === 'approved' ? result.status : null;
     }
 
     function getListingCountForSeller(email) {
@@ -100,8 +101,14 @@
       return listings.filter(listing => String(listing.sellerEmail || '').toLowerCase() === String(email || '').toLowerCase()).length;
     }
 
-    function renderVerificationBanner() {
-      const verifiedSeller = getSellerVerificationStatus(currentUser.email);
+    async function renderVerificationBanner() {
+      let verifiedSeller;
+      try {
+        verifiedSeller = await getSellerVerificationStatus(currentUser.email);
+      } catch (error) {
+        verificationBanner.textContent = `Could not check your seller verification status. ${error.message}`;
+        return;
+      }
       if (verifiedSeller) {
         verificationBanner.innerHTML = '<strong>Verified seller:</strong> Your account is approved. You can post without the default selling restrictions and are shown with a verified badge.';
         return;
@@ -134,9 +141,13 @@
     }
 
     function saveListingLocally(listing) {
-      const listings = JSON.parse(localStorage.getItem(listingsKey) || '[]');
-      listings.unshift(listing);
-      localStorage.setItem(listingsKey, JSON.stringify(listings));
+      try {
+        const listings = JSON.parse(localStorage.getItem(listingsKey) || '[]');
+        listings.unshift(listing);
+        localStorage.setItem(listingsKey, JSON.stringify(listings));
+      } catch (error) {
+        console.warn('Listing was published, but could not be cached in this browser:', error);
+      }
     }
 
     imageInput.addEventListener('change', () => {
@@ -163,7 +174,13 @@
         return;
       }
 
-      const verifiedSeller = getSellerVerificationStatus(currentUser.email);
+      let verifiedSeller;
+      try {
+        verifiedSeller = await getSellerVerificationStatus(currentUser.email);
+      } catch (error) {
+        message.textContent = `Could not check your seller verification status. ${error.message}`;
+        return;
+      }
       if (!verifiedSeller && getListingCountForSeller(currentUser.email) >= 1) {
         message.textContent = 'This seller account is still unverified and has reached the posting limit. Please complete verification to continue selling.';
         return;

@@ -132,7 +132,7 @@
         </div>
         <div class="wide">
           <label for="document-upload">Upload supporting document</label>
-          <input id="document-upload" name="document" type="file" accept="image/*,.pdf" required>
+          <input id="document-upload" name="document" type="file" accept="image/jpeg,image/png,image/gif,image/webp,.pdf" required>
         </div>
         <div class="wide">
           <label for="notes">Why do you want to sell on the platform?</label>
@@ -144,43 +144,35 @@
     </section>
   </main>
 
+  <script src="config.js"></script>
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser.email) window.location.href = 'index.html';
 
-    const verificationKey = 'rodyxSellerVerification';
-    const applicationsKey = 'rodyxSellerVerificationApplications';
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
+    const maxDocumentSizeBytes = 5 * 1024 * 1024;
     const statusBox = document.getElementById('status-box');
     const form = document.getElementById('verification-form');
     const message = document.getElementById('message');
-
-    function readJSON(key, fallback) {
-      try {
-        const value = JSON.parse(localStorage.getItem(key) || 'null');
-        return value ?? fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function getStatus() {
-      const status = readJSON(verificationKey, {});
-      return status[currentUser.email] || null;
-    }
+    let verificationStatus = null;
+    let statusLoadError = '';
 
     function renderStatus() {
-      const status = getStatus();
-      if (!status) {
+      if (statusLoadError) {
+        statusBox.textContent = `Could not check verification status. ${statusLoadError}`;
+        return;
+      }
+      if (!verificationStatus) {
         statusBox.innerHTML = '<strong>Verification status:</strong> Not submitted yet. You can apply to become a verified seller.';
         return;
       }
 
-      if (status.status === 'approved') {
+      if (verificationStatus.status === 'approved') {
         statusBox.innerHTML = '<strong>Verification status:</strong> Approved. Your profile is verified and you can access the full selling benefits.';
         return;
       }
 
-      if (status.status === 'pending') {
+      if (verificationStatus.status === 'pending') {
         statusBox.innerHTML = '<strong>Verification status:</strong> Pending admin approval. You are still limited to a basic selling level until approval is complete.';
         return;
       }
@@ -188,11 +180,52 @@
       statusBox.innerHTML = '<strong>Verification status:</strong> Rejected. Please update your details and resubmit, or ask the admin for more guidance.';
     }
 
+    async function refreshVerificationStatus() {
+      if (!apiBaseUrl) {
+        statusLoadError = 'The API URL is not configured.';
+        renderStatus();
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/seller-verifications/status?email=${encodeURIComponent(currentUser.email)}`);
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+        verificationStatus = result.status || null;
+        statusLoadError = '';
+      } catch (error) {
+        statusLoadError = error.message || 'Check your internet connection and try again.';
+      }
+      renderStatus();
+    }
+
+    function readDocument(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.addEventListener('load', () => resolve(reader.result));
+        reader.addEventListener('error', () => reject(new Error('The selected document could not be read.')));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function getDocumentType(file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+      if (allowedTypes.includes(file.type.toLowerCase())) return file.type.toLowerCase();
+      const extension = file.name.split('.').pop().toLowerCase();
+      return ({
+        pdf: 'application/pdf',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        gif: 'image/gif',
+        webp: 'image/webp'
+      })[extension] || '';
+    }
+
     document.getElementById('full-name').value = currentUser.fullname || '';
     document.getElementById('phone-number').value = currentUser.phone || '';
     document.getElementById('email-address').value = currentUser.email || '';
 
-    form.addEventListener('submit', async (event) => {
+    form.addEventListener('submit', async event => {
       event.preventDefault();
       const data = new FormData(form);
       const file = data.get('document');
@@ -200,56 +233,68 @@
         message.textContent = 'Please upload a supporting document.';
         return;
       }
-
-      const currentStatus = getStatus();
-      if (currentStatus && currentStatus.status === 'approved') {
+      if (file.size > maxDocumentSizeBytes) {
+        message.textContent = 'Choose a supporting document no larger than 5 MB.';
+        return;
+      }
+      const documentType = getDocumentType(file);
+      if (!['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(documentType)) {
+        message.textContent = 'Upload a PDF, JPEG, PNG, GIF, or WebP supporting document.';
+        return;
+      }
+      await refreshVerificationStatus();
+      if (statusLoadError) {
+        message.textContent = `Could not submit the request. ${statusLoadError}`;
+        return;
+      }
+      if (verificationStatus?.status === 'approved') {
         message.textContent = 'This account is already approved as a verified seller.';
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const application = {
-          id: `seller-verify-${Date.now()}`,
-          email: currentUser.email,
-          fullName: String(data.get('fullName') || '').trim(),
-          shopName: String(data.get('shopName') || '').trim(),
-          phone: String(data.get('phone') || '').trim(),
-          notes: String(data.get('notes') || '').trim(),
-          documentName: file.name,
-          documentType: file.type || 'application/octet-stream',
-          documentData: reader.result,
-          createdAt: new Date().toISOString(),
-          status: 'pending'
-        };
-
-        const applications = readJSON(applicationsKey, []);
-        const existingIndex = applications.findIndex(item => item.email.toLowerCase() === currentUser.email.toLowerCase());
-        if (existingIndex >= 0) applications.splice(existingIndex, 1);
-        applications.unshift(application);
-        localStorage.setItem(applicationsKey, JSON.stringify(applications));
-
-        const verificationState = readJSON(verificationKey, {});
-        verificationState[currentUser.email] = {
-          email: currentUser.email,
-          status: 'pending',
-          name: application.fullName,
-          phone: application.phone,
-          submittedAt: application.createdAt
-        };
-        localStorage.setItem(verificationKey, JSON.stringify(verificationState));
-
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      message.textContent = 'Submitting verification request...';
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/seller-verifications`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: currentUser.email,
+            fullName: String(data.get('fullName') || '').trim(),
+            shopName: String(data.get('shopName') || '').trim(),
+            phone: String(data.get('phone') || '').trim(),
+            notes: String(data.get('notes') || '').trim(),
+            documentName: file.name,
+            documentType,
+            documentData: await readDocument(file)
+          })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+        verificationStatus = result.status;
+        statusLoadError = '';
         renderStatus();
-        message.textContent = 'Your verification request has been submitted for admin review.';
+        message.textContent = 'Your verification request was submitted. The status will update here after admin review.';
         form.reset();
         document.getElementById('full-name').value = currentUser.fullname || '';
         document.getElementById('phone-number').value = currentUser.phone || '';
         document.getElementById('email-address').value = currentUser.email || '';
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        message.textContent = `Your verification request was not submitted. ${error.message || 'Check the API connection and try again.'}`;
+      } finally {
+        submitButton.disabled = false;
+      }
     });
 
-    renderStatus();
+    refreshVerificationStatus();
+    window.addEventListener('focus', refreshVerificationStatus);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) refreshVerificationStatus();
+    });
+    window.setInterval(() => {
+      if (!document.hidden) refreshVerificationStatus();
+    }, 30000);
   </script>
 </body>
 </html>

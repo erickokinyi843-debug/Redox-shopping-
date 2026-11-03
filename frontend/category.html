@@ -199,22 +199,24 @@
     <section class="products-grid" id="category-products"></section>
   </main>
 
+  <script src="config.js"></script>
   <script>
     const categoryMap = {
-      Fashion: { description: 'No products are published for this category yet. Add your first live listing from the backend or seller form.', theme: { accent: '#f97316', accentStrong: '#ea580c', heroStart: '#0f172a', heroEnd: '#1d4f67', glow: 'rgba(249, 115, 22, 0.16)' }, products: [] },
-      Electronics: { description: 'No live products are available for this category yet.', theme: { accent: '#22c55e', accentStrong: '#16a34a', heroStart: '#052e16', heroEnd: '#14532d', glow: 'rgba(34, 197, 94, 0.16)' }, products: [] },
-      Home: { description: 'This category is ready for real listings once your backend is connected.', theme: { accent: '#a855f7', accentStrong: '#7e22ce', heroStart: '#2d1b69', heroEnd: '#581c87', glow: 'rgba(168, 85, 247, 0.18)' }, products: [] },
-      Sports: { description: 'No products are published yet. The storefront will populate this section from your backend.', theme: { accent: '#06b6d4', accentStrong: '#0f766e', heroStart: '#083344', heroEnd: '#0f766e', glow: 'rgba(6, 182, 212, 0.18)' }, products: [] },
-      Gaming: { description: 'No demo listings remain. Publish real products from the seller flow.', theme: { accent: '#ef4444', accentStrong: '#b91c1c', heroStart: '#1f2937', heroEnd: '#7f1d1d', glow: 'rgba(239, 68, 68, 0.18)' }, products: [] },
-      Beauty: { description: 'No live beauty listings are published yet.', theme: { accent: '#ec4899', accentStrong: '#be185d', heroStart: '#3b0a2a', heroEnd: '#831843', glow: 'rgba(236, 72, 153, 0.18)' }, products: [] },
-      Books: { description: 'This category is waiting for the first real marketplace entry.', theme: { accent: '#f59e0b', accentStrong: '#b45309', heroStart: '#3f2d13', heroEnd: '#78350f', glow: 'rgba(245, 158, 11, 0.18)' }, products: [] },
-      Food: { description: 'No food listings are published yet. Connect your API and publish seller items here.', theme: { accent: '#f97316', accentStrong: '#c2410c', heroStart: '#431407', heroEnd: '#9a4d00', glow: 'rgba(249, 115, 22, 0.18)' }, products: [] }
+      Fashion: { theme: { accent: '#f97316', accentStrong: '#ea580c', heroStart: '#0f172a', heroEnd: '#1d4f67', glow: 'rgba(249, 115, 22, 0.16)' } },
+      Electronics: { theme: { accent: '#22c55e', accentStrong: '#16a34a', heroStart: '#052e16', heroEnd: '#14532d', glow: 'rgba(34, 197, 94, 0.16)' } },
+      Home: { theme: { accent: '#a855f7', accentStrong: '#7e22ce', heroStart: '#2d1b69', heroEnd: '#581c87', glow: 'rgba(168, 85, 247, 0.18)' } },
+      Sports: { theme: { accent: '#06b6d4', accentStrong: '#0f766e', heroStart: '#083344', heroEnd: '#0f766e', glow: 'rgba(6, 182, 212, 0.18)' } },
+      Gaming: { theme: { accent: '#ef4444', accentStrong: '#b91c1c', heroStart: '#1f2937', heroEnd: '#7f1d1d', glow: 'rgba(239, 68, 68, 0.18)' } },
+      Beauty: { theme: { accent: '#ec4899', accentStrong: '#be185d', heroStart: '#3b0a2a', heroEnd: '#831843', glow: 'rgba(236, 72, 153, 0.18)' } },
+      Books: { theme: { accent: '#f59e0b', accentStrong: '#b45309', heroStart: '#3f2d13', heroEnd: '#78350f', glow: 'rgba(245, 158, 11, 0.18)' } },
+      Food: { theme: { accent: '#f97316', accentStrong: '#c2410c', heroStart: '#431407', heroEnd: '#9a4d00', glow: 'rgba(249, 115, 22, 0.18)' } }
     };
 
     const params = new URLSearchParams(window.location.search);
     const categoryName = params.get('category') || 'Fashion';
     const selected = categoryMap[categoryName] || categoryMap.Fashion;
     const theme = selected.theme;
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
 
     document.documentElement.style.setProperty('--page-accent', theme.accent);
     document.documentElement.style.setProperty('--page-accent-strong', theme.accentStrong);
@@ -223,10 +225,12 @@
     document.documentElement.style.setProperty('--page-glow', theme.glow);
 
     document.getElementById('category-heading').textContent = categoryName;
-    document.getElementById('category-description').textContent = selected.description;
 
     const container = document.getElementById('category-products');
-    const cartStorageKey = 'rodyx:guest:cart';
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    const cartStorageKey = currentUser.email
+      ? `rodyx:${encodeURIComponent(currentUser.email)}:cart`
+      : 'rodyx:guest:cart';
 
     function readCart() {
       try {
@@ -236,22 +240,120 @@
       }
     }
 
-    function addToCart(productName, productPrice) {
+    function addToCart(product) {
       const cart = readCart();
-      const itemId = productName.toLowerCase();
+      const itemId = product.id || product.title.toLowerCase();
       const existing = cart.find(item => item.id === itemId);
       if (existing) existing.quantity += 1;
-      else cart.push({ id: itemId, name: productName, price: Number(productPrice.replace(/[^\d.]/g, '')), quantity: 1 });
+      else cart.push({
+        id: itemId,
+        name: product.title,
+        price: Number(String(product.price || '').replace(/[^\d.]/g, '')),
+        quantity: 1,
+        image: product.image || ''
+      });
       localStorage.setItem(cartStorageKey, JSON.stringify(cart));
-      alert(`${productName} added to cart.`);
+      alert(`${product.title} added to cart.`);
     }
 
-    const emptyState = document.createElement('div');
-    emptyState.className = 'product-card';
-    emptyState.style.gridColumn = '1 / -1';
-    emptyState.style.padding = '28px';
-    emptyState.innerHTML = '<div class="product-name">No live products yet</div><div class="product-rating">Connect the PythonAnywhere backend and publish the first seller listing.</div>';
-    container.appendChild(emptyState);
+    function renderProduct(product) {
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      if (product.image) {
+        const image = document.createElement('img');
+        image.className = 'product-image';
+        image.src = product.image;
+        image.alt = product.title || 'Marketplace listing';
+        image.loading = 'lazy';
+        image.style.width = '100%';
+        image.style.height = '160px';
+        image.style.objectFit = 'cover';
+        card.appendChild(image);
+      } else {
+        const image = document.createElement('div');
+        image.className = 'product-image';
+        image.setAttribute('aria-hidden', 'true');
+        card.appendChild(image);
+      }
+
+      const info = document.createElement('div');
+      info.className = 'product-info';
+      const name = document.createElement('div');
+      name.className = 'product-name';
+      name.textContent = product.title || 'Marketplace listing';
+      const seller = document.createElement('div');
+      seller.className = 'product-rating';
+      seller.textContent = `${product.category || categoryName} · ${product.sellerName || 'Community seller'}`;
+      const price = document.createElement('div');
+      price.className = 'product-price';
+      const priceValue = Number(String(product.price || '').replace(/[^\d.]/g, ''));
+      price.textContent = `KES ${priceValue.toLocaleString()}`;
+      const description = document.createElement('p');
+      description.textContent = product.description || '';
+      const addButton = document.createElement('button');
+      addButton.className = 'product-button';
+      addButton.type = 'button';
+      addButton.textContent = 'Add to cart';
+      addButton.addEventListener('click', () => addToCart(product));
+      info.append(name, seller, price, description, addButton);
+      card.appendChild(info);
+      container.appendChild(card);
+    }
+
+    async function loadCategoryProducts() {
+      let listings;
+      let connectionError = '';
+      try {
+        if (!apiBaseUrl) throw new Error('The API URL is not configured.');
+        const response = await fetch(`${apiBaseUrl}/api/listings`);
+        if (!response.ok) throw new Error(`The API returned ${response.status}.`);
+        listings = await response.json();
+        if (!Array.isArray(listings)) throw new Error('The API returned an invalid listing list.');
+        try {
+          localStorage.setItem('rodyxListings', JSON.stringify(listings));
+        } catch (error) {
+          console.warn('Could not cache marketplace listings in this browser:', error);
+        }
+      } catch (error) {
+        connectionError = error.message || 'The marketplace API could not be reached.';
+        try {
+          listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+          if (!Array.isArray(listings)) listings = [];
+        } catch {
+          listings = [];
+        }
+      }
+
+      const categoryListings = listings.filter(listing => String(listing.category || '').trim().toLowerCase() === categoryName.toLowerCase());
+      container.replaceChildren();
+      if (categoryListings.length) {
+        document.getElementById('category-description').textContent = connectionError
+          ? 'Showing saved listings from this device because the marketplace could not be reached.'
+          : `${categoryListings.length} live ${categoryListings.length === 1 ? 'listing' : 'listings'} in this collection.`;
+        categoryListings.forEach(renderProduct);
+        return;
+      }
+
+      const emptyState = document.createElement('div');
+      emptyState.className = 'product-card';
+      emptyState.style.gridColumn = '1 / -1';
+      emptyState.style.padding = '28px';
+      const title = document.createElement('div');
+      title.className = 'product-name';
+      title.textContent = connectionError ? 'Marketplace unavailable' : 'No live products yet';
+      const message = document.createElement('div');
+      message.className = 'product-rating';
+      message.textContent = connectionError
+        ? `Could not load marketplace listings. ${connectionError}`
+        : 'There are no listings in this category yet. Be the first to post one.';
+      emptyState.append(title, message);
+      container.appendChild(emptyState);
+      document.getElementById('category-description').textContent = connectionError
+        ? 'We could not load marketplace listings right now.'
+        : 'Explore listings posted by the community.';
+    }
+
+    loadCategoryProducts();
   </script>
 </body>
 </html>
