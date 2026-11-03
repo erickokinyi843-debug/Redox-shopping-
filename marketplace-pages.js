@@ -7,6 +7,31 @@ const categoryFilter = document.getElementById('market-category');
 const emptyState = document.getElementById('market-empty');
 const resultCount = document.getElementById('market-result-count');
 const statusMessage = document.getElementById('market-status');
+const apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.apiBaseUrl ? window.APP_CONFIG.apiBaseUrl.replace(/\/$/, '') : '');
+
+async function loadListings() {
+  if (apiBaseUrl) {
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/listings`);
+      if (response.ok) {
+        const listings = await response.json();
+        if (Array.isArray(listings)) {
+          localStorage.setItem('rodyxListings', JSON.stringify(listings));
+          return listings;
+        }
+      }
+    } catch {
+      // Fall back to local storage if the backend is unavailable.
+    }
+  }
+
+  try {
+    const listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+    return Array.isArray(listings) ? listings : [];
+  } catch {
+    return [];
+  }
+}
 
 function readListings() {
   try {
@@ -130,10 +155,10 @@ function createProductCard(listing) {
   return card;
 }
 
-function renderListings() {
+async function renderListings() {
   const query = searchInput.value.trim().toLowerCase();
   const selectedCategory = categoryFilter.value;
-  const listings = readListings()
+  const listings = (await loadListings())
     .filter(listing => !studentOnly || listing.studentMarketplace)
     .filter(listing => !selectedCategory || listing.category === selectedCategory)
     .filter(listing => `${listing.title || ''} ${listing.description || ''} ${listing.category || ''} ${listing.town || ''} ${listing.businessName || ''} ${listing.sellerName || ''}`.toLowerCase().includes(query))
@@ -146,6 +171,6 @@ function renderListings() {
   updateCartCount();
 }
 
-searchInput.addEventListener('input', renderListings);
-categoryFilter.addEventListener('change', renderListings);
+searchInput.addEventListener('input', () => renderListings());
+categoryFilter.addEventListener('change', () => renderListings());
 renderListings();

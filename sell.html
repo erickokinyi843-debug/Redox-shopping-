@@ -66,10 +66,11 @@
       </form>
     </section>
   </main>
+  <script src="config.js"></script>
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser.email) window.location.href = 'index.html';
-    const apiBaseUrl = 'http://localhost:8000/api';
+    const apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.apiBaseUrl ? window.APP_CONFIG.apiBaseUrl.replace(/\/$/, '') : 'http://localhost:5000');
     const form = document.getElementById('sell-form');
     const imageInput = document.getElementById('image');
     const preview = document.getElementById('preview');
@@ -184,23 +185,31 @@
         sellerVerified: Boolean(verifiedSeller),
         verificationStatus: verifiedSeller ? 'Verified seller' : 'Unverified seller'
       };
-      const postData = new FormData();
-      postData.append('title', listing.title);
-      postData.append('content', `Price: KES ${Number(listing.price).toLocaleString()} | Category: ${listing.category}\n\n${listing.description}`);
-      if (imageFile) postData.append('image', imageFile);
       const button = form.querySelector('button');
       button.disabled = true;
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
       try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch(`${apiBaseUrl}/posts/`, { method: 'POST', headers: token ? { Authorization: `Bearer ${token}` } : {}, body: postData });
-        if (!response.ok) throw new Error('Post failed');
+        const response = await fetch(`${apiBaseUrl}/api/listings`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...listing,
+            price: Number(listing.price),
+            image: listing.image || ''
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Listing API rejected the request.');
+        }
+
         saveListingLocally(listing);
         message.textContent = 'Your item was posted successfully.';
       } catch (error) {
         try {
           saveListingLocally(listing);
-          message.textContent = 'Item saved locally. Your listing is ready.';
+          message.textContent = 'API unavailable. The item was saved locally for now.';
         } catch (storageError) {
           message.textContent = 'The listing could not be saved in this browser. Try a smaller image or clear some storage.';
           console.error('Could not save listing locally:', storageError);

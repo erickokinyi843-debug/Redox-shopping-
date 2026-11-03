@@ -92,12 +92,12 @@
         <button class="auth-submit" type="submit"><i class="fas fa-lock"></i> Sign in to admin panel</button>
       </form>
       <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
-      <div class="auth-warning">Demo-only access: this account is stored in this browser. It is not a secure, server-backed admin account and setup can be reset by clearing browser storage.</div>
+      <div class="auth-warning">This browser-only admin setup is just a local fallback. For a production deployment, move admin authentication and data to the PythonAnywhere backend.</div>
     </section>
   </main>
   <main id="admin-dashboard" hidden>
     <div class="topline"><div><span class="admin-kicker">CHUKA RODYX SHOP MANAGEMENT CONSOLE</span><h1>Dashboard Overview</h1><p>Manage orders, customers, and marketplace listings.</p></div><button class="refresh" type="button" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-    <div class="notice" id="notice">Demo mode: dashboard data is stored in this browser only. This page does not provide server-side admin security.</div>
+    <div class="notice" id="notice">This dashboard is configured for local development and should be backed by a secure server-side admin API before production hosting.</div>
     <section class="stats">
       <div class="stat"><i class="fas fa-users"></i><strong id="users-count">0</strong><span>Customers</span></div>
       <div class="stat"><i class="fas fa-box-open"></i><strong id="products-count">0</strong><span>Product listings</span></div>
