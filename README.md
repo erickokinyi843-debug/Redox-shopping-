@@ -4,7 +4,7 @@ Redox Shopping is a static HTML/CSS/JavaScript marketplace with a Flask API. The
 
 ## What is shared by the API
 
-The Flask API stores marketplace listings, wanted posts, and orders as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, and order submission.
+The Flask API stores marketplace listings, wanted posts, and orders as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, and order submission. Item listing images can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
 
 Other features—including sign-in, account records, the admin dashboard, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. The admin dashboard does not manage the API's shared records.
 

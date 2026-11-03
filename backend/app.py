@@ -17,6 +17,7 @@ WANTED_FILE = DATA_DIR / 'wanted.json'
 ORDERS_FILE = DATA_DIR / 'orders.json'
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
 cors_origins = [
     origin.strip()
     for origin in os.environ.get(
@@ -26,6 +27,11 @@ cors_origins = [
     if origin.strip()
 ]
 CORS(app, resources={r"/api/*": {"origins": cors_origins}})
+
+
+@app.errorhandler(413)
+def request_too_large(_error):
+    return jsonify({'error': 'Request is too large. Listing images must be no larger than 5 MB.'}), 413
 
 
 def read_json(path: Path, default):
