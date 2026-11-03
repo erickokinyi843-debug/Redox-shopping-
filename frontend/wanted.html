@@ -263,7 +263,7 @@
             </div>
             <div>
               <label for="town">Town or area</label>
-              <input id="town" name="town" type="text" maxlength="80" placeholder="e.g. Chuka">
+              <input id="town" name="town" type="text" maxlength="80" placeholder="e.g. Chuka" data-gps-location>
             </div>
             <div>
               <label for="urgency">Urgency</label>
@@ -357,10 +357,15 @@
           <p>${escapeHtml(post.description || 'No details provided yet.')}</p>
           <div class="contact">
             <div><strong>Posted by:</strong> ${escapeHtml(post.buyerName || 'Community member')}</div>
-            <div><strong>Email:</strong> ${escapeHtml(post.buyerEmail || 'Not provided')}</div>
-            <div><strong>Phone:</strong> ${escapeHtml(post.buyerPhone || 'Not provided')}</div>
           </div>
         `;
+        if (post.buyerEmail && post.buyerEmail.toLowerCase() !== String(currentUser.email || '').toLowerCase()) {
+          const messageButton = document.createElement('button');
+          messageButton.type = 'button';
+          messageButton.textContent = 'Message buyer';
+          messageButton.addEventListener('click', () => window.startUserMessage(post.buyerEmail, post.buyerName || 'Buyer'));
+          card.appendChild(messageButton);
+        }
         wantedList.appendChild(card);
       });
     }

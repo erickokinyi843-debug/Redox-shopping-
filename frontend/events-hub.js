@@ -108,16 +108,14 @@ function createEventCard(event) {
   card.appendChild(createEventText('p', `Area: ${event.area}`));
   if (event.admission) card.appendChild(createEventText('p', `Admission: ${event.admission}`));
   card.appendChild(createEventText('p', `Organizer: ${event.organizer}`));
-
-  const email = document.createElement('a');
-  email.href = `mailto:${encodeURIComponent(event.email)}?subject=${encodeURIComponent(`Event enquiry: ${event.title}`)}`;
-  email.textContent = event.email;
-  card.appendChild(email);
-
-  const phone = document.createElement('a');
-  phone.href = `tel:${event.phone}`;
-  phone.textContent = event.phone;
-  card.appendChild(phone);
+  if (event.email && event.email.toLowerCase() !== String(eventUser.email || '').toLowerCase()) {
+    const messageButton = document.createElement('button');
+    messageButton.className = 'service-submit';
+    messageButton.type = 'button';
+    messageButton.textContent = 'Message organizer';
+    messageButton.addEventListener('click', () => window.startUserMessage(event.email, event.organizer || 'Organizer'));
+    card.appendChild(messageButton);
+  }
   return card;
 }
 

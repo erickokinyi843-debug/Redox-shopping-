@@ -82,16 +82,14 @@ function createRentalCard(rental) {
   card.appendChild(createRentalText('p', rental.description));
   card.appendChild(createRentalText('p', `Area: ${rental.area}`));
   card.appendChild(createRentalText('p', `Listed by: ${rental.ownerName}`));
-
-  const email = document.createElement('a');
-  email.href = `mailto:${encodeURIComponent(rental.email)}?subject=${encodeURIComponent(`Rental enquiry: ${rental.title}`)}`;
-  email.textContent = rental.email;
-  card.appendChild(email);
-
-  const phone = document.createElement('a');
-  phone.href = `tel:${rental.phone}`;
-  phone.textContent = rental.phone;
-  card.appendChild(phone);
+  if (rental.email && rental.email.toLowerCase() !== String(rentalUser.email || '').toLowerCase()) {
+    const messageButton = document.createElement('button');
+    messageButton.className = 'service-submit';
+    messageButton.type = 'button';
+    messageButton.textContent = 'Message owner';
+    messageButton.addEventListener('click', () => window.startUserMessage(rental.ownerEmail || rental.email, rental.ownerName || 'Owner'));
+    card.appendChild(messageButton);
+  }
 
   if (rentalUser.email && rentalUser.email.toLowerCase() === String(rental.ownerEmail || rental.email || '').toLowerCase()) {
     const availabilityButton = document.createElement('button');

@@ -116,18 +116,6 @@ function createProductCard(listing) {
   status.className = 'market-product-category';
   status.textContent = listing.sellerVerified || listing.verificationStatus === 'Verified seller' ? '✅ Verified seller' : '⚠ Unverified seller';
   seller.appendChild(status);
-  if (listing.sellerEmail) {
-    const email = document.createElement('a');
-    email.href = `mailto:${listing.sellerEmail}`;
-    email.textContent = listing.sellerEmail;
-    seller.appendChild(email);
-  }
-  if (listing.sellerPhone) {
-    const phone = document.createElement('a');
-    phone.href = `tel:${listing.sellerPhone}`;
-    phone.textContent = listing.sellerPhone;
-    seller.appendChild(phone);
-  }
   body.appendChild(seller);
 
   const actions = document.createElement('div');
@@ -150,7 +138,7 @@ function createProductCard(listing) {
       return;
     }
     const sellerName = listing.businessName || listing.sellerName || 'Seller';
-    window.location.href = `messages.html?contact=${encodeURIComponent(sellerEmail)}&name=${encodeURIComponent(sellerName)}`;
+    window.startUserMessage(sellerEmail, sellerName);
   });
 
   actions.append(addButton, messageButton);

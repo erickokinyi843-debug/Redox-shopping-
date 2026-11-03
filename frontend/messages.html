@@ -309,15 +309,18 @@
 
     function formatName(email) {
       if (!email) return 'Unknown user';
-      if (email === currentUser.email) return 'You';
-      const nameText = email.split('@')[0].replace(/[._-]/g, ' ');
-      return nameText.charAt(0).toUpperCase() + nameText.slice(1);
+      if (email === currentUser.email) return currentUser.fullname || 'You';
+      return 'Community member';
+    }
+
+    function participantName(thread, email) {
+      const name = thread.names?.[email];
+      return name && !name.includes('@') ? name : formatName(email);
     }
 
     function getThreadLabel(thread) {
       const otherEmail = getOtherParticipant(thread);
-      const otherName = thread.names && thread.names[otherEmail] ? thread.names[otherEmail] : formatName(otherEmail);
-      return otherName || formatName(otherEmail);
+      return participantName(thread, otherEmail);
     }
 
     function getUnreadCountForThread(thread) {
@@ -418,8 +421,7 @@
 
       markThreadAsRead(threadId);
       const otherEmail = getOtherParticipant(thread);
-      const otherName = thread.names && thread.names[otherEmail] ? thread.names[otherEmail] : formatName(otherEmail);
-      chatHeaderEl.textContent = otherName;
+      chatHeaderEl.textContent = participantName(thread, otherEmail);
       messagesEl.innerHTML = '';
 
       if (!thread.messages || !thread.messages.length) {
@@ -433,7 +435,7 @@
         row.className = `message-row ${isMine ? 'me' : 'other'}`;
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.innerHTML = `${message.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}<div class="message-meta">${formatName(message.sender)} · ${new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
+        bubble.innerHTML = `${message.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}<div class="message-meta">${participantName(thread, message.sender)} · ${new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
         row.appendChild(bubble);
         messagesEl.appendChild(row);
       });
@@ -450,7 +452,7 @@
         thread = {
           id: threadId,
           participants: [currentUser.email, contactEmail],
-          names: { [currentUser.email]: currentUser.fullname || currentUser.email, [contactEmail]: contactName || formatName(contactEmail) },
+          names: { [currentUser.email]: currentUser.fullname || 'You', [contactEmail]: contactName || formatName(contactEmail) },
           messages: [],
           lastUpdated: new Date().toISOString(),
           support: isSupport
@@ -497,8 +499,16 @@
     });
 
     const params = new URLSearchParams(window.location.search);
-    const contactEmail = params.get('contact');
-    const contactName = params.get('name');
+    const pendingContact = (() => {
+      try {
+        return JSON.parse(sessionStorage.getItem('rodyxPendingMessage') || 'null');
+      } catch {
+        return null;
+      }
+    })();
+    sessionStorage.removeItem('rodyxPendingMessage');
+    const contactEmail = params.get('contact') || pendingContact?.email || '';
+    const contactName = params.get('name') || pendingContact?.name || '';
 
     if (contactEmail === 'support') {
       let supportEmail = 'support@rodyx.local';

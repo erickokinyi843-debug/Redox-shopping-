@@ -48,7 +48,7 @@ function getRatingSummary(targetId, targetType) {
   const stars = `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`;
   const remarks = reviews.filter(review => String(review.remark || '').trim()).slice(-3).map(review => ({
     text: review.remark.trim(),
-    author: review.author || 'Customer'
+    author: review.author && !review.author.includes('@') ? review.author : 'Customer'
   }));
   return { average, count: reviews.length, stars, remarks };
 }
@@ -63,7 +63,7 @@ function submitReview(targetId, targetType, rating, remark) {
     targetType,
     rating: safeRating,
     remark: cleanRemark || 'No additional remarks',
-    author: currentUser.fullname || currentUser.email || 'Customer',
+    author: currentUser.fullname || 'Customer',
     createdAt: new Date().toISOString()
   });
   localStorage.setItem(reviewsStorageKey, JSON.stringify(reviews));
@@ -143,17 +143,13 @@ function makeServiceCard(service) {
   if (service.area) card.appendChild(makeText('p', service.area));
   card.appendChild(makeText('p', service.description));
   card.appendChild(makeText('p', `Provider: ${service.providerName}`));
-  if (service.email) {
-    const email = document.createElement('a');
-    email.href = `mailto:${service.email}`;
-    email.textContent = service.email;
-    card.appendChild(email);
-  }
-  if (service.phone) {
-    const phone = document.createElement('a');
-    phone.href = `tel:${service.phone}`;
-    phone.textContent = service.phone;
-    card.appendChild(phone);
+  if (service.email && service.email.toLowerCase() !== String(currentUser.email || '').toLowerCase()) {
+    const messageButton = document.createElement('button');
+    messageButton.className = 'service-submit';
+    messageButton.type = 'button';
+    messageButton.textContent = 'Message provider';
+    messageButton.addEventListener('click', () => window.startUserMessage(service.email, service.providerName || 'Provider'));
+    card.appendChild(messageButton);
   }
   card.appendChild(createReviewUI(service.id, 'service', 'Rate this service'));
   return card;

@@ -65,16 +65,14 @@ function createAccommodationCard(listing) {
     : 'Available now';
   card.appendChild(createAccommodationText('p', availableText, 'accommodation-availability'));
   card.appendChild(createAccommodationText('p', `Contact: ${listing.contactName}`));
-
-  const email = document.createElement('a');
-  email.href = `mailto:${encodeURIComponent(listing.email)}?subject=${encodeURIComponent(`Accommodation enquiry: ${listing.title}`)}`;
-  email.textContent = listing.email;
-  card.appendChild(email);
-
-  const phone = document.createElement('a');
-  phone.href = `tel:${listing.phone}`;
-  phone.textContent = listing.phone;
-  card.appendChild(phone);
+  if (listing.email && listing.email.toLowerCase() !== String(accommodationUser.email || '').toLowerCase()) {
+    const messageButton = document.createElement('button');
+    messageButton.className = 'service-submit';
+    messageButton.type = 'button';
+    messageButton.textContent = 'Message host';
+    messageButton.addEventListener('click', () => window.startUserMessage(listing.email, listing.contactName || 'Host'));
+    card.appendChild(messageButton);
+  }
   return card;
 }
 

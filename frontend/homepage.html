@@ -158,6 +158,12 @@
       gap: 30px;
     }
 
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+    }
+
     .navbar-item {
       color: white;
       text-decoration: none;
@@ -929,22 +935,15 @@
 
     @media (max-width: 768px) {
       .menu-toggle { display: block; }
-      .navbar-content { position: relative; flex-wrap: wrap; gap: 0; }
-      .navbar-item { display: none; width: 100%; padding: 11px 8px; border-top: 1px solid rgba(255, 255, 255, .12); }
-      .navbar-content.menu-open .navbar-item { display: block; }
-      .navbar-content.menu-open .account-nav { width: 100%; }
+      .navbar-content { position: relative; flex-wrap: nowrap; gap: 8px; }
+      .navbar-links { flex: 1 1 auto; min-width: 0; gap: 4px; overflow-x: auto; scrollbar-width: thin; }
+      .navbar-links .navbar-item { display: block; flex: 0 0 auto; width: auto; padding: 11px 8px; border-top: 0; white-space: nowrap; }
+      .account-nav { display: none; }
+      .navbar-content.menu-open .account-nav { display: block; position: absolute; z-index: 20; top: 100%; right: 0; width: min(240px, calc(100vw - 24px)); background: #123047; }
       .navbar-content.menu-open .account-nav summary { padding: 11px 8px; border-top: 1px solid rgba(255, 255, 255, .12); }
       .navbar-content.menu-open .account-menu { position: static; min-width: 0; padding: 0 0 6px 12px; background: transparent; box-shadow: none; }
       .navbar-content.menu-open .account-menu button { width: 100%; background: transparent; color: #fff; }
       .navbar-content.menu-open .account-menu button:hover { background: rgba(255, 255, 255, .1); }
-      .navbar-content.menu-open .sell-nav-button {
-        display: block;
-        width: 100%;
-        margin: 0;
-        padding: 11px 8px;
-        text-align: left;
-        border-radius: 0;
-      }
     }
   </style>
   <link rel="stylesheet" href="styles.css">
@@ -980,18 +979,20 @@
   <!-- NAVBAR -->
   <div class="navbar">
     <div class="navbar-content">
-      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" onclick="toggleMobileMenu()">
+      <button class="menu-toggle" type="button" aria-label="Open account menu" aria-expanded="false" onclick="toggleMobileMenu()">
         <i class="fas fa-bars"></i>
       </button>
-      <div class="navbar-item active" aria-current="page" onclick="scrollToSection('home')">Home</div>
-      <div class="navbar-item" onclick="scrollToSection('products')">Explore</div>
-      <div class="navbar-item" onclick="scrollToSection('categories')">Categories</div>
-      <a class="navbar-item" href="services.html">Services</a>
-      <a class="navbar-item" href="wanted.html">Wanted</a>
-      <a class="navbar-item" href="rentals.html">Rentals</a>
-      <a class="navbar-item" href="accommodation.html">Accommodation</a>
-      <a class="navbar-item" href="events-hub.html">Events Hub</a>
-      <a class="navbar-item nav-message-link" href="messages.html">Messages <span class="nav-message-badge" id="nav-message-badge" hidden>0</span></a>
+      <div class="navbar-links">
+        <div class="navbar-item active" aria-current="page" onclick="scrollToSection('home')">Home</div>
+        <div class="navbar-item" onclick="scrollToSection('products')">Explore</div>
+        <div class="navbar-item" onclick="scrollToSection('categories')">Categories</div>
+        <a class="navbar-item" href="services.html">Services</a>
+        <a class="navbar-item" href="wanted.html">Wanted</a>
+        <a class="navbar-item" href="rentals.html">Rentals</a>
+        <a class="navbar-item" href="accommodation.html">Accommodation</a>
+        <a class="navbar-item" href="events-hub.html">Events Hub</a>
+        <a class="navbar-item nav-message-link" href="messages.html">Messages <span class="nav-message-badge" id="nav-message-badge" hidden>0</span></a>
+      </div>
       <details class="navbar-item account-nav">
         <summary>My account</summary>
         <div class="account-menu">
@@ -1035,8 +1036,6 @@
         </div>
         <div class="user-details">
           <h2 id="display-name">Welcome User</h2>
-          <p id="display-email">Email will appear here</p>
-          <p id="display-phone">Phone will appear here</p>
         </div>
       </div>
       <button class="edit-profile-btn" onclick="viewProfile()">Edit Profile</button>
@@ -1050,8 +1049,6 @@
           <p>Browse products or post an item for the community.</p>
           <div class="marketplace-choice-actions">
             <a href="buy-sell.html"><i class="fas fa-store" aria-hidden="true"></i> Browse products</a>
-            <a href="sell.html"><i class="fas fa-plus" aria-hidden="true"></i> Sell an item</a>
-            <a href="wanted.html"><i class="fas fa-bullhorn" aria-hidden="true"></i> Post a wanted ad</a>
           </div>
         </article>
         <article class="marketplace-choice">
@@ -1059,18 +1056,6 @@
           <p>Find listings shared by sellers for the student community.</p>
           <div class="marketplace-choice-actions">
             <a href="students-marketplace.html"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Browse student listings</a>
-            <a href="sell.html?audience=students"><i class="fas fa-plus" aria-hidden="true"></i> Post a student listing</a>
-          </div>
-        </article>
-        <article class="marketplace-choice">
-          <h3>Post to the Community</h3>
-          <p>Choose the form that matches what you want to share.</p>
-          <div class="marketplace-choice-actions">
-            <a href="services.html"><i class="fas fa-tools" aria-hidden="true"></i> Advertise a service</a>
-            <a href="rentals.html"><i class="fas fa-key" aria-hidden="true"></i> Post a rental</a>
-            <a href="accommodation.html"><i class="fas fa-bed" aria-hidden="true"></i> Post accommodation</a>
-            <a href="events-hub.html"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Post an event</a>
-            <a href="seller-verification.html"><i class="fas fa-user-check" aria-hidden="true"></i> Verify as a seller</a>
           </div>
         </article>
       </div>
@@ -1119,7 +1104,7 @@
       <h2 class="section-title">Products Near You</h2>
       <p class="section-note" id="nearby-note">Enter your town or area to match listings with the area provided by the seller. Your location is not collected automatically.</p>
       <form class="location-search" id="nearby-search-form">
-        <input id="nearby-location" type="search" aria-label="Your town or area" placeholder="Enter your town or area">
+        <input id="nearby-location" type="search" aria-label="Your town or area" placeholder="Enter your town or area" data-gps-location data-gps-search>
         <button type="submit">Find products</button>
       </form>
       <div class="products-grid" id="nearby-products-list"></div>
@@ -1257,8 +1242,6 @@
     const displayFullname = currentUser.fullname || currentUser.email?.split('@')[0] || 'User';
     document.getElementById('user-name').textContent = displayFullname.split(' ')[0];
     document.getElementById('display-name').textContent = `Welcome, ${displayFullname}!`;
-    document.getElementById('display-email').textContent = `Email: ${currentUser.email || 'Not provided'}`;
-    document.getElementById('display-phone').textContent = `Phone: ${currentUser.phone || 'Not provided'}`;
 
     // Toggle user menu dropdown
     function toggleUserMenu() {
@@ -1288,7 +1271,7 @@
       const menuToggle = document.querySelector('.menu-toggle');
       const menuOpen = navbarContent.classList.toggle('menu-open');
       menuToggle.setAttribute('aria-expanded', menuOpen);
-      menuToggle.setAttribute('aria-label', menuOpen ? 'Close navigation' : 'Open navigation');
+      menuToggle.setAttribute('aria-label', menuOpen ? 'Close account menu' : 'Open account menu');
       menuToggle.innerHTML = `<i class="fas fa-${menuOpen ? 'times' : 'bars'}"></i>`;
     }
 
@@ -1567,20 +1550,6 @@
           description.textContent = ` | ${listing.description}`;
           contact.appendChild(description);
         }
-        if (listing.sellerEmail) {
-          const email = document.createElement('a');
-          email.href = `mailto:${listing.sellerEmail}`;
-          email.textContent = listing.sellerEmail;
-          email.setAttribute('aria-label', `Email seller ${listing.sellerName || ''}`);
-          contact.appendChild(email);
-        }
-        if (listing.sellerPhone) {
-          const phone = document.createElement('a');
-          phone.href = `tel:${listing.sellerPhone}`;
-          phone.textContent = listing.sellerPhone;
-          phone.setAttribute('aria-label', `Call seller ${listing.sellerName || ''}`);
-          contact.appendChild(phone);
-        }
         if (listing.studentMarketplace) {
           const badge = document.createElement('span');
           badge.className = 'student-listing-badge';
@@ -1605,7 +1574,7 @@
               average,
               count: matching.length,
               stars: `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`,
-              remarks: matching.filter(review => String(review.remark || '').trim()).slice(-3).map(review => ({ author: review.author || 'Customer', text: review.remark.trim() }))
+              remarks: matching.filter(review => String(review.remark || '').trim()).slice(-3).map(review => ({ author: review.author && !review.author.includes('@') ? review.author : 'Customer', text: review.remark.trim() }))
             };
           } catch {
             return { average: '0.0', count: 0, stars: '☆☆☆☆☆', remarks: [] };
@@ -1687,7 +1656,7 @@
             return;
           }
           const sellerName = listing.businessName || listing.sellerName || 'Seller';
-          window.location.href = `messages.html?contact=${encodeURIComponent(sellerEmail)}&name=${encodeURIComponent(sellerName)}`;
+          window.startUserMessage(sellerEmail, sellerName);
         });
 
         info.append(addButton, messageButton);
@@ -1700,7 +1669,34 @@
       return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
     }
 
+    function parseGpsCoordinates(value) {
+      const match = String(value || '').match(/(?:gps\s*)?(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/i);
+      if (!match) return null;
+      const latitude = Number(match[1]);
+      const longitude = Number(match[2]);
+      if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return null;
+      return { latitude, longitude };
+    }
+
+    function distanceBetweenLocations(first, second) {
+      const radians = degrees => degrees * Math.PI / 180;
+      const latitudeDifference = radians(second.latitude - first.latitude);
+      const longitudeDifference = radians(second.longitude - first.longitude);
+      const haversine = Math.sin(latitudeDifference / 2) ** 2
+        + Math.cos(radians(first.latitude)) * Math.cos(radians(second.latitude))
+        * Math.sin(longitudeDifference / 2) ** 2;
+      return 6371 * 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+    }
+
     function getExactLocationMatches(listings, requestedLocation) {
+      const requestedCoordinates = parseGpsCoordinates(requestedLocation);
+      if (requestedCoordinates) {
+        return listings
+          .map(listing => ({ listing, coordinates: parseGpsCoordinates(listing.town || listing.area) }))
+          .filter(match => match.coordinates && distanceBetweenLocations(requestedCoordinates, match.coordinates) <= 25)
+          .sort((first, second) => distanceBetweenLocations(requestedCoordinates, first.coordinates) - distanceBetweenLocations(requestedCoordinates, second.coordinates))
+          .map(match => match.listing);
+      }
       const normalizedRequest = normalizeLocation(requestedLocation);
       if (!normalizedRequest) return listings;
       return listings.filter(listing => normalizeLocation(listing.town || listing.area || '').trim() === normalizedRequest);
@@ -1719,7 +1715,8 @@
       }
 
       const exactMatches = getExactLocationMatches(allListings, requestedLocation);
-      const locationMatches = exactMatches.length ? exactMatches : allListings;
+      const isGpsSearch = Boolean(parseGpsCoordinates(requestedLocation));
+      const locationMatches = isGpsSearch ? exactMatches : exactMatches.length ? exactMatches : allListings;
       const prioritizedMatches = [...locationMatches].sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0)).slice(0, 4);
 
       nearbyList.replaceChildren();
@@ -1730,7 +1727,7 @@
       }
 
       recommendedSellerList.replaceChildren();
-      const recommendedSellers = prioritizedMatches.filter(listing => listing.sellerEmail || listing.sellerPhone || listing.sellerName || listing.businessName).slice(0, 4);
+      const recommendedSellers = prioritizedMatches.filter(listing => listing.sellerName || listing.businessName).slice(0, 4);
       if (!recommendedSellers.length) {
         recommendedSellerList.innerHTML = '<p class="marketplace-note">No recommended sellers are available for that exact location yet.</p>';
       } else {
@@ -1741,9 +1738,16 @@
             <h3>${(listing.businessName || listing.sellerName || 'Seller').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
             <p><strong>Area:</strong> ${String(listing.town || 'General area').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
             <p><strong>Category:</strong> ${String(listing.category || 'Community listing').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
-            <p><strong>Contact:</strong> ${String(listing.sellerEmail || listing.sellerPhone || 'Message seller').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
-            <a href="messages.html?contact=${encodeURIComponent(listing.sellerEmail || '')}&name=${encodeURIComponent(listing.businessName || listing.sellerName || 'Seller')}">Message seller</a>
           `;
+          const messageLink = document.createElement('a');
+          messageLink.href = 'messages.html';
+          messageLink.textContent = 'Message seller';
+          messageLink.addEventListener('click', event => {
+            if (!listing.sellerEmail) return;
+            event.preventDefault();
+            window.startUserMessage(listing.sellerEmail, listing.businessName || listing.sellerName || 'Seller');
+          });
+          card.appendChild(messageLink);
           recommendedSellerList.appendChild(card);
         });
       }
@@ -1760,8 +1764,16 @@
             <h3>${String(listing.businessName || 'Business').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
             <p><strong>Location:</strong> ${String(listing.town || 'General area').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
             <p><strong>Featured item:</strong> ${String(listing.title || 'Community item').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
-            <a href="messages.html?contact=${encodeURIComponent(listing.sellerEmail || '')}&name=${encodeURIComponent(listing.businessName || listing.sellerName || 'Seller')}">Contact business</a>
           `;
+          const messageLink = document.createElement('a');
+          messageLink.href = 'messages.html';
+          messageLink.textContent = 'Contact business';
+          messageLink.addEventListener('click', event => {
+            if (!listing.sellerEmail) return;
+            event.preventDefault();
+            window.startUserMessage(listing.sellerEmail, listing.businessName || listing.sellerName || 'Seller');
+          });
+          card.appendChild(messageLink);
           localBusinessList.appendChild(card);
         });
       }

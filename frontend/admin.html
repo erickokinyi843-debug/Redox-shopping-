@@ -117,7 +117,7 @@
         <section class="panel"><h2><i class="fas fa-shield-alt"></i>All marketplace content</h2><div class="table-toolbar"><input class="search" id="content-search" type="search" placeholder="Search posts, owners, or details" aria-label="Search marketplace content"></div><div class="table-wrap"><table><thead><tr><th>Type</th><th>Post and details</th><th>Owner</th><th>Created</th><th>Status</th><th>Admin actions</th></tr></thead><tbody id="content-table"></tbody></table></div></section>
       </div>
       <div>
-        <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-toolbar"><input class="search" id="customer-search" type="search" placeholder="Search customers" aria-label="Search customers"></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
+        <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-toolbar"><input class="search" id="customer-search" type="search" placeholder="Search customers" aria-label="Search customers"></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
         <section class="panel">
           <h2><i class="fas fa-user-check"></i>Seller verification requests</h2>
           <form id="verification-api-form" class="table-toolbar">
@@ -157,12 +157,12 @@
     const sellerVerificationAdminKey = 'rodyxSellerVerificationAdminKey';
     const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const managedCollections = [
-      { type: 'Product', key: 'rodyxListings', title: item => item.title, owner: item => item.sellerName || item.sellerEmail, details: item => `${item.category || ''} ${item.description || ''}` },
-      { type: 'Wanted', key: 'rodyxWantedPosts', title: item => item.title, owner: item => item.buyerName || item.buyerEmail, details: item => `${item.category || ''} ${item.town || ''} ${item.description || ''} Budget ${item.budget || ''}` },
-      { type: 'Service', key: 'rodyxServices', title: item => item.title, owner: item => item.providerName || item.email, details: item => `${item.skill || ''} ${item.area || ''} ${item.description || ''} ${item.rate || ''}` },
-      { type: 'Rental', key: 'rodyxRentals', title: item => item.title, owner: item => item.ownerName || item.email, details: item => `${item.category || ''} ${item.area || ''} ${item.duration || ''} KES ${item.price || ''}` },
-      { type: 'Accommodation', key: 'rodyxAccommodation', title: item => item.title, owner: item => item.contactName || item.email, details: item => `${item.type || ''} ${item.location || ''} ${item.address || ''} KES ${item.price || ''}` },
-      { type: 'Event', key: 'rodyxEvents', title: item => item.title, owner: item => item.organizer || item.email, details: item => `${item.category || ''} ${item.area || ''} ${item.venue || ''} ${item.date || ''} ${item.description || ''}` },
+      { type: 'Product', key: 'rodyxListings', title: item => item.title, owner: item => item.sellerName || 'Seller', details: item => `${item.category || ''} ${item.description || ''} Email ${item.sellerEmail || ''} Phone ${item.sellerPhone || ''}` },
+      { type: 'Wanted', key: 'rodyxWantedPosts', title: item => item.title, owner: item => item.buyerName || 'Buyer', details: item => `${item.category || ''} ${item.town || ''} ${item.description || ''} Budget ${item.budget || ''} Email ${item.buyerEmail || ''} Phone ${item.buyerPhone || ''}` },
+      { type: 'Service', key: 'rodyxServices', title: item => item.title, owner: item => item.providerName || 'Provider', details: item => `${item.skill || ''} ${item.area || ''} ${item.description || ''} ${item.rate || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
+      { type: 'Rental', key: 'rodyxRentals', title: item => item.title, owner: item => item.ownerName || 'Owner', details: item => `${item.category || ''} ${item.area || ''} ${item.duration || ''} KES ${item.price || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
+      { type: 'Accommodation', key: 'rodyxAccommodation', title: item => item.title, owner: item => item.contactName || 'Contact', details: item => `${item.type || ''} ${item.location || ''} ${item.address || ''} KES ${item.price || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
+      { type: 'Event', key: 'rodyxEvents', title: item => item.title, owner: item => item.organizer || 'Organizer', details: item => `${item.category || ''} ${item.area || ''} ${item.venue || ''} ${item.date || ''} ${item.description || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
       { type: 'Review', key: 'rodyxReviews', title: item => `${item.rating || 0}-star review of ${item.targetType || 'listing'} ${item.targetId || ''}`, owner: item => item.author, details: item => item.remark || '' }
     ];
     const orderStatuses = ['Placed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
@@ -833,8 +833,9 @@
         const row = document.createElement('tr');
         cell(row, customer.fullname || customer.email.split('@')[0]);
         cell(row, customer.email);
+        cell(row, customer.phone || '');
         cell(row, formatDate(customer.createdAt));
-        row.dataset.search = `${customer.fullname || ''} ${customer.email || ''}`.toLowerCase();
+        row.dataset.search = `${customer.fullname || ''} ${customer.email || ''} ${customer.phone || ''}`.toLowerCase();
         const actionCell = cell(row, '');
         const remove = document.createElement('button');
         remove.className = 'remove-user';
@@ -845,7 +846,7 @@
         actionCell.appendChild(remove);
         users.appendChild(row);
       });
-      if (!users.children.length) emptyRow(users, 4, 'No local customer accounts found.');
+      if (!users.children.length) emptyRow(users, 5, 'No local customer accounts found.');
       filterRows('customer-search', users);
     }
 
