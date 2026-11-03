@@ -368,7 +368,9 @@
     async function loadWantedPosts() {
       try {
         const response = await fetch(`${apiBaseUrl}/api/wanted`);
-        if (!response.ok) throw new Error(`Wanted posts API returned ${response.status}.`);
+        if (!response.ok) throw new Error(response.status === 404
+          ? 'The deployed API is missing the wanted-post route. Deploy the current backend/app.py and reload the PythonAnywhere web app.'
+          : `Wanted posts API returned ${response.status}.`);
         const posts = await response.json();
         if (!Array.isArray(posts)) throw new Error('Wanted posts API returned an invalid response.');
         try {
@@ -415,7 +417,9 @@
           body: JSON.stringify(post)
         });
         const responseData = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(responseData.error || 'The wanted post could not be saved.');
+        if (!response.ok) throw new Error(response.status === 404
+          ? 'The deployed API is missing the wanted-post route. Deploy the current backend/app.py and reload the PythonAnywhere web app.'
+          : responseData.error || 'The wanted post could not be saved.');
 
         const posts = readWantedPosts();
         posts.unshift(responseData);

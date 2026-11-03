@@ -189,7 +189,9 @@
       try {
         const response = await fetch(`${apiBaseUrl}/api/seller-verifications/status?email=${encodeURIComponent(currentUser.email)}`);
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+        if (!response.ok) throw new Error(response.status === 404
+          ? 'The deployed API is missing the seller-verification route. Deploy the current backend/app.py and reload the PythonAnywhere web app.'
+          : result.error || `The API returned ${response.status}.`);
         verificationStatus = result.status || null;
         statusLoadError = '';
       } catch (error) {
@@ -271,7 +273,9 @@
           })
         });
         const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
+        if (!response.ok) throw new Error(response.status === 404
+          ? 'The deployed API is missing the seller-verification route. Deploy the current backend/app.py and reload the PythonAnywhere web app.'
+          : result.error || `The API returned ${response.status}.`);
         verificationStatus = result.status;
         statusLoadError = '';
         renderStatus();

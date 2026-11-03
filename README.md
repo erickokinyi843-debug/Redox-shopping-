@@ -80,7 +80,7 @@ The JSON-file storage is a small-project starting point, not a production databa
    - Add an item to the cart and submit an order. Orders are recorded by the API, but the site does not process payments.
    - Submit a seller verification request. In the admin dashboard, sign in, enter the server `ADMIN_API_KEY` in the seller verification panel, and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically. Previously saved applications in that admin browser are migrated to the API the first time it connects.
 
-If requests fail, first open the PythonAnywhere `/api/health` URL. Then check that the frontend's `config.js` has the correct API URL, `CORS_ORIGINS` exactly matches the Vercel origin, `ADMIN_API_KEY` is set for verification administration, and the PythonAnywhere Web app was reloaded. The PythonAnywhere **Error log** is available from the Web tab.
+If requests fail, first open the PythonAnywhere `/api/health` URL. A working health route alongside a 404 for `/api/seller-verifications/status` or a POST route usually means the deployed web app is running older backend code: confirm its Source code and Working directory point to the current `backend/` folder, then reload the PythonAnywhere Web app. Also check that the frontend's `config.js` has the correct API URL, `CORS_ORIGINS` exactly matches the Vercel origin, and `ADMIN_API_KEY` is set for verification administration. The PythonAnywhere **Error log** is available from the Web tab.
 
 ## Local development
 

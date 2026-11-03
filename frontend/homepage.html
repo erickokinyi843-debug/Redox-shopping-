@@ -327,7 +327,7 @@
     }
 
     .marketplace-choices { margin: 0 0 38px; }
-    .marketplace-choice-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .marketplace-choice-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 16px; }
     .marketplace-choice { display: flex; flex-direction: column; min-height: 220px; padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--brand-orange); border-radius: 4px; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .07); }
     .marketplace-choice:nth-child(2) { border-top-color: var(--brand-teal); }
     .marketplace-choice h3 { margin: 0 0 8px; color: var(--ink); font-size: 19px; }
@@ -336,7 +336,11 @@
     .marketplace-choice-actions a { display: inline-flex; align-items: center; gap: 7px; padding: 10px 12px; border-radius: 3px; background: var(--brand-orange); color: #fff; font-size: 13px; font-weight: 700; text-decoration: none; }
     .marketplace-choice:nth-child(2) .marketplace-choice-actions a { background: var(--brand-teal); }
     .student-listing-badge { display: inline-block; margin-bottom: 8px; color: var(--brand-teal); font-size: 11px; font-weight: 800; text-transform: uppercase; }
-    @media (max-width: 600px) { .marketplace-choice-grid { grid-template-columns: 1fr; } }
+    .category-quick-links { display: flex; align-items: center; gap: 8px; overflow-x: auto; padding: 9px max(16px, calc((100% - 1240px) / 2)); background: #fff; border-bottom: 1px solid var(--line); scrollbar-width: thin; }
+    .category-quick-links span { flex: 0 0 auto; margin-right: 4px; color: var(--ink); font-size: 12px; font-weight: 800; }
+    .category-quick-links a { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 3px; padding: 7px 10px; color: var(--ink); font-size: 12px; font-weight: 700; text-decoration: none; }
+    .category-quick-links a:hover { border-color: var(--brand-orange); color: var(--brand-orange); }
+    @media (max-width: 600px) { .marketplace-choice-grid { grid-template-columns: 1fr; } .category-quick-links { gap: 7px; padding: 8px 12px; } }
 
     .section-note { margin: -10px 0 16px; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .location-search { display: flex; gap: 8px; max-width: 520px; margin-bottom: 16px; }
@@ -1000,6 +1004,18 @@
     </div>
   </div>
 
+  <nav class="category-quick-links" aria-label="Shop by category">
+    <span>Categories</span>
+    <a href="category.html?category=Fashion">Fashion</a>
+    <a href="category.html?category=Electronics">Electronics</a>
+    <a href="category.html?category=Home">Home</a>
+    <a href="category.html?category=Sports">Sports</a>
+    <a href="category.html?category=Gaming">Gaming</a>
+    <a href="category.html?category=Beauty">Beauty</a>
+    <a href="category.html?category=Books">Books</a>
+    <a href="category.html?category=Food">Food</a>
+  </nav>
+
   <!-- HERO BANNER -->
   <div class="hero" id="home">
     <div class="hero-content">
@@ -1043,6 +1059,18 @@
           <p>Find listings shared by sellers for the student community.</p>
           <div class="marketplace-choice-actions">
             <a href="students-marketplace.html"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Browse student listings</a>
+            <a href="sell.html?audience=students"><i class="fas fa-plus" aria-hidden="true"></i> Post a student listing</a>
+          </div>
+        </article>
+        <article class="marketplace-choice">
+          <h3>Post to the Community</h3>
+          <p>Choose the form that matches what you want to share.</p>
+          <div class="marketplace-choice-actions">
+            <a href="services.html"><i class="fas fa-tools" aria-hidden="true"></i> Advertise a service</a>
+            <a href="rentals.html"><i class="fas fa-key" aria-hidden="true"></i> Post a rental</a>
+            <a href="accommodation.html"><i class="fas fa-bed" aria-hidden="true"></i> Post accommodation</a>
+            <a href="events-hub.html"><i class="fas fa-calendar-plus" aria-hidden="true"></i> Post an event</a>
+            <a href="seller-verification.html"><i class="fas fa-user-check" aria-hidden="true"></i> Verify as a seller</a>
           </div>
         </article>
       </div>
