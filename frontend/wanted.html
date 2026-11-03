@@ -300,10 +300,12 @@
     </section>
   </main>
 
+  <script src="config.js"></script>
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     if (!currentUser.email) window.location.href = 'index.html';
 
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const wantedKey = 'rodyxWantedPosts';
     const form = document.getElementById('wanted-form');
     const wantedList = document.getElementById('wanted-list');
@@ -332,8 +334,8 @@
       }
     }
 
-    function renderWantedPosts() {
-      const posts = readWantedPosts().sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    function renderWantedPosts(posts = readWantedPosts()) {
+      posts = posts.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
       wantedList.innerHTML = '';
 
       if (!posts.length) {
@@ -363,7 +365,22 @@
       });
     }
 
-    form.addEventListener('submit', (event) => {
+    async function loadWantedPosts() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/wanted`);
+        if (!response.ok) throw new Error(`Wanted posts API returned ${response.status}.`);
+        const posts = await response.json();
+        if (!Array.isArray(posts)) throw new Error('Wanted posts API returned an invalid response.');
+        localStorage.setItem(wantedKey, JSON.stringify(posts));
+        renderWantedPosts(posts);
+      } catch (error) {
+        console.warn('Could not load shared wanted posts; using this browser cache:', error);
+        message.textContent = 'Could not load community posts from the server. Showing saved posts from this browser.';
+        renderWantedPosts();
+      }
+    }
+
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const data = new FormData(form);
       const post = {
@@ -385,17 +402,34 @@
         return;
       }
 
-      const posts = readWantedPosts();
-      posts.unshift(post);
-      localStorage.setItem(wantedKey, JSON.stringify(posts));
-      form.reset();
-      buyerEmailInput.value = currentUser.email || '';
-      buyerPhoneInput.value = currentUser.phone || '';
-      message.textContent = 'Your wanted post was published successfully.';
-      renderWantedPosts();
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/wanted`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(post)
+        });
+        const responseData = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(responseData.error || 'The wanted post could not be saved.');
+
+        const posts = readWantedPosts();
+        posts.unshift(responseData);
+        localStorage.setItem(wantedKey, JSON.stringify(posts));
+        form.reset();
+        buyerEmailInput.value = currentUser.email || '';
+        buyerPhoneInput.value = currentUser.phone || '';
+        message.textContent = 'Your wanted post was published successfully.';
+        renderWantedPosts(posts);
+      } catch (error) {
+        message.textContent = `Your wanted post was not published. ${error.message || 'Check the API connection and try again.'}`;
+        console.error('Wanted post submission failed:', error);
+      } finally {
+        submitButton.disabled = false;
+      }
     });
 
-    renderWantedPosts();
+    loadWantedPosts();
   </script>
 </body>
 </html>

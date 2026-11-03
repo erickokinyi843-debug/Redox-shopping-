@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,7 +17,15 @@ WANTED_FILE = DATA_DIR / 'wanted.json'
 ORDERS_FILE = DATA_DIR / 'orders.json'
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors_origins = [
+    origin.strip()
+    for origin in os.environ.get(
+        'CORS_ORIGINS',
+        'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5000,http://127.0.0.1:5000,http://localhost:5500,http://127.0.0.1:5500'
+    ).split(',')
+    if origin.strip()
+]
+CORS(app, resources={r"/api/*": {"origins": cors_origins}})
 
 
 def read_json(path: Path, default):
@@ -138,10 +147,13 @@ def create_order():
     order = {
         'id': payload.get('id') or f"order-{int(datetime.now(timezone.utc).timestamp() * 1000)}",
         'customerName': str(payload.get('customerName') or '').strip(),
+        'email': str(payload.get('email') or '').strip(),
+        'phone': str(payload.get('phone') or '').strip(),
         'items': payload['items'],
         'total': payload.get('total', 0),
         'status': payload.get('status', 'Placed'),
         'fulfillmentMethod': payload.get('fulfillmentMethod', 'Pickup'),
+        'fulfillmentLocation': str(payload.get('fulfillmentLocation') or '').strip(),
         'createdAt': datetime.now(timezone.utc).isoformat(),
     }
     orders.insert(0, order)
@@ -150,4 +162,4 @@ def create_order():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=os.environ.get('FLASK_DEBUG') == '1')

@@ -27,9 +27,6 @@ document.querySelectorAll('[data-password-toggle]').forEach(button => {
   });
 });
 
-// API Configuration
-const API_BASE_URL = 'http://localhost:8000/api';
-
 // Helper function to extract username from email
 function getUsername(email) {
   return email.split('@')[0];
@@ -190,67 +187,15 @@ signupForm.addEventListener('submit', async (e) => {
     return;
   }
   
-  // Split fullname into first_name and last_name
-  const nameParts = fullname.split(' ');
-  const firstName = nameParts[0];
-  const lastName = nameParts.slice(1).join(' ') || '';
-  const username = getUsername(email);
-  
+  const accounts = getLocalAccounts();
+  if (accounts[email]) {
+    showMessage('An account with this email already exists on this device. Sign in instead.', 'error');
+    signupButton.disabled = false;
+    signupButton.textContent = 'Sign Up';
+    return;
+  }
+
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/register/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        first_name: firstName,
-        last_name: lastName,
-        password: password,
-        password2: confirmPassword,
-        phone: phone
-      })
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      const errorMessage = data.username?.[0] || data.email?.[0] || data.password?.[0] || 'Registration failed. Please try again.';
-      showMessage(errorMessage, 'error');
-      signupButton.disabled = false;
-      signupButton.textContent = 'Sign Up';
-      return;
-    }
-
-    if (data.access && data.refresh) {
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-    }
-    
-    saveCurrentUser({
-      fullname: fullname,
-      email: email,
-      phone: phone
-    });
-    showMessage(`Welcome ${fullname}! Your account has been created successfully. Redirecting to the homepage...`, 'success');
-    
-    // Clear form
-    signupForm.reset();
-    
-    // Redirect to homepage after 2 seconds
-    setTimeout(() => {
-      window.location.href = 'homepage.html';
-    }, 2000);
-  } catch (error) {
-    const accounts = getLocalAccounts();
-    if (accounts[email]) {
-      showMessage('An account with this email already exists on this device. Sign in instead.', 'error');
-      signupButton.disabled = false;
-      signupButton.textContent = 'Sign Up';
-      return;
-    }
-
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const saltValue = Array.from(salt, byte => byte.toString(16).padStart(2, '0')).join('');
     accounts[email] = {
@@ -263,13 +208,16 @@ signupForm.addEventListener('submit', async (e) => {
     };
     localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
     saveCurrentUser(accounts[email]);
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    showMessage('Account saved locally. Redirecting to the homepage...', 'success');
-    console.error('Registration server unavailable; using local account:', error);
+    showMessage('Account saved on this device only. Redirecting to the homepage...', 'success');
+    signupForm.reset();
     setTimeout(() => {
       window.location.href = 'homepage.html';
     }, 1000);
+  } catch (error) {
+    console.error('Could not save the local account:', error);
+    showMessage('Could not save the account in this browser. Check browser storage and try again.', 'error');
+    signupButton.disabled = false;
+    signupButton.textContent = 'Sign Up';
   }
 });
 
@@ -285,91 +233,28 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
   
+  const account = getLocalAccounts()[email];
+  if (!account) {
+    showMessage('No account for this email exists in this browser. Create an account on this device first.', 'error');
+    return;
+  }
+
   try {
-    const response = await fetch(`${API_BASE_URL}/token/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: getUsername(email),
-        password: password
-      })
-    });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      const account = getLocalAccounts()[email];
-      if (response.status === 401 && account) {
-        const salt = Uint8Array.from(account.salt.match(/.{2}/g), byte => parseInt(byte, 16));
-        if (await hashPassword(password, salt) === account.passwordHash) {
-          saveCurrentUser(account);
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          showMessage('Signed in on this device. Redirecting...', 'success');
-          loginForm.reset();
-          setTimeout(() => {
-            window.location.href = 'homepage.html';
-          }, 1000);
-          return;
-        }
-      }
+    const salt = Uint8Array.from(account.salt.match(/.{2}/g), byte => parseInt(byte, 16));
+    const passwordHash = await hashPassword(password, salt);
+    if (passwordHash !== account.passwordHash) {
       showMessage('Invalid email or password. Please try again.', 'error');
       return;
     }
-    
-    // Successful login - store session info
-    localStorage.setItem('access_token', data.access);
-    localStorage.setItem('refresh_token', data.refresh);
-    const localAccount = getLocalAccounts()[email];
-    let profile = localAccount || { email };
-    try {
-      const profileResponse = await fetch(`${API_BASE_URL}/profile/me/`, {
-        headers: { Authorization: `Bearer ${data.access}` }
-      });
-      if (profileResponse.ok) {
-        const profileData = await profileResponse.json();
-        profile = {
-          email,
-          fullname: [profileData.user?.first_name, profileData.user?.last_name].filter(Boolean).join(' ') || getUsername(email),
-          phone: profileData.phone || ''
-        };
-      }
-    } catch (error) {
-      console.warn('Could not load the account profile:', error);
-    }
-    saveCurrentUser(profile);
-    
-    showMessage('You have successfully signed in. Redirecting...', 'success');
-    
-    // Clear form
+
+    saveCurrentUser(account);
+    showMessage('Signed in on this device. Redirecting...', 'success');
     loginForm.reset();
-    
-    // Redirect to homepage after 1.5 seconds
     setTimeout(() => {
       window.location.href = 'homepage.html';
-    }, 1500);
+    }, 1000);
   } catch (error) {
-    const account = getLocalAccounts()[email];
-    if (account) {
-      const salt = Uint8Array.from(account.salt.match(/.{2}/g), byte => parseInt(byte, 16));
-      const passwordHash = await hashPassword(password, salt);
-      if (passwordHash === account.passwordHash) {
-        saveCurrentUser(account);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        showMessage('Signed in on this device. Redirecting...', 'success');
-        loginForm.reset();
-        setTimeout(() => {
-          window.location.href = 'homepage.html';
-        }, 1000);
-        return;
-      }
-      showMessage('Invalid email or password. Please try again.', 'error');
-    } else {
-      showMessage('Could not connect to the account server, and no local account was found.', 'error');
-    }
-    console.error('Login error:', error);
+    console.error('Could not verify the local account:', error);
+    showMessage('Could not verify this account in the browser. Try again using HTTPS.', 'error');
   }
 });

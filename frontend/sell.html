@@ -207,14 +207,8 @@
         saveListingLocally(listing);
         message.textContent = 'Your item was posted successfully.';
       } catch (error) {
-        try {
-          saveListingLocally(listing);
-          message.textContent = 'API unavailable. The item was saved locally for now.';
-        } catch (storageError) {
-          message.textContent = 'The listing could not be saved in this browser. Try a smaller image or clear some storage.';
-          console.error('Could not save listing locally:', storageError);
-        }
-        console.warn('Listing API unavailable; using local listing:', error);
+        message.textContent = `Your listing was not posted. ${error.message || 'Check the API connection and try again.'}`;
+        console.error('Listing submission failed:', error);
       } finally {
         form.reset();
         preview.removeAttribute('src');

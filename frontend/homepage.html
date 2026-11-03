@@ -1220,8 +1220,9 @@
     </div>
   </dialog>
 
+  <script src="config.js"></script>
   <script>
-    const API_BASE_URL = 'http://localhost:8000/api';
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     // Get current user from localStorage
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
@@ -1373,7 +1374,7 @@
       [label.textContent, field.placeholder] = options[method];
     }
 
-    function checkout(event) {
+    async function checkout(event) {
       event.preventDefault();
       const cart = readStoredItems(cartStorageKey);
       if (!cart.length) return;
@@ -1382,29 +1383,44 @@
       const fulfillmentLocation = String(formData.get('fulfillmentLocation') || '').trim();
       const phone = String(formData.get('phone') || '').trim();
       if (!fulfillmentLocation || !phone) return;
-      const orders = readStoredItems(ordersStorageKey);
-      const order = {
-        id: `ORD-${Date.now()}`,
-        items: cart,
-        total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-        email: currentUser.email || '',
-        fulfillmentMethod,
-        fulfillmentLocation,
-        address: fulfillmentMethod === 'rider' ? fulfillmentLocation : '',
-        phone,
-        status: 'Placed',
-        createdAt: new Date().toISOString()
-      };
-      orders.unshift(order);
-      localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
-      localStorage.setItem(cartStorageKey, '[]');
-      document.getElementById('fulfillment-form').reset();
-      document.getElementById('fulfillment-form').hidden = true;
-      document.getElementById('checkout-button').hidden = false;
-      closeCart();
-      updateCartBadge();
-      const fulfillmentNames = { rider: 'local rider delivery', pickup: 'seller pickup', meetup: 'public meetup' };
-      alert(`Demo order ${order.id} saved for ${formatMoney(order.total)}. Arrangement: ${fulfillmentNames[fulfillmentMethod]}. No payment or delivery service is connected.`);
+      const submitButton = document.querySelector('#fulfillment-form button[type="submit"]');
+      submitButton.disabled = true;
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/orders`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName: currentUser.fullname || currentUser.email || 'Customer',
+            email: currentUser.email || '',
+            phone,
+            items: cart,
+            total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            fulfillmentMethod,
+            fulfillmentLocation
+          })
+        });
+        const responseData = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(responseData.error || 'The order could not be saved.');
+        }
+
+        const orders = readStoredItems(ordersStorageKey);
+        orders.unshift(responseData);
+        localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
+        localStorage.setItem(cartStorageKey, '[]');
+        document.getElementById('fulfillment-form').reset();
+        document.getElementById('fulfillment-form').hidden = true;
+        document.getElementById('checkout-button').hidden = false;
+        closeCart();
+        updateCartBadge();
+        const fulfillmentNames = { rider: 'local rider delivery', pickup: 'seller pickup', meetup: 'public meetup' };
+        alert(`Order ${responseData.id} saved for ${formatMoney(responseData.total)}. Arrangement: ${fulfillmentNames[fulfillmentMethod]}. No payment or delivery service is connected.`);
+      } catch (error) {
+        console.error('Order submission failed:', error);
+        alert(`Your order was not submitted. ${error.message || 'Check the API connection and try again.'}`);
+      } finally {
+        submitButton.disabled = false;
+      }
     }
 
     document.getElementById('fulfillment-form').addEventListener('submit', checkout);
@@ -1724,8 +1740,23 @@
       }
     }
 
-    function loadSellerListings() {
-      const listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+    async function loadSellerListings() {
+      let listings;
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/listings`);
+        if (!response.ok) throw new Error(`Listings API returned ${response.status}.`);
+        listings = await response.json();
+        if (!Array.isArray(listings)) throw new Error('Listings API returned an invalid response.');
+        localStorage.setItem('rodyxListings', JSON.stringify(listings));
+      } catch (error) {
+        console.warn('Could not load shared listings; using this browser cache:', error);
+        try {
+          listings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+          if (!Array.isArray(listings)) listings = [];
+        } catch {
+          listings = [];
+        }
+      }
       sellerListings.replaceChildren();
       studentListings.replaceChildren();
       if (!listings.length) {
