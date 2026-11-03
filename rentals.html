@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rentals | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body>
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Marketplace navigation">
+      <a href="homepage.html">Home</a>
+      <a href="buy-sell.html">Buy &amp; Sell</a>
+      <a href="services.html">Services</a>
+      <a href="accommodation.html">Accommodation</a>
+      <a href="events-hub.html">Events Hub</a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro">
+      <p class="market-eyebrow">Community marketplace</p>
+      <h1>Rentals</h1>
+      <p>List items available to rent or search for what you need in your area.</p>
+    </section>
+    <div class="services-layout">
+      <section class="service-panel" aria-labelledby="rental-form-title">
+        <h2 id="rental-form-title">Post a rental</h2>
+        <form class="service-form" id="rental-form">
+          <div>
+            <label for="rental-category">Category</label>
+            <select id="rental-category" name="category" required>
+              <option value="">Choose a category</option>
+              <option>Tools and Equipment</option>
+              <option>Electronics</option>
+              <option>Furniture and Appliances</option>
+              <option>Vehicles and Transport</option>
+              <option>Clothing and Events</option>
+              <option>Sports and Outdoors</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="rental-title">Item name</label>
+            <input id="rental-title" name="title" maxlength="100" required placeholder="e.g. Portable PA speaker">
+          </div>
+          <div>
+            <label for="rental-description">Details and condition</label>
+            <textarea id="rental-description" name="description" maxlength="700" required placeholder="Describe the item, condition, what's included, and any rental requirements"></textarea>
+          </div>
+          <div class="rental-price-fields">
+            <div>
+              <label for="rental-price">Rental price (KES)</label>
+              <input id="rental-price" name="price" type="number" min="1" step="1" required placeholder="500">
+            </div>
+            <div>
+              <label for="rental-period">Price is per</label>
+              <select id="rental-period" name="pricePeriod" required>
+                <option value="hour">Hour</option>
+                <option value="day" selected>Day</option>
+                <option value="week">Week</option>
+                <option value="month">Month</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="rental-duration">Rental duration or availability</label>
+            <input id="rental-duration" name="duration" maxlength="120" required placeholder="e.g. Minimum 2 days, available through December">
+          </div>
+          <div>
+            <label for="rental-area">Town or area</label>
+            <input id="rental-area" name="area" maxlength="100" required placeholder="e.g. Chuka">
+          </div>
+          <div>
+            <label for="rental-owner">Your name</label>
+            <input id="rental-owner" name="ownerName" maxlength="100" required>
+          </div>
+          <div>
+            <label for="rental-email">Contact email</label>
+            <input id="rental-email" name="email" type="email" required>
+          </div>
+          <div>
+            <label for="rental-phone">Contact phone</label>
+            <input id="rental-phone" name="phone" type="tel" maxlength="40" required>
+          </div>
+          <div>
+            <label for="rental-image">Item photo (optional, up to 2 MB)</label>
+            <input id="rental-image" name="image" type="file" accept="image/*">
+            <img class="rental-image-preview" id="rental-image-preview" alt="Rental item preview" hidden>
+          </div>
+          <button class="service-submit" type="submit">Publish rental</button>
+          <p class="service-message" id="rental-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="service-panel" aria-labelledby="rental-list-title">
+        <h2 id="rental-list-title">Find something to rent</h2>
+        <div class="service-search">
+          <input id="rental-search" type="search" aria-label="Search rental listings" placeholder="Search items, categories, price, or area">
+        </div>
+        <div class="service-listings" id="rental-listings" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+  <script src="rentals.js"></script>
+</body>
+</html>

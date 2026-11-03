@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events Hub | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body>
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Marketplace navigation">
+      <a href="homepage.html">Home</a>
+      <a href="buy-sell.html">Buy &amp; Sell</a>
+      <a href="services.html">Services</a>
+      <a href="rentals.html">Rentals</a>
+      <a href="accommodation.html">Accommodation</a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro student">
+      <p class="market-eyebrow">Community marketplace</p>
+      <h1>Events Hub</h1>
+      <p>Share upcoming events, discover what is happening nearby, and contact organizers for more information.</p>
+    </section>
+    <div class="services-layout">
+      <section class="service-panel" aria-labelledby="event-form-title">
+        <h2 id="event-form-title">Post an event</h2>
+        <form class="service-form" id="event-form">
+          <div>
+            <label for="event-category">Event category</label>
+            <select id="event-category" name="category" required>
+              <option value="">Choose a category</option>
+              <option>Music and Entertainment</option>
+              <option>Education and Workshops</option>
+              <option>Sports</option>
+              <option>Community and Culture</option>
+              <option>Business and Networking</option>
+              <option>Campus</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="event-title">Event name</label>
+            <input id="event-title" name="title" maxlength="120" required placeholder="e.g. Chuka Creators Market">
+          </div>
+          <div>
+            <label for="event-description">Event details</label>
+            <textarea id="event-description" name="description" maxlength="900" required placeholder="What will happen? Include schedule, audience, registration details, or anything attendees should know."></textarea>
+          </div>
+          <div class="rental-price-fields">
+            <div>
+              <label for="event-date">Date</label>
+              <input id="event-date" name="date" type="date" required>
+            </div>
+            <div>
+              <label for="event-start-time">Start time</label>
+              <input id="event-start-time" name="startTime" type="time" required>
+            </div>
+          </div>
+          <div>
+            <label for="event-end-time">End time (optional)</label>
+            <input id="event-end-time" name="endTime" type="time">
+          </div>
+          <div>
+            <label for="event-venue">Venue</label>
+            <input id="event-venue" name="venue" maxlength="160" required placeholder="Venue name or online meeting details">
+          </div>
+          <div>
+            <label for="event-area">Town or area</label>
+            <input id="event-area" name="area" maxlength="100" required placeholder="e.g. Chuka">
+          </div>
+          <div>
+            <label for="event-admission">Admission or ticket price</label>
+            <input id="event-admission" name="admission" maxlength="100" placeholder="e.g. Free or KES 500">
+          </div>
+          <div>
+            <label for="event-organizer">Organizer name</label>
+            <input id="event-organizer" name="organizer" maxlength="100" required>
+          </div>
+          <div>
+            <label for="event-email">Contact email</label>
+            <input id="event-email" name="email" type="email" required>
+          </div>
+          <div>
+            <label for="event-phone">Contact phone</label>
+            <input id="event-phone" name="phone" type="tel" maxlength="40" required>
+          </div>
+          <div>
+            <label for="event-poster">Poster or event image (optional, up to 2 MB)</label>
+            <input id="event-poster" name="poster" type="file" accept="image/*">
+            <img class="event-poster-preview" id="event-poster-preview" alt="Event poster preview" hidden>
+          </div>
+          <button class="service-submit" type="submit">Publish event</button>
+          <p class="service-message" id="event-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="service-panel" aria-labelledby="event-list-title">
+        <h2 id="event-list-title">Upcoming events</h2>
+        <div class="service-search">
+          <input id="event-search" type="search" aria-label="Search upcoming events" placeholder="Search events, categories, or areas">
+        </div>
+        <div class="service-listings" id="event-listings" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+  <script src="events-hub.js"></script>
+</body>
+</html>

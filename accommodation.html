@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accommodation | CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="marketplace-pages.css">
+</head>
+<body>
+  <header class="market-header">
+    <a class="market-brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <nav class="market-header-links" aria-label="Marketplace navigation">
+      <a href="homepage.html">Home</a>
+      <a href="buy-sell.html">Buy &amp; Sell</a>
+      <a href="rentals.html">Rentals</a>
+      <a href="services.html">Services</a>
+      <a href="events-hub.html">Events Hub</a>
+    </nav>
+  </header>
+  <main class="market-main">
+    <section class="market-intro student">
+      <p class="market-eyebrow">Rooms and properties</p>
+      <h1>Accommodation</h1>
+      <p>Post a vacancy or search rooms and properties by type, location, and price.</p>
+    </section>
+    <div class="services-layout">
+      <section class="service-panel" aria-labelledby="accommodation-form-title">
+        <h2 id="accommodation-form-title">Post a vacancy</h2>
+        <form class="service-form" id="accommodation-form">
+          <div>
+            <label for="accommodation-type">Accommodation type</label>
+            <select id="accommodation-type" name="type" required>
+              <option value="">Choose a type</option>
+              <option>Single room</option>
+              <option>Bedsitter / studio</option>
+              <option>Shared room / hostel</option>
+              <option>1 bedroom</option>
+              <option>2 bedrooms</option>
+              <option>3+ bedrooms</option>
+              <option>House</option>
+              <option>Commercial space</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="accommodation-title">Listing title</label>
+            <input id="accommodation-title" name="title" maxlength="120" required placeholder="e.g. Furnished bedsitter near Chuka campus">
+          </div>
+          <div>
+            <label for="accommodation-details">Full details</label>
+            <textarea id="accommodation-details" name="details" maxlength="1200" required placeholder="Describe the space, facilities, utilities, lease terms, rules, and nearby landmarks"></textarea>
+          </div>
+          <div class="rental-price-fields">
+            <div>
+              <label for="accommodation-price">Rent (KES per month)</label>
+              <input id="accommodation-price" name="price" type="number" min="1" step="1" required placeholder="8000">
+            </div>
+            <div>
+              <label for="accommodation-deposit">Deposit (KES, optional)</label>
+              <input id="accommodation-deposit" name="deposit" type="number" min="0" step="1" placeholder="8000">
+            </div>
+          </div>
+          <div>
+            <label for="accommodation-available-date">Available from (optional)</label>
+            <input id="accommodation-available-date" name="availableFrom" type="date">
+          </div>
+          <div>
+            <label for="accommodation-location">Town and neighborhood</label>
+            <input id="accommodation-location" name="location" maxlength="140" required placeholder="e.g. Chuka, near the main campus gate">
+          </div>
+          <div>
+            <label for="accommodation-address">Street or directions (optional)</label>
+            <input id="accommodation-address" name="address" maxlength="180" placeholder="Add directions or a nearby landmark">
+          </div>
+          <div>
+            <label for="accommodation-contact-name">Contact name</label>
+            <input id="accommodation-contact-name" name="contactName" maxlength="100" required>
+          </div>
+          <div>
+            <label for="accommodation-email">Contact email</label>
+            <input id="accommodation-email" name="email" type="email" required>
+          </div>
+          <div>
+            <label for="accommodation-phone">Contact phone</label>
+            <input id="accommodation-phone" name="phone" type="tel" maxlength="40" required>
+          </div>
+          <div>
+            <label for="accommodation-images-input">Photos (up to 5 images, 500 KB each and 1.5 MB total)</label>
+            <input id="accommodation-images-input" name="images" type="file" accept="image/*" multiple>
+            <div class="accommodation-image-previews" id="accommodation-image-previews" hidden></div>
+          </div>
+          <button class="service-submit" type="submit">Publish vacancy</button>
+          <p class="service-message" id="accommodation-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <section class="service-panel" aria-labelledby="accommodation-list-title">
+        <h2 id="accommodation-list-title">Find accommodation</h2>
+        <div class="service-search">
+          <input id="accommodation-search" type="search" aria-label="Search accommodation vacancies" placeholder="Search type, location, price, or details">
+        </div>
+        <div class="service-listings" id="accommodation-listings" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+  <script src="accommodation.js"></script>
+</body>
+</html>

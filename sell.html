@@ -24,6 +24,10 @@
     .student-listing-toggle { display: flex; align-items: center; gap: 10px; }
     .student-listing-toggle input[type="checkbox"] { flex: 0 0 18px; width: 18px; height: 18px; margin: 0; padding: 0; }
     .student-listing-toggle label { margin: 0; }
+    .verification-banner {
+      border: 1px solid #ffd9cf; border-left: 5px solid var(--coral); border-radius: 4px; background: #fff7f4; padding: 14px 16px; margin: 0 0 18px; color: var(--navy); line-height: 1.6;
+    }
+    .verification-banner a { color: var(--coral); font-weight: 800; text-decoration: none; }
     input:focus, select:focus, textarea:focus { outline: 2px solid rgba(24, 169, 153, .25); border-color: var(--teal); }
     .wide { grid-column: 1 / -1; }
     .upload { display: flex; align-items: end; gap: 14px; }
@@ -45,6 +49,7 @@
     <section class="panel">
       <h1>Sell an item</h1>
       <p class="intro">Add your item details and let shoppers discover it.</p>
+      <div class="verification-banner" id="verification-banner"></div>
       <form id="sell-form">
         <div><label for="title">Item name</label><input id="title" name="title" required maxlength="200" placeholder="e.g. Samsung Galaxy A54"></div>
         <div><label for="price">Price (KES)</label><input id="price" name="price" type="number" min="1" required placeholder="25000"></div>
@@ -69,12 +74,52 @@
     const imageInput = document.getElementById('image');
     const preview = document.getElementById('preview');
     const message = document.getElementById('message');
+    const verificationBanner = document.getElementById('verification-banner');
     const listingsKey = 'rodyxListings';
+    const verificationKey = 'rodyxSellerVerification';
+
+    function readJSON(key, fallback) {
+      try {
+        const value = JSON.parse(localStorage.getItem(key) || 'null');
+        return value ?? fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function getSellerVerificationStatus(email) {
+      const statuses = readJSON(verificationKey, {});
+      const status = statuses[email || ''];
+      return status && status.status === 'approved' ? status : null;
+    }
+
+    function getListingCountForSeller(email) {
+      const listings = readJSON(listingsKey, []);
+      return listings.filter(listing => String(listing.sellerEmail || '').toLowerCase() === String(email || '').toLowerCase()).length;
+    }
+
+    function renderVerificationBanner() {
+      const verifiedSeller = getSellerVerificationStatus(currentUser.email);
+      if (verifiedSeller) {
+        verificationBanner.innerHTML = '<strong>Verified seller:</strong> Your account is approved. You can post without the default selling restrictions and are shown with a verified badge.';
+        return;
+      }
+
+      const listingCount = getListingCountForSeller(currentUser.email);
+      if (listingCount >= 1) {
+        verificationBanner.innerHTML = '<strong>Limited selling access:</strong> Your seller account is still unverified. Please complete verification to unlock full selling benefits and avoid posting limits. <a href="seller-verification.html">Apply now</a>';
+        return;
+      }
+
+      verificationBanner.innerHTML = '<strong>Seller access:</strong> You are currently unverified. You can post a limited number of listings while your account is under review. <a href="seller-verification.html">Apply for verification</a>';
+    }
+
     document.getElementById('seller-email').value = currentUser.email || '';
     document.getElementById('seller-phone').value = currentUser.phone || '';
     if (new URLSearchParams(window.location.search).get('audience') === 'students') {
       document.getElementById('student-marketplace').checked = true;
     }
+    renderVerificationBanner();
 
     function readImageData(file) {
       if (!file) return Promise.resolve('');
@@ -115,6 +160,13 @@
         message.textContent = 'Choose an image smaller than 2 MB.';
         return;
       }
+
+      const verifiedSeller = getSellerVerificationStatus(currentUser.email);
+      if (!verifiedSeller && getListingCountForSeller(currentUser.email) >= 1) {
+        message.textContent = 'This seller account is still unverified and has reached the posting limit. Please complete verification to continue selling.';
+        return;
+      }
+
       const listing = {
         id: `listing-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
         createdAt: new Date().toISOString(),
@@ -128,7 +180,9 @@
         image: await readImageData(imageFile),
         sellerName: currentUser.fullname,
         sellerEmail: data.get('sellerEmail').trim(),
-        sellerPhone: data.get('sellerPhone').trim()
+        sellerPhone: data.get('sellerPhone').trim(),
+        sellerVerified: Boolean(verifiedSeller),
+        verificationStatus: verifiedSeller ? 'Verified seller' : 'Unverified seller'
       };
       const postData = new FormData();
       postData.append('title', listing.title);
@@ -156,6 +210,7 @@
         form.reset();
         preview.removeAttribute('src');
         preview.style.display = 'none';
+        renderVerificationBanner();
         button.disabled = false;
         button.innerHTML = '<i class="fas fa-paper-plane"></i> Post item';
       }

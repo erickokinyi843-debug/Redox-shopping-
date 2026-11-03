@@ -175,6 +175,55 @@
       font-weight: 800;
     }
 
+    .account-nav { position: relative; }
+    .account-nav summary { list-style: none; }
+    .account-nav summary::-webkit-details-marker { display: none; }
+    .account-nav summary::after { content: ' ▾'; font-size: 11px; }
+    .account-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      z-index: 1100;
+      display: none;
+      min-width: 190px;
+      padding: 6px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, .2);
+    }
+    .account-nav[open] .account-menu { display: grid; }
+    .account-menu button {
+      border: 0;
+      padding: 10px;
+      background: #fff;
+      color: #183b56;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+    }
+    .account-menu button:hover { background: #eef5f5; }
+
+    .nav-message-link {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-message-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: #E74C3C;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
     /* HERO BANNER */
     .hero {
       background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
@@ -715,6 +764,7 @@
     .header-icon { color: #e7f4f3; }
     .header-icon:hover { color: #7de2d5; }
     .header-icon i { color: var(--brand-yellow); }
+    .help-link { text-decoration: none; }
 
     .search-bar input { background: #fff; }
     .search-bar button { background: var(--brand-orange); }
@@ -810,6 +860,14 @@
     .cart-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
     .cart-item p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
     .cart-item button { border: 0; background: transparent; color: var(--coral); cursor: pointer; }
+    .fulfillment-form { display: grid; gap: 11px; padding: 0 20px 16px; }
+    .fulfillment-form[hidden] { display: none; }
+    .fulfillment-form label { display: grid; gap: 5px; color: var(--ink); font-size: 12px; font-weight: 800; }
+    .fulfillment-form select, .fulfillment-form input { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 4px; padding: 10px 11px; background: #fff; color: var(--ink); font: inherit; }
+    .fulfillment-note { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .fulfillment-actions { display: flex; justify-content: flex-end; gap: 9px; }
+    .fulfillment-actions button { min-height: 38px; border: 1px solid var(--line); border-radius: 4px; padding: 8px 12px; background: #fff; color: var(--ink); font: inherit; font-weight: 700; cursor: pointer; }
+    .fulfillment-actions .product-button { border: 0; background: var(--coral); color: #fff; }
     .cart-dialog-footer { border-top: 1px solid var(--line); font-weight: 700; }
     .cart-dialog-footer .product-button { width: auto; }
     .cart-empty { padding: 22px 0; color: var(--muted); text-align: center; }
@@ -870,6 +928,11 @@
       .navbar-content { position: relative; flex-wrap: wrap; gap: 0; }
       .navbar-item { display: none; width: 100%; padding: 11px 8px; border-top: 1px solid rgba(255, 255, 255, .12); }
       .navbar-content.menu-open .navbar-item { display: block; }
+      .navbar-content.menu-open .account-nav { width: 100%; }
+      .navbar-content.menu-open .account-nav summary { padding: 11px 8px; border-top: 1px solid rgba(255, 255, 255, .12); }
+      .navbar-content.menu-open .account-menu { position: static; min-width: 0; padding: 0 0 6px 12px; background: transparent; box-shadow: none; }
+      .navbar-content.menu-open .account-menu button { width: 100%; background: transparent; color: #fff; }
+      .navbar-content.menu-open .account-menu button:hover { background: rgba(255, 255, 255, .1); }
       .navbar-content.menu-open .sell-nav-button {
         display: block;
         width: 100%;
@@ -898,19 +961,13 @@
 
       <div class="header-right">
         <button class="cart-button" type="button" aria-label="Open shopping cart" onclick="openCart()"><i class="fas fa-shopping-cart"></i><span>Cart</span><span class="cart-count" id="cart-count">0</span></button>
-        <div class="header-icon">
-          <i class="fas fa-phone"></i>
+        <a class="header-icon help-link" href="messages.html?contact=support" aria-label="Chat with customer support">
+          <i class="fas fa-headset"></i>
           <span>Help</span>
-        </div>
-        <div class="header-icon user-menu" onclick="toggleUserMenu()">
+        </a>
+        <div class="header-icon">
           <i class="fas fa-user-circle"></i>
           <span id="user-name">Account</span>
-          <div class="user-menu-dropdown" id="userMenuDropdown">
-            <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> My Profile</a>
-            <a href="#" onclick="viewOrders()"><i class="fas fa-box"></i> My Orders</a>
-            <a href="#" onclick="viewWishlist()"><i class="fas fa-heart"></i> Wishlist</a>
-            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-          </div>
         </div>
       </div>
     </div>
@@ -926,9 +983,20 @@
       <div class="navbar-item" onclick="scrollToSection('products')">Explore</div>
       <div class="navbar-item" onclick="scrollToSection('categories')">Categories</div>
       <a class="navbar-item" href="services.html">Services</a>
-      <div class="navbar-item" onclick="scrollToSection('community-listings')">Wanted</div>
-      <div class="navbar-item">Messages</div>
-      <div class="navbar-item" onclick="event.stopPropagation(); toggleUserMenu()">My account</div>
+      <a class="navbar-item" href="wanted.html">Wanted</a>
+      <a class="navbar-item" href="rentals.html">Rentals</a>
+      <a class="navbar-item" href="accommodation.html">Accommodation</a>
+      <a class="navbar-item" href="events-hub.html">Events Hub</a>
+      <a class="navbar-item nav-message-link" href="messages.html">Messages <span class="nav-message-badge" id="nav-message-badge" hidden>0</span></a>
+      <details class="navbar-item account-nav">
+        <summary>My account</summary>
+        <div class="account-menu">
+          <button type="button" onclick="viewProfile()"><i class="fas fa-user"></i> My Profile</button>
+          <button type="button" onclick="viewOrders()"><i class="fas fa-box"></i> My Orders</button>
+          <button type="button" onclick="viewWishlist()"><i class="fas fa-heart"></i> Wishlist</button>
+          <button type="button" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </details>
     </div>
   </div>
 
@@ -967,6 +1035,7 @@
           <div class="marketplace-choice-actions">
             <a href="buy-sell.html"><i class="fas fa-store" aria-hidden="true"></i> Browse products</a>
             <a href="sell.html"><i class="fas fa-plus" aria-hidden="true"></i> Sell an item</a>
+            <a href="wanted.html"><i class="fas fa-bullhorn" aria-hidden="true"></i> Post a wanted ad</a>
           </div>
         </article>
         <article class="marketplace-choice">
@@ -1215,9 +1284,26 @@
       <button type="button" aria-label="Close cart" onclick="closeCart()">&times;</button>
     </div>
     <div class="cart-items" id="cart-items"></div>
+    <form class="fulfillment-form" id="fulfillment-form" hidden>
+      <label for="fulfillment-method">How would you like to receive your order?</label>
+      <select id="fulfillment-method" name="fulfillmentMethod" required>
+        <option value="rider">Delivery by a local rider</option>
+        <option value="pickup">Collect from the seller</option>
+        <option value="meetup">Meet at an agreed public location</option>
+      </select>
+      <label for="fulfillment-location" id="fulfillment-location-label">Delivery address</label>
+      <input id="fulfillment-location" name="fulfillmentLocation" maxlength="240" required placeholder="Enter delivery address">
+      <label for="order-phone">Contact phone number</label>
+      <input id="order-phone" name="phone" type="tel" maxlength="40" required placeholder="Phone number for coordination">
+      <p class="fulfillment-note">Coordinate the final pickup, rider, or meeting details directly with the seller. For meetups, choose a public place.</p>
+      <div class="fulfillment-actions">
+        <button type="button" id="cancel-checkout">Back to cart</button>
+        <button class="product-button" type="submit">Place order</button>
+      </div>
+    </form>
     <div class="cart-dialog-footer">
       <span id="cart-total">Total: KES 0</span>
-      <button class="product-button" id="checkout-button" type="button" onclick="checkout()">Checkout</button>
+      <button class="product-button" id="checkout-button" type="button" onclick="beginCheckout()">Checkout</button>
     </div>
   </dialog>
 
@@ -1331,6 +1417,10 @@
       });
       document.getElementById('cart-total').textContent = `Total: ${formatMoney(total)}`;
       document.getElementById('checkout-button').disabled = !items.length;
+      if (!items.length) {
+        document.getElementById('fulfillment-form').hidden = true;
+        document.getElementById('checkout-button').hidden = false;
+      }
       updateCartBadge();
     }
 
@@ -1349,30 +1439,67 @@
       document.getElementById('cart-dialog').close();
     }
 
-    function checkout() {
+    function beginCheckout() {
       const cart = readStoredItems(cartStorageKey);
       if (!cart.length) return;
-      const address = prompt('Enter your delivery address:');
-      if (!address || !address.trim()) return;
-      const phone = prompt('Enter a contact phone number:');
-      if (!phone || !phone.trim()) return;
+      document.getElementById('fulfillment-form').hidden = false;
+      document.getElementById('checkout-button').hidden = true;
+      document.getElementById('order-phone').value = currentUser.phone || '';
+      document.getElementById('fulfillment-location').focus();
+    }
+
+    function updateFulfillmentLocationLabel() {
+      const method = document.getElementById('fulfillment-method').value;
+      const label = document.getElementById('fulfillment-location-label');
+      const field = document.getElementById('fulfillment-location');
+      const options = {
+        rider: ['Delivery address', 'Enter delivery address'],
+        pickup: ['Seller pickup details', 'Enter the seller pickup location or collection arrangement'],
+        meetup: ['Agreed public meeting place', 'Enter a public place to meet']
+      };
+      [label.textContent, field.placeholder] = options[method];
+    }
+
+    function checkout(event) {
+      event.preventDefault();
+      const cart = readStoredItems(cartStorageKey);
+      if (!cart.length) return;
+      const formData = new FormData(document.getElementById('fulfillment-form'));
+      const fulfillmentMethod = String(formData.get('fulfillmentMethod') || '');
+      const fulfillmentLocation = String(formData.get('fulfillmentLocation') || '').trim();
+      const phone = String(formData.get('phone') || '').trim();
+      if (!fulfillmentLocation || !phone) return;
       const orders = readStoredItems(ordersStorageKey);
       const order = {
         id: `ORD-${Date.now()}`,
         items: cart,
         total: cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
-        address: address.trim(),
-        phone: phone.trim(),
+        email: currentUser.email || '',
+        fulfillmentMethod,
+        fulfillmentLocation,
+        address: fulfillmentMethod === 'rider' ? fulfillmentLocation : '',
+        phone,
         status: 'Placed',
         createdAt: new Date().toISOString()
       };
       orders.unshift(order);
       localStorage.setItem(ordersStorageKey, JSON.stringify(orders));
       localStorage.setItem(cartStorageKey, '[]');
+      document.getElementById('fulfillment-form').reset();
+      document.getElementById('fulfillment-form').hidden = true;
+      document.getElementById('checkout-button').hidden = false;
       closeCart();
       updateCartBadge();
-      alert(`Demo order ${order.id} saved on this browser for ${formatMoney(order.total)}. No payment or delivery service is connected.`);
+      const fulfillmentNames = { rider: 'local rider delivery', pickup: 'seller pickup', meetup: 'public meetup' };
+      alert(`Demo order ${order.id} saved for ${formatMoney(order.total)}. Arrangement: ${fulfillmentNames[fulfillmentMethod]}. No payment or delivery service is connected.`);
     }
+
+    document.getElementById('fulfillment-form').addEventListener('submit', checkout);
+    document.getElementById('fulfillment-method').addEventListener('change', updateFulfillmentLocationLabel);
+    document.getElementById('cancel-checkout').addEventListener('click', () => {
+      document.getElementById('fulfillment-form').hidden = true;
+      document.getElementById('checkout-button').hidden = false;
+    });
 
     function toggleWishlist(card) {
       const name = card.querySelector('.product-name').textContent.trim();
@@ -1467,6 +1594,12 @@
         const price = document.createElement('div');
         price.className = 'product-price';
         price.textContent = `KES ${Number(listing.price).toLocaleString()}`;
+
+        const sellerStatus = document.createElement('div');
+        sellerStatus.className = 'product-rating';
+        const verified = Boolean(listing.sellerVerified || (listing.verificationStatus === 'Verified seller'));
+        sellerStatus.textContent = verified ? '✅ Verified seller' : '⚠ Unverified seller';
+
         const contact = document.createElement('p');
         contact.className = 'seller-contact';
         contact.style.display = 'block';
@@ -1498,15 +1631,184 @@
           badge.textContent = 'Student listing';
           info.appendChild(badge);
         }
-        info.append(name, category, price, contact);
+
+        const reviewBox = document.createElement('div');
+        reviewBox.className = 'review-box';
+        const reviewSummary = document.createElement('div');
+        reviewSummary.className = 'review-summary';
+        const targetId = listing.id || `${listing.title || 'listing'}-${listing.sellerEmail || 'seller'}`;
+        const reviewData = (() => {
+          try {
+            const reviews = JSON.parse(localStorage.getItem('rodyxReviews') || '[]');
+            const matching = reviews.filter(review => review.targetId === targetId && review.targetType === 'listing');
+            if (!matching.length) return { average: '0.0', count: 0, stars: '☆☆☆☆☆', remarks: [] };
+            const total = matching.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+            const average = (total / matching.length).toFixed(1);
+            const rounded = Math.round(Number(average));
+            return {
+              average,
+              count: matching.length,
+              stars: `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`,
+              remarks: matching.filter(review => String(review.remark || '').trim()).slice(-3).map(review => ({ author: review.author || 'Customer', text: review.remark.trim() }))
+            };
+          } catch {
+            return { average: '0.0', count: 0, stars: '☆☆☆☆☆', remarks: [] };
+          }
+        })();
+        reviewSummary.innerHTML = `<strong>${reviewData.stars}</strong> <span>${reviewData.average} (${reviewData.count} review${reviewData.count === 1 ? '' : 's'})</span>`;
+        reviewBox.appendChild(reviewSummary);
+
+        const remarks = document.createElement('div');
+        remarks.className = 'review-remarks';
+        if (reviewData.remarks.length) {
+          reviewData.remarks.forEach(item => {
+            const remark = document.createElement('div');
+            remark.className = 'review-remark';
+            remark.innerHTML = `<span class="review-remark-author">${item.author}</span> <span>${item.text}</span>`;
+            remarks.appendChild(remark);
+          });
+        } else {
+          remarks.textContent = 'No remarks yet. Be the first to rate this seller.';
+        }
+        reviewBox.appendChild(remarks);
+
+        const reviewForm = document.createElement('form');
+        reviewForm.className = 'review-form';
+        reviewForm.innerHTML = `
+          <label>Rate this seller
+            <select name="rating">
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Good</option>
+              <option value="3">3 - Fair</option>
+              <option value="2">2 - Poor</option>
+              <option value="1">1 - Very poor</option>
+            </select>
+          </label>
+          <label>Remark
+            <textarea name="remark" rows="2" maxlength="220" placeholder="Share your remarks about this seller"></textarea>
+          </label>
+          <button type="submit">Submit rating</button>
+        `;
+        reviewForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const formData = new FormData(reviewForm);
+          const rating = Number(formData.get('rating'));
+          const remark = String(formData.get('remark') || '').trim();
+          try {
+            const reviews = JSON.parse(localStorage.getItem('rodyxReviews') || '[]');
+            reviews.unshift({
+              targetId,
+              targetType: 'listing',
+              rating,
+              remark: remark || 'No additional remarks',
+              author: JSON.parse(localStorage.getItem('currentUser') || '{}').fullname || 'Customer',
+              createdAt: new Date().toISOString()
+            });
+            localStorage.setItem('rodyxReviews', JSON.stringify(reviews));
+            reviewForm.reset();
+            window.location.reload();
+          } catch {
+            alert('Your rating could not be saved in this browser.');
+          }
+        });
+        reviewBox.appendChild(reviewForm);
+
+        info.append(name, category, sellerStatus, price, contact);
         const addButton = document.createElement('button');
         addButton.className = 'product-button';
         addButton.type = 'button';
         addButton.textContent = 'Add to Cart';
         addButton.addEventListener('click', () => addToCart(card));
-        info.appendChild(addButton);
+
+        const messageButton = document.createElement('button');
+        messageButton.className = 'wishlist-button';
+        messageButton.type = 'button';
+        messageButton.innerHTML = '<i class="fas fa-envelope"></i> Message seller';
+        messageButton.addEventListener('click', () => {
+          const sellerEmail = listing.sellerEmail || '';
+          if (!sellerEmail) {
+            alert('No seller contact is available for this listing.');
+            return;
+          }
+          const sellerName = listing.businessName || listing.sellerName || 'Seller';
+          window.location.href = `messages.html?contact=${encodeURIComponent(sellerEmail)}&name=${encodeURIComponent(sellerName)}`;
+        });
+
+        info.append(addButton, messageButton);
+    info.appendChild(reviewBox);
         card.append(image, info);
         return card;
+    }
+
+    function normalizeLocation(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    }
+
+    function getExactLocationMatches(listings, requestedLocation) {
+      const normalizedRequest = normalizeLocation(requestedLocation);
+      if (!normalizedRequest) return listings;
+      return listings.filter(listing => normalizeLocation(listing.town || listing.area || '').trim() === normalizedRequest);
+    }
+
+    function renderLocationRecommendations() {
+      const allListings = JSON.parse(localStorage.getItem('rodyxListings') || '[]');
+      const nearbyList = document.getElementById('nearby-products-list');
+      const recommendedSellerList = document.getElementById('recommended-seller-list');
+      const localBusinessList = document.getElementById('local-business-list');
+      const nearbyInput = document.getElementById('nearby-location');
+      const requestedLocation = (nearbyInput && nearbyInput.value.trim()) || localStorage.getItem('rodyxPreferredLocation') || '';
+
+      if (nearbyInput) {
+        nearbyInput.value = requestedLocation;
+      }
+
+      const exactMatches = getExactLocationMatches(allListings, requestedLocation);
+      const locationMatches = exactMatches.length ? exactMatches : allListings;
+      const prioritizedMatches = [...locationMatches].sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0)).slice(0, 4);
+
+      nearbyList.replaceChildren();
+      if (!prioritizedMatches.length) {
+        nearbyList.innerHTML = '<p class="marketplace-note">No listings match that exact location yet. Try another town or post a local listing.</p>';
+      } else {
+        prioritizedMatches.forEach(listing => nearbyList.appendChild(createSellerListingCard(listing)));
+      }
+
+      recommendedSellerList.replaceChildren();
+      const recommendedSellers = prioritizedMatches.filter(listing => listing.sellerEmail || listing.sellerPhone || listing.sellerName || listing.businessName).slice(0, 4);
+      if (!recommendedSellers.length) {
+        recommendedSellerList.innerHTML = '<p class="marketplace-note">No recommended sellers are available for that exact location yet.</p>';
+      } else {
+        recommendedSellers.forEach(listing => {
+          const card = document.createElement('div');
+          card.className = 'seller-card';
+          card.innerHTML = `
+            <h3>${(listing.businessName || listing.sellerName || 'Seller').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
+            <p><strong>Area:</strong> ${String(listing.town || 'General area').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <p><strong>Category:</strong> ${String(listing.category || 'Community listing').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <p><strong>Contact:</strong> ${String(listing.sellerEmail || listing.sellerPhone || 'Message seller').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <a href="messages.html?contact=${encodeURIComponent(listing.sellerEmail || '')}&name=${encodeURIComponent(listing.businessName || listing.sellerName || 'Seller')}">Message seller</a>
+          `;
+          recommendedSellerList.appendChild(card);
+        });
+      }
+
+      localBusinessList.replaceChildren();
+      const localBusinesses = allListings.filter(listing => (listing.businessName || '').trim() && normalizeLocation(listing.town || listing.area || '') === normalizeLocation(requestedLocation || listing.town || '')).slice(0, 4);
+      if (!localBusinesses.length) {
+        localBusinessList.innerHTML = '<p class="marketplace-note">No local businesses are registered in that exact location yet.</p>';
+      } else {
+        localBusinesses.forEach(listing => {
+          const card = document.createElement('div');
+          card.className = 'seller-card';
+          card.innerHTML = `
+            <h3>${String(listing.businessName || 'Business').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</h3>
+            <p><strong>Location:</strong> ${String(listing.town || 'General area').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <p><strong>Featured item:</strong> ${String(listing.title || 'Community item').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            <a href="messages.html?contact=${encodeURIComponent(listing.sellerEmail || '')}&name=${encodeURIComponent(listing.businessName || listing.sellerName || 'Seller')}">Contact business</a>
+          `;
+          localBusinessList.appendChild(card);
+        });
+      }
     }
 
     function loadSellerListings() {
@@ -1516,6 +1818,7 @@
       if (!listings.length) {
         sellerListings.innerHTML = '<p class="marketplace-note">No recent products yet. <a href="sell.html">Post the first listing</a>.</p>';
         studentListings.innerHTML = '<p class="marketplace-note">No student listings yet. Sellers can mark items for the student marketplace when posting.</p>';
+        renderLocationRecommendations();
         return;
       }
       listings.sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0));
@@ -1523,14 +1826,57 @@
       const studentItems = listings.filter(listing => listing.studentMarketplace);
       if (!studentItems.length) {
         studentListings.innerHTML = '<p class="marketplace-note">No student listings yet. Sellers can mark items for the student marketplace when posting.</p>';
-        return;
+      } else {
+        studentItems.slice(0, 8).forEach(listing => studentListings.appendChild(createSellerListingCard(listing)));
       }
-      studentItems.slice(0, 8).forEach(listing => studentListings.appendChild(createSellerListingCard(listing)));
+      renderLocationRecommendations();
     }
 
     updateCartBadge();
+    updateMessageNotificationBadge();
     loadSellerListings();
+    const nearbySearchForm = document.getElementById('nearby-search-form');
+    const nearbyLocationInput = document.getElementById('nearby-location');
+    if (nearbySearchForm) {
+      nearbySearchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const location = nearbyLocationInput ? nearbyLocationInput.value.trim() : '';
+        if (location) {
+          localStorage.setItem('rodyxPreferredLocation', location);
+        }
+        renderLocationRecommendations();
+      });
+    }
+    if (nearbyLocationInput) {
+      nearbyLocationInput.addEventListener('input', (event) => {
+        if (event.target.value.trim()) {
+          localStorage.setItem('rodyxPreferredLocation', event.target.value.trim());
+        }
+        renderLocationRecommendations();
+      });
+    }
     if (new URLSearchParams(window.location.search).get('cart') === 'open') openCart();
+    window.updateMessageNotificationBadge = updateMessageNotificationBadge;
+
+    function updateMessageNotificationBadge() {
+      const badge = document.getElementById('nav-message-badge');
+      if (!badge || !currentUser.email) return;
+
+      const threads = JSON.parse(localStorage.getItem('rodyxMessages') || '[]');
+      let unreadCount = 0;
+
+      threads.forEach(thread => {
+        if (!Array.isArray(thread.participants) || !thread.participants.includes(currentUser.email)) return;
+        (thread.messages || []).forEach(message => {
+          if (message.sender === currentUser.email) return;
+          const readBy = Array.isArray(message.readBy) ? message.readBy : [];
+          if (!readBy.includes(currentUser.email)) unreadCount += 1;
+        });
+      });
+
+      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+      badge.hidden = unreadCount === 0;
+    }
 
     function viewProfile() {
       alert(`Profile Info:\nName: ${currentUser.fullname}\nEmail: ${currentUser.email}\nPhone: ${currentUser.phone}\nAccount Created: ${currentUser.createdAt}`);

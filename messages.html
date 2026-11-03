@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages - CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #183b56;
+      --teal: #18a999;
+      --coral: #ff6b4a;
+      --page: #edf5f5;
+      --muted: #607d8b;
+      --line: #dfe9eb;
+      --card: #ffffff;
+      --shadow: rgba(24, 59, 86, 0.12);
+      --soft: #f5fafb;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--navy);
+      font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+    }
+
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 16px max(20px, calc((100% - 1200px) / 2));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo { color: #fff; text-decoration: none; font-size: 24px; font-weight: 900; }
+    .logo i { color: var(--coral); margin-right: 8px; }
+    .back-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 34px auto;
+      padding: 0 20px 40px;
+    }
+
+    .chat-shell {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 70vh;
+      background: var(--card);
+      border-radius: 8px;
+      box-shadow: 0 8px 22px var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    .sidebar {
+      background: var(--soft);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header {
+      padding: 18px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .sidebar-header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .threads {
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+    }
+
+    .thread {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--line);
+      padding: 14px 16px;
+      text-align: left;
+      color: var(--navy);
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .thread:hover, .thread.active {
+      background: #edf9f8;
+    }
+
+    .thread-name {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .thread-preview {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .thread-unread {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--coral);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .chat-panel {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .chat-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: #fdfefe;
+    }
+
+    .message-row {
+      display: flex;
+    }
+
+    .message-row.me {
+      justify-content: flex-end;
+    }
+
+    .bubble {
+      max-width: min(78%, 480px);
+      padding: 10px 12px;
+      border-radius: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .message-row.me .bubble {
+      background: var(--teal);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-row.other .bubble {
+      background: #eef4f5;
+      color: var(--navy);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-meta {
+      font-size: 11px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 16px 20px;
+      background: #fff;
+      display: flex;
+      gap: 12px;
+    }
+
+    .composer input {
+      flex: 1;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font: inherit;
+      color: var(--navy);
+    }
+
+    .composer button {
+      border: none;
+      border-radius: 6px;
+      background: var(--coral);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      padding: 12px 18px;
+      cursor: pointer;
+    }
+
+    .composer button:hover { background: #e95334; }
+
+    .empty-state {
+      display: grid;
+      place-items: center;
+      min-height: 200px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    @media (max-width: 760px) {
+      .chat-shell {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+      }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="homepage.html"><i class="fas fa-shopping-bag"></i>RODYX</a>
+    <a class="back-link" href="homepage.html"><i class="fas fa-arrow-left"></i> Back to homepage</a>
+  </header>
+
+  <main>
+    <div class="chat-shell">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>Messages</h1>
+        </div>
+        <div id="threads" class="threads" aria-live="polite"></div>
+      </aside>
+
+      <section class="chat-panel">
+        <div id="chat-header" class="chat-header">Select a conversation</div>
+        <div id="messages" class="messages"></div>
+        <form id="composer" class="composer">
+          <input id="message-input" type="text" maxlength="500" placeholder="Type your message..." autocomplete="off">
+          <button type="submit">Send</button>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.email) window.location.href = 'index.html';
+
+    const storageKey = 'rodyxMessages';
+    const threadsEl = document.getElementById('threads');
+    const messagesEl = document.getElementById('messages');
+    const chatHeaderEl = document.getElementById('chat-header');
+    const composer = document.getElementById('composer');
+    const input = document.getElementById('message-input');
+
+    function readMessages() {
+      try {
+        const data = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        return Array.isArray(data) ? data : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveMessages(threads) {
+      localStorage.setItem(storageKey, JSON.stringify(threads));
+    }
+
+    function getThreadId(emailA, emailB) {
+      return [emailA, emailB].slice().sort().join('|');
+    }
+
+    function getOtherParticipant(thread) {
+      return thread.participants.find(email => email !== currentUser.email) || 'Unknown person';
+    }
+
+    function formatName(email) {
+      if (!email) return 'Unknown user';
+      if (email === currentUser.email) return 'You';
+      const nameText = email.split('@')[0].replace(/[._-]/g, ' ');
+      return nameText.charAt(0).toUpperCase() + nameText.slice(1);
+    }
+
+    function getThreadLabel(thread) {
+      const otherEmail = getOtherParticipant(thread);
+      const otherName = thread.names && thread.names[otherEmail] ? thread.names[otherEmail] : formatName(otherEmail);
+      return otherName || formatName(otherEmail);
+    }
+
+    function getUnreadCountForThread(thread) {
+      if (!thread || !Array.isArray(thread.messages)) return 0;
+      return thread.messages.filter(message => {
+        return message.sender !== currentUser.email && !(Array.isArray(message.readBy) && message.readBy.includes(currentUser.email));
+      }).length;
+    }
+
+    function updateGlobalBadge() {
+      const badge = document.getElementById('nav-message-badge');
+      if (!badge) return;
+      const threads = readMessages();
+      const unreadCount = threads.reduce((count, thread) => count + getUnreadCountForThread(thread), 0);
+      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+      badge.hidden = unreadCount === 0;
+      if (window.updateMessageNotificationBadge) window.updateMessageNotificationBadge();
+    }
+
+    window.addEventListener('storage', event => {
+      if (event.key === storageKey) renderThreads();
+    });
+
+    function markThreadAsRead(threadId) {
+      const threads = readMessages();
+      const thread = threads.find(item => item.id === threadId);
+      if (!thread || !Array.isArray(thread.messages)) return;
+
+      let changed = false;
+      thread.messages.forEach(message => {
+        if (message.sender === currentUser.email) return;
+        if (!Array.isArray(message.readBy)) message.readBy = [];
+        if (!message.readBy.includes(currentUser.email)) {
+          message.readBy.push(currentUser.email);
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        saveMessages(threads);
+      }
+      updateGlobalBadge();
+    }
+
+    function renderThreads() {
+      const threads = readMessages();
+      if (!threads.length) {
+        threadsEl.innerHTML = '<div class="empty-state">No conversations yet. Message a seller from a listing to start chatting.</div>';
+        return;
+      }
+
+      const sorted = threads
+        .filter(thread => Array.isArray(thread.participants) && thread.participants.includes(currentUser.email))
+        .sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+
+      const activeThreadId = document.body.dataset.activeThread || sorted[0]?.id;
+      threadsEl.innerHTML = '';
+
+      if (!sorted.length) {
+        threadsEl.innerHTML = '<div class="empty-state">No conversations yet. Message a seller from a listing to start chatting.</div>';
+        return;
+      }
+
+      sorted.forEach(thread => {
+        const unreadCount = getUnreadCountForThread(thread);
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'thread' + (thread.id === activeThreadId ? ' active' : '');
+        button.innerHTML = `
+          <div class="thread-name">${getThreadLabel(thread)}${unreadCount ? `<span class="thread-unread">${unreadCount > 9 ? '9+' : unreadCount}</span>` : ''}</div>
+          <div class="thread-preview">${thread.messages?.slice(-1)[0]?.text || 'No messages yet'}</div>
+        `;
+        button.addEventListener('click', () => {
+          document.body.dataset.activeThread = thread.id;
+          markThreadAsRead(thread.id);
+          renderThreads();
+          renderMessages(thread.id);
+        });
+        threadsEl.appendChild(button);
+      });
+
+      if (!sorted.some(thread => thread.id === activeThreadId)) {
+        document.body.dataset.activeThread = sorted[0].id;
+      }
+
+      renderMessages(document.body.dataset.activeThread);
+      updateGlobalBadge();
+    }
+
+    function renderMessages(threadId) {
+      const threads = readMessages();
+      const thread = threads.find(item => item.id === threadId);
+      if (!thread) {
+        messagesEl.innerHTML = '<div class="empty-state">Choose a thread to start messaging.</div>';
+        chatHeaderEl.textContent = 'Select a conversation';
+        return;
+      }
+
+      markThreadAsRead(threadId);
+      const otherEmail = getOtherParticipant(thread);
+      const otherName = thread.names && thread.names[otherEmail] ? thread.names[otherEmail] : formatName(otherEmail);
+      chatHeaderEl.textContent = otherName;
+      messagesEl.innerHTML = '';
+
+      if (!thread.messages || !thread.messages.length) {
+        messagesEl.innerHTML = '<div class="empty-state">Say hello and start the conversation.</div>';
+        return;
+      }
+
+      thread.messages.forEach(message => {
+        const row = document.createElement('div');
+        const isMine = message.sender === currentUser.email;
+        row.className = `message-row ${isMine ? 'me' : 'other'}`;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = `${message.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}<div class="message-meta">${formatName(message.sender)} · ${new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+      });
+
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function openOrCreateThread(contactEmail, contactName, isSupport = false) {
+      const threads = readMessages();
+      const threadId = getThreadId(currentUser.email, contactEmail);
+      let thread = threads.find(item => item.id === threadId);
+
+      if (!thread) {
+        thread = {
+          id: threadId,
+          participants: [currentUser.email, contactEmail],
+          names: { [currentUser.email]: currentUser.fullname || currentUser.email, [contactEmail]: contactName || formatName(contactEmail) },
+          messages: [],
+          lastUpdated: new Date().toISOString(),
+          support: isSupport
+        };
+        threads.push(thread);
+      }
+
+      if (isSupport) thread.support = true;
+
+      if (contactName) {
+        thread.names = thread.names || {};
+        thread.names[contactEmail] = contactName;
+      }
+
+      saveMessages(threads);
+      document.body.dataset.activeThread = thread.id;
+      renderThreads();
+    }
+
+    composer.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      const threads = readMessages();
+      const threadId = document.body.dataset.activeThread;
+      const thread = threads.find(item => item.id === threadId);
+
+      if (!thread) {
+        input.value = '';
+        return;
+      }
+
+      thread.messages.push({
+        sender: currentUser.email,
+        text,
+        createdAt: new Date().toISOString(),
+        readBy: [currentUser.email]
+      });
+      thread.lastUpdated = new Date().toISOString();
+      saveMessages(threads);
+      input.value = '';
+      renderThreads();
+      updateGlobalBadge();
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const contactEmail = params.get('contact');
+    const contactName = params.get('name');
+
+    if (contactEmail === 'support') {
+      let supportEmail = 'support@rodyx.local';
+      try {
+        const adminAccount = JSON.parse(localStorage.getItem('rodyxAdminAccount') || 'null');
+        if (adminAccount?.email) supportEmail = adminAccount.email.toLowerCase();
+      } catch {
+        // Keep the support inbox available before admin setup.
+      }
+      openOrCreateThread(supportEmail, 'CHUKA RODYX SHOP Support', true);
+    } else if (contactEmail) {
+      openOrCreateThread(contactEmail, contactName || '');
+    } else {
+      const threads = readMessages();
+      const forUser = threads.filter(thread => Array.isArray(thread.participants) && thread.participants.includes(currentUser.email));
+      if (forUser.length) {
+        document.body.dataset.activeThread = forUser[0].id;
+      }
+      updateGlobalBadge();
+      renderThreads();
+    }
+  </script>
+</body>
+</html>

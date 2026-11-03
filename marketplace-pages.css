@@ -68,13 +68,135 @@ a { color: inherit; }
 .service-card p { margin: 7px 0; color: var(--market-muted); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .service-card a { display: block; margin-top: 7px; color: #b9412b; font-size: 13px; font-weight: 800; text-decoration: none; overflow-wrap: anywhere; }
 .service-card a:hover { text-decoration: underline; }
+.review-box {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--market-line);
+}
+.review-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  color: var(--market-navy);
+  font-size: 12px;
+  font-weight: 800;
+}
+.review-summary strong { color: #f4b400; letter-spacing: .08em; }
+.review-remarks {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 10px;
+  color: var(--market-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.review-remark {
+  padding: 7px 8px;
+  border-radius: 4px;
+  background: #f4f9f9;
+}
+.review-remark-author {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--market-navy);
+  font-weight: 800;
+}
+.review-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.review-form label {
+  display: grid;
+  gap: 5px;
+  color: var(--market-navy);
+  font-size: 12px;
+  font-weight: 800;
+}
+.review-form select,
+.review-form textarea {
+  width: 100%;
+  border: 1px solid var(--market-line);
+  border-radius: 4px;
+  padding: 8px 9px;
+  font: inherit;
+  color: var(--market-navy);
+  background: #fff;
+}
+.review-form textarea {
+  min-height: 54px;
+  resize: vertical;
+}
+.review-form button {
+  border: 0;
+  border-radius: 4px;
+  padding: 9px 10px;
+  background: var(--market-coral);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.review-form button:hover { filter: brightness(.94); }
 .service-search { margin-bottom: 14px; }
 .service-search input { width: 100%; border: 1px solid var(--market-line); border-radius: 3px; padding: 11px 12px; color: var(--market-navy); font: inherit; }
 .service-empty { grid-column: 1 / -1; padding: 24px; border: 1px dashed var(--market-line); color: var(--market-muted); background: #fff; text-align: center; }
+.rental-price-fields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, .7fr); gap: 10px; }
+.rental-image-preview { display: block; width: min(100%, 260px); max-height: 180px; margin-top: 9px; border-radius: 4px; object-fit: cover; }
+.rental-image-preview[hidden] { display: none; }
+.rental-card-image { display: block; width: 100%; aspect-ratio: 4 / 3; margin-bottom: 12px; border-radius: 3px; background: #eef5f5; object-fit: cover; }
+.rental-card-price { color: #b9412b !important; font-size: 15px !important; font-weight: 900; }
+.rental-card-duration { font-weight: 800; }
+.event-poster-preview { display: block; width: min(100%, 300px); max-height: 210px; margin-top: 9px; border-radius: 4px; object-fit: cover; }
+.event-poster-preview[hidden] { display: none; }
+.event-poster { display: block; width: 100%; aspect-ratio: 4 / 3; margin-bottom: 12px; border-radius: 3px; background: #eef5f5; object-fit: cover; }
+.event-card-datetime { color: #08776d !important; font-weight: 800; }
+.accommodation-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 7px; margin-bottom: 12px; }
+.accommodation-images img { display: block; width: 100%; aspect-ratio: 4 / 3; border-radius: 3px; background: #eef5f5; object-fit: cover; }
+.accommodation-image-previews { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 7px; margin-top: 9px; }
+.accommodation-image-previews img { display: block; width: 100%; aspect-ratio: 1; border-radius: 3px; object-fit: cover; }
+.accommodation-image-previews[hidden] { display: none; }
+.accommodation-price { color: #b9412b !important; font-size: 15px !important; font-weight: 900; }
+.accommodation-availability { color: #08776d !important; font-weight: 800; }
+.listing-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin: 4px 0 8px !important;
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 11px !important;
+  font-weight: 900;
+  line-height: 1.35 !important;
+}
+.listing-status.is-available,
+.listing-status.is-upcoming { background: #e5f5ee; color: #176846; }
+.listing-status.is-live { background: #e1f3f5; color: #12616a; }
+.listing-status.is-unavailable,
+.listing-status.is-expired { background: #fff0e8; color: #a53d25; }
+.listing-status-action {
+  display: block;
+  margin-top: 12px;
+  border: 1px solid var(--market-line);
+  border-radius: 3px;
+  padding: 8px 10px;
+  background: #fff;
+  color: var(--market-navy);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.listing-status-action:hover { background: #f4f9f9; }
+@media (max-width: 420px) { .rental-price-fields { grid-template-columns: 1fr; } }
 @media (max-width: 800px) { .services-layout { grid-template-columns: 1fr; } }
 @media (max-width: 650px) {
   .market-header { flex-wrap: wrap; padding: 12px 16px; }
-  .market-header-links { width: 100%; justify-content: space-between; gap: 8px; }
+  .market-header-links { width: 100%; flex-wrap: wrap; justify-content: flex-start; gap: 8px 14px; }
   .market-main { margin-top: 18px; padding: 0 12px; }
   .market-intro { padding: 20px; }
   .market-intro h1 { font-size: 25px; }

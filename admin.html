@@ -36,9 +36,33 @@
     .topline { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 22px; }.topline h1 { margin: 0 0 5px; font-size: 28px; }.topline p { margin: 0; color: var(--muted); }.refresh { border: 0; background: var(--teal); color: #fff; padding: 10px 14px; border-radius: 3px; cursor: pointer; font: inherit; font-weight: 700; }.refresh:hover { background: #128b7e; }
     .admin-kicker { display: block; margin-bottom: 7px; color: #b9412b; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     .notice { background: #fff2de; color: #97510e; border-left: 4px solid var(--coral); padding: 12px 15px; margin-bottom: 18px; font-size: 13px; }
-    .stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 13px; margin-bottom: 25px; }.stat { background: #fff; border-radius: 4px; padding: 17px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); border-top: 4px solid var(--teal); }.stat:nth-child(2n) { border-top-color: var(--coral); }.stat i { color: var(--teal); font-size: 19px; }.stat:nth-child(2n) i { color: var(--coral); }.stat strong { display: block; font-size: 25px; margin: 9px 0 2px; }.stat span { color: var(--muted); font-size: 12px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 25px; }.stat { background: #fff; border-radius: 4px; padding: 17px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); border-top: 4px solid var(--teal); }.stat:nth-child(2n) { border-top-color: var(--coral); }.stat i { color: var(--teal); font-size: 19px; }.stat:nth-child(2n) i { color: var(--coral); }.stat strong { display: block; font-size: 25px; margin: 9px 0 2px; }.stat span { color: var(--muted); font-size: 12px; }
     .grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; }.panel { background: #fff; border-radius: 4px; padding: 20px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); margin-bottom: 18px; overflow: hidden; }.panel h2 { font-size: 18px; margin: 0 0 14px; }.panel h2 i { color: var(--coral); margin-right: 8px; }
     .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: 12px; } th { color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid var(--line); padding: 9px 8px; } td { border-bottom: 1px solid var(--line); padding: 11px 8px; white-space: nowrap; } tr:last-child td { border-bottom: 0; }.empty { color: var(--muted); padding: 18px 0; font-size: 13px; }.status-select, .search { border: 1px solid var(--line); border-radius: 3px; background: #fff; color: var(--navy); font: inherit; padding: 8px 10px; }.search { width: min(100%, 260px); }.table-toolbar { display: flex; justify-content: flex-end; margin: -4px 0 12px; }.remove-listing, .remove-user { border: 0; background: transparent; color: #b9412b; font: inherit; font-weight: 700; cursor: pointer; }.shortcuts { display: flex; flex-wrap: wrap; gap: 10px; }.shortcuts a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 3px; color: var(--navy); text-decoration: none; font-size: 13px; font-weight: 700; }.shortcuts a:hover { border-color: var(--teal); color: #08776d; }
+    .content-cell { min-width: 240px; max-width: 420px; white-space: normal; overflow-wrap: anywhere; }
+    .content-cell strong { display: block; color: var(--deep); }
+    .content-cell span { display: block; margin-top: 4px; color: var(--muted); line-height: 1.45; }
+    .content-status { white-space: normal; }
+    .admin-action { display: block; margin: 3px 0; border: 0; padding: 3px 0; background: transparent; color: #08776d; font: inherit; font-weight: 800; cursor: pointer; }
+    .admin-action:hover, .remove-listing:hover { text-decoration: underline; }
+    .support-inbox { display: grid; grid-template-columns: minmax(210px, .7fr) minmax(0, 1.5fr); min-height: 380px; border: 1px solid var(--line); }
+    .support-threads { min-width: 0; overflow-y: auto; border-right: 1px solid var(--line); background: #f7fafb; }
+    .support-thread { display: block; width: 100%; padding: 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--navy); text-align: left; cursor: pointer; }
+    .support-thread[aria-current="true"] { background: #e5f5f2; }
+    .support-thread strong, .support-thread span { display: block; overflow-wrap: anywhere; }
+    .support-thread span { margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .support-unread { display: inline-block !important; width: fit-content; padding: 2px 6px; border-radius: 10px; background: var(--coral); color: #fff !important; font-weight: 800; }
+    .support-conversation { display: flex; min-width: 0; flex-direction: column; }
+    .support-chat-title { padding: 12px 15px; border-bottom: 1px solid var(--line); font-weight: 800; overflow-wrap: anywhere; }
+    .support-chat-messages { flex: 1; min-height: 240px; max-height: 480px; overflow-y: auto; padding: 14px; }
+    .support-message { width: fit-content; max-width: min(85%, 620px); margin: 0 0 10px; padding: 9px 11px; background: #edf4f5; overflow-wrap: anywhere; white-space: pre-wrap; }
+    .support-message.from-admin { margin-left: auto; background: #e5f5f2; }
+    .support-message small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
+    .support-empty { padding: 18px; color: var(--muted); font-size: 13px; }
+    .support-reply-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+    .support-reply-form input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 3px; padding: 10px; font: inherit; }
+    .support-reply-form button { border: 0; border-radius: 3px; padding: 0 16px; background: var(--teal); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+    @media (max-width: 620px) { .support-inbox { grid-template-columns: 1fr; }.support-threads { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--line); }.support-chat-messages { min-height: 200px; } }
     @media (max-width: 950px) { .stats { grid-template-columns: repeat(3, 1fr); }.grid { grid-template-columns: 1fr; } }
     @media (max-width: 700px) { header { height: auto; min-height: 60px; padding: 12px 16px; flex-wrap: wrap; gap: 10px; }.brand { font-size: 18px; }.admin-badge { order: 3; }.back-link { margin-left: auto; } }
     @media (max-width: 560px) { .topline { align-items: start; flex-direction: column; }.stats { grid-template-columns: repeat(2, 1fr); }.stat { padding: 13px; } main { margin-top: 22px; padding: 0 12px; }.auth-shell { margin-top: 32px; padding: 0 12px; }.auth-card { padding: 22px; }.panel { padding: 15px; } }
@@ -76,28 +100,59 @@
     <div class="notice" id="notice">Demo mode: dashboard data is stored in this browser only. This page does not provide server-side admin security.</div>
     <section class="stats">
       <div class="stat"><i class="fas fa-users"></i><strong id="users-count">0</strong><span>Customers</span></div>
-      <div class="stat"><i class="fas fa-box-open"></i><strong id="products-count">0</strong><span>Community listings</span></div>
+      <div class="stat"><i class="fas fa-box-open"></i><strong id="products-count">0</strong><span>Product listings</span></div>
       <div class="stat"><i class="fas fa-receipt"></i><strong id="orders-count">0</strong><span>Demo orders</span></div>
-      <div class="stat"><i class="fas fa-shopping-cart"></i><strong id="posts-count">0</strong><span>Items in carts</span></div>
       <div class="stat"><i class="fas fa-coins"></i><strong id="revenue-count">KES 0</strong><span>Demo order value</span></div>
+      <div class="stat"><i class="fas fa-clipboard-list"></i><strong id="posts-count">0</strong><span>Wants and services</span></div>
+      <div class="stat"><i class="fas fa-house"></i><strong id="rental-count">0</strong><span>Rentals and accommodation</span></div>
+      <div class="stat"><i class="fas fa-calendar-days"></i><strong id="events-count">0</strong><span>Events</span></div>
+      <div class="stat"><i class="fas fa-star"></i><strong id="reviews-count">0</strong><span>Ratings and remarks</span></div>
+      <div class="stat"><i class="fas fa-user-check"></i><strong id="verification-count">0</strong><span>Pending seller checks</span></div>
       <div class="stat"><i class="fas fa-clock"></i><strong id="stock-count">0</strong><span>Open orders</span></div>
     </section>
     <div class="grid">
       <div>
-        <section class="panel"><h2><i class="fas fa-receipt"></i>Recent orders</h2><div class="table-toolbar"><input class="search" id="order-search" type="search" placeholder="Search orders or customers" aria-label="Search orders or customers"></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th></tr></thead><tbody id="orders-table"></tbody></table></div></section>
+        <section class="panel"><h2><i class="fas fa-receipt"></i>Recent orders</h2><div class="table-toolbar"><input class="search" id="order-search" type="search" placeholder="Search orders or customers" aria-label="Search orders or customers"></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Fulfillment</th><th>Status</th><th>Date</th></tr></thead><tbody id="orders-table"></tbody></table></div></section>
         <section class="panel"><h2><i class="fas fa-box-open"></i>Marketplace inventory</h2><div class="table-toolbar"><input class="search" id="listing-search" type="search" placeholder="Search listings" aria-label="Search listings"></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>Seller</th><th>Price</th><th>Added</th><th>Action</th></tr></thead><tbody id="products-table"></tbody></table></div></section>
+        <section class="panel"><h2><i class="fas fa-shield-alt"></i>All marketplace content</h2><div class="table-toolbar"><input class="search" id="content-search" type="search" placeholder="Search posts, owners, or details" aria-label="Search marketplace content"></div><div class="table-wrap"><table><thead><tr><th>Type</th><th>Post and details</th><th>Owner</th><th>Created</th><th>Status</th><th>Admin actions</th></tr></thead><tbody id="content-table"></tbody></table></div></section>
       </div>
       <div>
-        <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
+        <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-toolbar"><input class="search" id="customer-search" type="search" placeholder="Search customers" aria-label="Search customers"></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
+        <section class="panel"><h2><i class="fas fa-user-check"></i>Seller verification requests</h2><div class="table-toolbar"><input class="search" id="verification-search" type="search" placeholder="Search verification requests" aria-label="Search verification requests"></div><div class="table-wrap"><table><thead><tr><th>Seller</th><th>Email</th><th>Phone</th><th>Document</th><th>Status</th><th>Action</th></tr></thead><tbody id="seller-verification-table"></tbody></table></div></section>
         <section class="panel"><h2><i class="fas fa-bolt"></i>Quick links</h2><div class="shortcuts"><a href="homepage.html"><i class="fas fa-store"></i>Storefront</a><a href="sell.html"><i class="fas fa-plus"></i>Post a listing</a></div></section>
       </div>
     </div>
+    <section class="panel" aria-labelledby="support-inbox-title">
+      <h2 id="support-inbox-title"><i class="fas fa-headset"></i>Customer support inbox</h2>
+      <div class="support-inbox">
+        <div class="support-threads" id="support-thread-list" aria-label="Support conversations"></div>
+        <div class="support-conversation">
+          <div class="support-chat-title" id="support-chat-title">Select a support conversation</div>
+          <div class="support-chat-messages" id="support-chat-messages" aria-live="polite"><div class="support-empty">Help conversations started from the storefront will appear here.</div></div>
+          <form class="support-reply-form" id="support-reply-form">
+            <input id="support-reply-input" type="text" maxlength="500" required placeholder="Reply to the customer" aria-label="Support reply">
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
   </main>
   <script>
     const adminAccountKey = 'rodyxAdminAccount';
     const adminSessionKey = 'rodyxAdminSession';
     const accountsKey = 'rodyxAccounts';
     const listingsKey = 'rodyxListings';
+    const sellerVerificationKey = 'rodyxSellerVerification';
+    const sellerVerificationApplicationsKey = 'rodyxSellerVerificationApplications';
+    const managedCollections = [
+      { type: 'Product', key: 'rodyxListings', title: item => item.title, owner: item => item.sellerName || item.sellerEmail, details: item => `${item.category || ''} ${item.description || ''}` },
+      { type: 'Wanted', key: 'rodyxWantedPosts', title: item => item.title, owner: item => item.buyerName || item.buyerEmail, details: item => `${item.category || ''} ${item.town || ''} ${item.description || ''} Budget ${item.budget || ''}` },
+      { type: 'Service', key: 'rodyxServices', title: item => item.title, owner: item => item.providerName || item.email, details: item => `${item.skill || ''} ${item.area || ''} ${item.description || ''} ${item.rate || ''}` },
+      { type: 'Rental', key: 'rodyxRentals', title: item => item.title, owner: item => item.ownerName || item.email, details: item => `${item.category || ''} ${item.area || ''} ${item.duration || ''} KES ${item.price || ''}` },
+      { type: 'Accommodation', key: 'rodyxAccommodation', title: item => item.title, owner: item => item.contactName || item.email, details: item => `${item.type || ''} ${item.location || ''} ${item.address || ''} KES ${item.price || ''}` },
+      { type: 'Event', key: 'rodyxEvents', title: item => item.title, owner: item => item.organizer || item.email, details: item => `${item.category || ''} ${item.area || ''} ${item.venue || ''} ${item.date || ''} ${item.description || ''}` },
+      { type: 'Review', key: 'rodyxReviews', title: item => `${item.rating || 0}-star review of ${item.targetType || 'listing'} ${item.targetId || ''}`, owner: item => item.author, details: item => item.remark || '' }
+    ];
     const orderStatuses = ['Placed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
     const money = value => `KES ${Number(value || 0).toLocaleString()}`;
     const formatDate = value => value && !Number.isNaN(new Date(value).getTime()) ? new Date(value).toLocaleDateString() : '-';
@@ -106,6 +161,7 @@
     const setupForm = document.getElementById('admin-setup-form');
     const loginForm = document.getElementById('admin-login-form');
     const authMessage = document.getElementById('auth-message');
+    let activeSupportThreadId = '';
 
     document.querySelectorAll('[data-password-toggle]').forEach(button => {
       button.addEventListener('click', () => {
@@ -268,6 +324,9 @@
         cell(row, order.email);
         cell(row, (order.items || []).map(item => `${item.name} x${item.quantity || 1}`).join(', ') || '-');
         cell(row, money(order.total));
+        const fulfillmentNames = { rider: 'Local rider', pickup: 'Seller pickup', meetup: 'Public meetup' };
+        const fulfillment = [fulfillmentNames[order.fulfillmentMethod] || 'Not specified', order.fulfillmentLocation || order.address].filter(Boolean).join(': ');
+        cell(row, fulfillment || '-');
         const statusCell = cell(row, '');
         const status = document.createElement('select');
         status.className = 'status-select';
@@ -282,12 +341,108 @@
         status.addEventListener('change', () => updateOrderStatus(order, status.value));
         statusCell.appendChild(status);
         cell(row, formatDate(order.createdAt));
-        row.dataset.search = `${order.id || ''} ${order.email || ''} ${(order.items || []).map(item => item.name).join(' ')}`.toLowerCase();
+        row.dataset.search = `${order.id || ''} ${order.email || ''} ${(order.items || []).map(item => item.name).join(' ')} ${fulfillment}`.toLowerCase();
         target.appendChild(row);
       });
-      if (!target.children.length) emptyRow(target, 6, 'No demo orders yet. Orders placed from the storefront will appear here.');
+      if (!target.children.length) emptyRow(target, 7, 'No demo orders yet. Orders placed from the storefront will appear here.');
       filterRows('order-search', target);
     }
+
+    function renderSupportInbox() {
+      const threadList = document.getElementById('support-thread-list');
+      const messageList = document.getElementById('support-chat-messages');
+      const replyForm = document.getElementById('support-reply-form');
+      const adminEmail = String(readJSON(adminAccountKey, {})?.email || '').toLowerCase();
+      const threads = readJSON('rodyxMessages', [])
+        .filter(thread => thread.support === true && Array.isArray(thread.participants))
+        .sort((first, second) => new Date(second.lastUpdated || 0) - new Date(first.lastUpdated || 0));
+
+      threadList.replaceChildren();
+      if (!threads.length) {
+        const empty = document.createElement('div');
+        empty.className = 'support-empty';
+        empty.textContent = 'No support conversations yet.';
+        threadList.appendChild(empty);
+      }
+
+      if (!threads.some(thread => thread.id === activeSupportThreadId)) activeSupportThreadId = threads[0]?.id || '';
+      threads.forEach(thread => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'support-thread';
+        button.setAttribute('aria-current', String(thread.id === activeSupportThreadId));
+        const participant = thread.participants.find(email => email !== adminEmail) || 'Customer';
+        const participantName = thread.names?.[participant] || participant;
+        const title = document.createElement('strong');
+        title.textContent = participantName;
+        const preview = document.createElement('span');
+        preview.textContent = thread.messages?.slice(-1)[0]?.text || 'No messages yet';
+        const unreadCount = (thread.messages || []).filter(message => message.sender !== adminEmail && !(message.readBy || []).includes(adminEmail)).length;
+        button.append(title, preview);
+        if (unreadCount) {
+          const unread = document.createElement('span');
+          unread.className = 'support-unread';
+          unread.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+          button.appendChild(unread);
+        }
+        button.addEventListener('click', () => {
+          activeSupportThreadId = thread.id;
+          renderSupportInbox();
+        });
+        threadList.appendChild(button);
+      });
+
+      const activeThread = threads.find(thread => thread.id === activeSupportThreadId);
+      messageList.replaceChildren();
+      replyForm.querySelector('button').disabled = !activeThread;
+      document.getElementById('support-reply-input').disabled = !activeThread;
+      if (!activeThread) {
+        document.getElementById('support-chat-title').textContent = 'Select a support conversation';
+        const empty = document.createElement('div');
+        empty.className = 'support-empty';
+        empty.textContent = 'Help conversations started from the storefront will appear here.';
+        messageList.appendChild(empty);
+        return;
+      }
+
+      document.getElementById('support-chat-title').textContent = activeThread.names?.[activeThread.participants.find(email => email !== adminEmail)] || 'Customer support chat';
+      (activeThread.messages || []).forEach(message => {
+        const bubble = document.createElement('div');
+        bubble.className = `support-message${message.sender.toLowerCase() === adminEmail ? ' from-admin' : ''}`;
+        bubble.appendChild(document.createTextNode(message.text));
+        const meta = document.createElement('small');
+        meta.textContent = `${message.sender.toLowerCase() === adminEmail ? 'Admin' : 'Customer'} · ${new Date(message.createdAt).toLocaleString()}`;
+        bubble.appendChild(meta);
+        messageList.appendChild(bubble);
+        if (message.sender.toLowerCase() !== adminEmail) {
+          if (!Array.isArray(message.readBy)) message.readBy = [];
+          if (!message.readBy.includes(adminEmail)) message.readBy.push(adminEmail);
+        }
+      });
+      localStorage.setItem('rodyxMessages', JSON.stringify(threads));
+      messageList.scrollTop = messageList.scrollHeight;
+    }
+
+    document.getElementById('support-reply-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const adminEmail = String(readJSON(adminAccountKey, {})?.email || '').toLowerCase();
+      const input = document.getElementById('support-reply-input');
+      const text = input.value.trim();
+      if (!adminEmail || !activeSupportThreadId || !text) return;
+      const threads = readJSON('rodyxMessages', []);
+      const thread = threads.find(item => item.id === activeSupportThreadId && item.support === true);
+      if (!thread) return;
+      thread.messages = Array.isArray(thread.messages) ? thread.messages : [];
+      thread.messages.push({ sender: adminEmail, text, createdAt: new Date().toISOString(), readBy: [adminEmail] });
+      thread.lastUpdated = new Date().toISOString();
+      localStorage.setItem('rodyxMessages', JSON.stringify(threads));
+      input.value = '';
+      renderSupportInbox();
+    });
+
+    window.addEventListener('storage', event => {
+      if (event.key === 'rodyxMessages') renderSupportInbox();
+    });
 
     function updateOrderStatus(order, status) {
       const storedOrders = readJSON(order.storageKey, []);
@@ -321,6 +476,165 @@
       filterRows('listing-search', target);
     }
 
+    function renderSellerVerificationRequests() {
+      const target = document.getElementById('seller-verification-table');
+      target.replaceChildren();
+      const requests = readJSON(sellerVerificationApplicationsKey, []);
+
+      requests.forEach(request => {
+        const row = document.createElement('tr');
+        cell(row, request.fullName || request.email || 'Seller');
+        cell(row, request.email || '-');
+        cell(row, request.phone || '-');
+        const docCell = cell(row, '');
+        if (request.documentData) {
+          const documentLink = document.createElement('a');
+          documentLink.href = request.documentData;
+          documentLink.target = '_blank';
+          documentLink.rel = 'noopener';
+          documentLink.textContent = request.documentName || 'View document';
+          docCell.appendChild(documentLink);
+        } else {
+          docCell.textContent = request.documentName || 'No document';
+        }
+        const statusCell = cell(row, request.status || 'pending');
+        const actions = document.createElement('td');
+        const approve = document.createElement('button');
+        approve.type = 'button';
+        approve.className = 'remove-listing';
+        approve.textContent = 'Approve';
+        approve.addEventListener('click', () => approveSellerApplication(request.email));
+
+        const reject = document.createElement('button');
+        reject.type = 'button';
+        reject.className = 'remove-user';
+        reject.textContent = 'Reject';
+        reject.style.marginLeft = '10px';
+        reject.addEventListener('click', () => rejectSellerApplication(request.email));
+
+        actions.append(approve, reject);
+        row.appendChild(actions);
+        row.dataset.search = `${request.fullName || ''} ${request.email || ''} ${request.phone || ''} ${request.status || ''}`.toLowerCase();
+        target.appendChild(row);
+      });
+
+      if (!target.children.length) emptyRow(target, 6, 'No seller verification requests yet.');
+      target.querySelectorAll('tr[data-search]').forEach(row => {
+        row.dataset.search = `${row.dataset.search} ${row.textContent}`.toLowerCase();
+      });
+      filterRows('verification-search', target);
+    }
+
+    function getManagedContent() {
+      return managedCollections.flatMap(collection => readJSON(collection.key, []).map((item, index) => {
+        let status = 'Published';
+        if (collection.type === 'Rental') status = item.available === false ? 'Unavailable' : 'Available';
+        if (collection.type === 'Accommodation') status = 'Vacancy';
+        if (collection.type === 'Wanted') status = item.urgency || 'Open request';
+        if (collection.type === 'Review') status = 'Customer feedback';
+        if (collection.type === 'Event') {
+          const starts = new Date(`${item.date}T${item.startTime || '00:00'}`);
+          const ends = item.endTime ? new Date(`${item.date}T${item.endTime}`) : new Date(starts.getTime() + 2 * 60 * 60 * 1000);
+          const now = new Date();
+          status = now < starts ? 'Upcoming' : now <= ends ? 'On now' : 'Expired';
+        }
+        return {
+          ...item,
+          type: collection.type,
+          storageKey: collection.key,
+          sourceIndex: index,
+          managedTitle: collection.title(item) || 'Untitled',
+          managedOwner: collection.owner(item) || 'Unknown',
+          managedDetails: collection.details(item) || '',
+          managedStatus: status
+        };
+      })).sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0));
+    }
+
+    function renderMarketplaceContent() {
+      const target = document.getElementById('content-table');
+      target.replaceChildren();
+      getManagedContent().forEach(record => {
+        const row = document.createElement('tr');
+        cell(row, record.type);
+        const contentCell = cell(row, '');
+        contentCell.className = 'content-cell';
+        const title = document.createElement('strong');
+        title.textContent = record.managedTitle;
+        const details = document.createElement('span');
+        details.textContent = record.managedDetails;
+        contentCell.append(title, details);
+        cell(row, record.managedOwner);
+        cell(row, formatDate(record.createdAt));
+        const statusCell = cell(row, record.managedStatus);
+        statusCell.className = 'content-status';
+        const actions = document.createElement('td');
+
+        if (record.type === 'Rental') {
+          const availability = document.createElement('button');
+          availability.type = 'button';
+          availability.className = 'admin-action';
+          availability.textContent = record.available === false ? 'Mark available' : 'Mark unavailable';
+          availability.addEventListener('click', () => toggleManagedRental(record));
+          actions.appendChild(availability);
+        }
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'remove-listing';
+        remove.textContent = 'Delete post';
+        remove.addEventListener('click', () => removeManagedContent(record));
+        actions.appendChild(remove);
+        row.dataset.search = `${record.type} ${record.managedTitle} ${record.managedOwner} ${record.managedDetails} ${record.managedStatus}`.toLowerCase();
+        row.appendChild(actions);
+        target.appendChild(row);
+      });
+      if (!target.children.length) emptyRow(target, 6, 'No community content has been posted yet.');
+      filterRows('content-search', target);
+    }
+
+    function approveSellerApplication(email) {
+      const applications = readJSON(sellerVerificationApplicationsKey, []);
+      const verificationState = readJSON(sellerVerificationKey, {});
+      const selected = applications.find(item => item.email.toLowerCase() === String(email).toLowerCase());
+      if (!selected) return;
+
+      selected.status = 'approved';
+      verificationState[selected.email] = {
+        email: selected.email,
+        status: 'approved',
+        name: selected.fullName || selected.email,
+        phone: selected.phone || '',
+        approvedAt: new Date().toISOString(),
+        approvedBy: 'admin'
+      };
+
+      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(applications));
+      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
+      loadDashboard();
+    }
+
+    function rejectSellerApplication(email) {
+      const applications = readJSON(sellerVerificationApplicationsKey, []);
+      const verificationState = readJSON(sellerVerificationKey, {});
+      const selected = applications.find(item => item.email.toLowerCase() === String(email).toLowerCase());
+      if (!selected) return;
+
+      selected.status = 'rejected';
+      verificationState[selected.email] = {
+        email: selected.email,
+        status: 'rejected',
+        name: selected.fullName || selected.email,
+        phone: selected.phone || '',
+        rejectedAt: new Date().toISOString(),
+        rejectedBy: 'admin'
+      };
+
+      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(applications));
+      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
+      loadDashboard();
+    }
+
     function removeListing(id) {
       if (!window.confirm('Remove this marketplace listing?')) return;
       const listings = readJSON(listingsKey, []).filter(listing => listing.id !== id);
@@ -328,16 +642,58 @@
       loadDashboard();
     }
 
+    function removeManagedContent(record) {
+      if (!window.confirm(`Permanently delete this ${record.type.toLowerCase()} post?`)) return;
+      const items = readJSON(record.storageKey, []);
+      const remaining = items.filter((item, index) => record.id !== undefined ? item.id !== record.id : index !== record.sourceIndex);
+      localStorage.setItem(record.storageKey, JSON.stringify(remaining));
+      loadDashboard();
+    }
+
+    function toggleManagedRental(record) {
+      const rentals = readJSON('rodyxRentals', []);
+      const rental = record.id !== undefined ? rentals.find(item => item.id === record.id) : rentals[record.sourceIndex];
+      if (!rental) return;
+      rental.available = rental.available === false;
+      rental.unavailableAt = rental.available ? '' : new Date().toISOString();
+      localStorage.setItem('rodyxRentals', JSON.stringify(rentals));
+      loadDashboard();
+    }
+
     function removeCustomer(email) {
-      const confirmed = window.confirm(`Delete ${email} from this browser? This also removes their local cart, wishlist, and orders. Any server-side account is not affected.`);
+      const accounts = readJSON(accountsKey, {});
+      const account = accounts[email] || {};
+      const confirmed = window.confirm(`Delete ${email} and their local carts, orders, messages, marketplace posts, reviews, and verification records from this browser? Any server-side account is not affected.`);
       if (!confirmed) return;
 
-      const accounts = readJSON(accountsKey, {});
       delete accounts[email];
       localStorage.setItem(accountsKey, JSON.stringify(accounts));
 
       const storagePrefix = `rodyx:${encodeURIComponent(email)}`;
       ['cart', 'wishlist', 'orders'].forEach(type => localStorage.removeItem(`${storagePrefix}:${type}`));
+
+      const ownedContent = [
+        ['rodyxListings', item => item.sellerEmail],
+        ['rodyxWantedPosts', item => item.buyerEmail],
+        ['rodyxServices', item => item.email],
+        ['rodyxRentals', item => item.ownerEmail || item.email],
+        ['rodyxAccommodation', item => item.email],
+        ['rodyxEvents', item => item.email],
+        ['rodyxReviews', item => item.author]
+      ];
+      ownedContent.forEach(([key, getOwner]) => {
+        const remaining = readJSON(key, []).filter(item => {
+          const owner = String(getOwner(item) || '').toLowerCase();
+          return owner !== email.toLowerCase() && !(account.fullname && owner === account.fullname.toLowerCase());
+        });
+        localStorage.setItem(key, JSON.stringify(remaining));
+      });
+
+      localStorage.setItem('rodyxMessages', JSON.stringify(readJSON('rodyxMessages', []).filter(thread => !thread.participants?.some(participant => participant.toLowerCase() === email.toLowerCase()))));
+      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(readJSON(sellerVerificationApplicationsKey, []).filter(application => application.email.toLowerCase() !== email.toLowerCase())));
+      const verificationState = readJSON(sellerVerificationKey, {});
+      delete verificationState[email];
+      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
 
       const currentUser = readJSON('currentUser', null);
       if (currentUser?.email?.toLowerCase() === email.toLowerCase()) {
@@ -357,6 +713,13 @@
     function loadDashboard() {
       const customers = getCustomers();
       const listings = readJSON(listingsKey, []);
+      const wanted = readJSON('rodyxWantedPosts', []);
+      const services = readJSON('rodyxServices', []);
+      const rentals = readJSON('rodyxRentals', []);
+      const accommodation = readJSON('rodyxAccommodation', []);
+      const events = readJSON('rodyxEvents', []);
+      const reviews = readJSON('rodyxReviews', []);
+      const verificationRequests = readJSON(sellerVerificationApplicationsKey, []);
       const orders = getOrders();
       const openOrders = orders.filter(order => !['Delivered', 'Cancelled'].includes(order.status));
       const revenue = orders.filter(order => order.status !== 'Cancelled').reduce((total, order) => total + Number(order.total || 0), 0);
@@ -364,12 +727,19 @@
       document.getElementById('users-count').textContent = customers.length;
       document.getElementById('products-count').textContent = listings.length;
       document.getElementById('orders-count').textContent = orders.length;
-      document.getElementById('posts-count').textContent = getCartCount();
+      document.getElementById('posts-count').textContent = wanted.length + services.length;
+      document.getElementById('rental-count').textContent = rentals.length + accommodation.length;
+      document.getElementById('events-count').textContent = events.length;
+      document.getElementById('reviews-count').textContent = reviews.length;
+      document.getElementById('verification-count').textContent = verificationRequests.filter(request => request.status === 'pending').length;
       document.getElementById('revenue-count').textContent = money(revenue);
       document.getElementById('stock-count').textContent = openOrders.length;
 
       renderOrders(orders);
       renderListings(listings);
+      renderMarketplaceContent();
+      renderSellerVerificationRequests();
+      renderSupportInbox();
 
       const users = document.getElementById('users-table');
       users.replaceChildren();
@@ -378,6 +748,7 @@
         cell(row, customer.fullname || customer.email.split('@')[0]);
         cell(row, customer.email);
         cell(row, formatDate(customer.createdAt));
+        row.dataset.search = `${customer.fullname || ''} ${customer.email || ''}`.toLowerCase();
         const actionCell = cell(row, '');
         const remove = document.createElement('button');
         remove.className = 'remove-user';
@@ -389,10 +760,14 @@
         users.appendChild(row);
       });
       if (!users.children.length) emptyRow(users, 4, 'No local customer accounts found.');
+      filterRows('customer-search', users);
     }
 
     document.getElementById('order-search').addEventListener('input', () => filterRows('order-search', document.getElementById('orders-table')));
     document.getElementById('listing-search').addEventListener('input', () => filterRows('listing-search', document.getElementById('products-table')));
+    document.getElementById('content-search').addEventListener('input', () => filterRows('content-search', document.getElementById('content-table')));
+    document.getElementById('customer-search').addEventListener('input', () => filterRows('customer-search', document.getElementById('users-table')));
+    document.getElementById('verification-search').addEventListener('input', () => filterRows('verification-search', document.getElementById('seller-verification-table')));
     if (readJSON(adminAccountKey, null) && sessionStorage.getItem(adminSessionKey) === 'authenticated') openAdminDashboard();
     else showAdminAccess();
   </script>

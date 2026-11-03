@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wanted - CHUKA RODYX SHOP</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --navy: #183b56;
+      --teal: #18a999;
+      --coral: #ff6b4a;
+      --page: #edf5f5;
+      --muted: #607d8b;
+      --line: #dfe9eb;
+      --card: #ffffff;
+      --shadow: rgba(24, 59, 86, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--navy);
+      font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+    }
+
+    header {
+      background: var(--navy);
+      color: #fff;
+      padding: 16px max(20px, calc((100% - 1100px) / 2));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo { color: #fff; text-decoration: none; font-size: 24px; font-weight: 900; }
+    .logo i { color: var(--coral); margin-right: 8px; }
+    .back-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 34px auto;
+      padding: 0 20px 40px;
+    }
+
+    .panel {
+      background: var(--card);
+      border-top: 5px solid var(--teal);
+      border-radius: 6px;
+      box-shadow: 0 8px 20px var(--shadow);
+      padding: 28px;
+    }
+
+    .intro {
+      margin-top: 0;
+      margin-bottom: 24px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+    }
+
+    .heading-tag {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .wide { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      font: inherit;
+      color: var(--navy);
+      background: #fbfdfd;
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: 2px solid rgba(24, 169, 153, 0.18);
+      border-color: var(--teal);
+    }
+
+    button {
+      border: none;
+      border-radius: 4px;
+      background: var(--coral);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button:hover { background: #e95334; }
+
+    .list-panel {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f7fbfb;
+      padding: 18px;
+    }
+
+    .list-panel h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
+
+    .wanted-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .wanted-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--teal);
+      border-radius: 6px;
+      padding: 15px 14px;
+    }
+
+    .wanted-card h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .meta {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .wanted-card p {
+      margin: 0 0 8px;
+      line-height: 1.6;
+      color: var(--navy);
+    }
+
+    .contact {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .empty {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    #message {
+      min-height: 20px;
+      margin: 0;
+      color: var(--coral);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      form {
+        grid-template-columns: 1fr;
+      }
+      .panel {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="homepage.html"><i class="fas fa-shopping-bag"></i>RODYX</a>
+    <a class="back-link" href="homepage.html"><i class="fas fa-arrow-left"></i> Back to homepage</a>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="heading-tag">Marketplace requests</div>
+      <h1>Wanted</h1>
+      <p class="intro">Post what you need and let the community help you find it. Add the category, exact details, your budget, and how to contact you.</p>
+
+      <div class="layout">
+        <section>
+          <form id="wanted-form">
+            <div>
+              <label for="title">Item name</label>
+              <input id="title" name="title" type="text" required maxlength="200" placeholder="e.g. second-hand study desk">
+            </div>
+            <div>
+              <label for="category">Category</label>
+              <select id="category" name="category" required>
+                <option value="">Choose a category</option>
+                <option>Fashion</option>
+                <option>Electronics</option>
+                <option>Home</option>
+                <option>Sports</option>
+                <option>Gaming</option>
+                <option>Beauty</option>
+                <option>Books</option>
+                <option>Food</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <label for="budget">Budget (KES)</label>
+              <input id="budget" name="budget" type="number" min="0" step="100" placeholder="2500">
+            </div>
+            <div>
+              <label for="town">Town or area</label>
+              <input id="town" name="town" type="text" maxlength="80" placeholder="e.g. Chuka">
+            </div>
+            <div>
+              <label for="urgency">Urgency</label>
+              <select id="urgency" name="urgency">
+                <option value="Flexible">Flexible</option>
+                <option value="Needed soon">Needed soon</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+            <div>
+              <label for="buyer-email">Contact email</label>
+              <input id="buyer-email" name="buyerEmail" type="email" required>
+            </div>
+            <div>
+              <label for="buyer-phone">Contact phone</label>
+              <input id="buyer-phone" name="buyerPhone" type="tel" required>
+            </div>
+            <div class="wide">
+              <label for="description">Full details and description</label>
+              <textarea id="description" name="description" required placeholder="Describe exactly what you need: condition, size, color, preferred brand, delivery preference, and any other useful details."></textarea>
+            </div>
+            <div class="wide">
+              <button type="submit">Post wanted item</button>
+            </div>
+            <p class="wide" id="message" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <aside class="list-panel">
+          <h2>Recent wants</h2>
+          <div id="wanted-list" class="wanted-list"></div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser.email) window.location.href = 'index.html';
+
+    const wantedKey = 'rodyxWantedPosts';
+    const form = document.getElementById('wanted-form');
+    const wantedList = document.getElementById('wanted-list');
+    const message = document.getElementById('message');
+
+    const buyerEmailInput = document.getElementById('buyer-email');
+    const buyerPhoneInput = document.getElementById('buyer-phone');
+    buyerEmailInput.value = currentUser.email || '';
+    buyerPhoneInput.value = currentUser.phone || '';
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function readWantedPosts() {
+      try {
+        const posts = JSON.parse(localStorage.getItem(wantedKey) || '[]');
+        return Array.isArray(posts) ? posts : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function renderWantedPosts() {
+      const posts = readWantedPosts().sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      wantedList.innerHTML = '';
+
+      if (!posts.length) {
+        wantedList.innerHTML = '<p class="empty">No wanted ads yet. Post the first request for the community to see.</p>';
+        return;
+      }
+
+      posts.forEach((post) => {
+        const card = document.createElement('article');
+        card.className = 'wanted-card';
+        card.innerHTML = `
+          <h3>${escapeHtml(post.title || 'Wanted item')}</h3>
+          <div class="meta">
+            <span>${escapeHtml(post.category || 'General')}</span>
+            <span>${escapeHtml(post.town || 'Any area')}</span>
+            <span>${escapeHtml(post.urgency || 'Flexible')}</span>
+          </div>
+          <p><strong>Budget:</strong> ${escapeHtml(post.budget ? `KES ${Number(post.budget).toLocaleString()}` : 'Open to discussion')}</p>
+          <p>${escapeHtml(post.description || 'No details provided yet.')}</p>
+          <div class="contact">
+            <div><strong>Posted by:</strong> ${escapeHtml(post.buyerName || 'Community member')}</div>
+            <div><strong>Email:</strong> ${escapeHtml(post.buyerEmail || 'Not provided')}</div>
+            <div><strong>Phone:</strong> ${escapeHtml(post.buyerPhone || 'Not provided')}</div>
+          </div>
+        `;
+        wantedList.appendChild(card);
+      });
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const post = {
+        id: `wanted-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        createdAt: new Date().toISOString(),
+        title: String(data.get('title') || '').trim(),
+        category: String(data.get('category') || '').trim(),
+        budget: String(data.get('budget') || '').trim(),
+        town: String(data.get('town') || '').trim(),
+        urgency: String(data.get('urgency') || '').trim(),
+        description: String(data.get('description') || '').trim(),
+        buyerName: currentUser.fullname || 'Community member',
+        buyerEmail: String(data.get('buyerEmail') || '').trim(),
+        buyerPhone: String(data.get('buyerPhone') || '').trim()
+      };
+
+      if (!post.title || !post.category || !post.description || !post.buyerEmail || !post.buyerPhone) {
+        message.textContent = 'Please complete all required fields before posting.';
+        return;
+      }
+
+      const posts = readWantedPosts();
+      posts.unshift(post);
+      localStorage.setItem(wantedKey, JSON.stringify(posts));
+      form.reset();
+      buyerEmailInput.value = currentUser.email || '';
+      buyerPhoneInput.value = currentUser.phone || '';
+      message.textContent = 'Your wanted post was published successfully.';
+      renderWantedPosts();
+    });
+
+    renderWantedPosts();
+  </script>
+</body>
+</html>

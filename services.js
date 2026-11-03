@@ -13,6 +13,7 @@ const serviceCategory = document.getElementById('service-category');
 const customSkillField = document.getElementById('custom-skill-field');
 const customSkillInput = document.getElementById('custom-skill');
 const serviceMessage = document.getElementById('service-message');
+const reviewsStorageKey = 'rodyxReviews';
 
 document.getElementById('provider-name').value = currentUser.fullname || '';
 document.getElementById('provider-email').value = currentUser.email || '';
@@ -25,6 +26,108 @@ function readServices() {
   } catch {
     return [];
   }
+}
+
+function readReviews() {
+  try {
+    const reviews = JSON.parse(localStorage.getItem(reviewsStorageKey) || '[]');
+    return Array.isArray(reviews) ? reviews : [];
+  } catch {
+    return [];
+  }
+}
+
+function getRatingSummary(targetId, targetType) {
+  const reviews = readReviews().filter(review => review.targetId === targetId && review.targetType === targetType);
+  if (!reviews.length) {
+    return { average: '0.0', count: 0, stars: '☆☆☆☆☆', remarks: [] };
+  }
+  const total = reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+  const average = (total / reviews.length).toFixed(1);
+  const rounded = Math.round(Number(average));
+  const stars = `${'★'.repeat(rounded)}${'☆'.repeat(5 - rounded)}`;
+  const remarks = reviews.filter(review => String(review.remark || '').trim()).slice(-3).map(review => ({
+    text: review.remark.trim(),
+    author: review.author || 'Customer'
+  }));
+  return { average, count: reviews.length, stars, remarks };
+}
+
+function submitReview(targetId, targetType, rating, remark) {
+  const safeRating = Number(rating);
+  const cleanRemark = String(remark || '').trim();
+  if (!targetId || Number.isNaN(safeRating) || safeRating < 1 || safeRating > 5) return false;
+  const reviews = readReviews();
+  reviews.unshift({
+    targetId,
+    targetType,
+    rating: safeRating,
+    remark: cleanRemark || 'No additional remarks',
+    author: currentUser.fullname || currentUser.email || 'Customer',
+    createdAt: new Date().toISOString()
+  });
+  localStorage.setItem(reviewsStorageKey, JSON.stringify(reviews));
+  return true;
+}
+
+function createReviewUI(targetId, targetType, label) {
+  const reviewWrap = document.createElement('div');
+  reviewWrap.className = 'review-box';
+
+  const summary = getRatingSummary(targetId, targetType);
+  const summaryRow = document.createElement('div');
+  summaryRow.className = 'review-summary';
+  summaryRow.innerHTML = `<strong>${summary.stars}</strong> <span>${summary.average} (${summary.count} review${summary.count === 1 ? '' : 's'})</span>`;
+  reviewWrap.appendChild(summaryRow);
+
+  if (summary.remarks.length) {
+    const remarks = document.createElement('div');
+    remarks.className = 'review-remarks';
+    summary.remarks.forEach(item => {
+      const remark = document.createElement('div');
+      remark.className = 'review-remark';
+      remark.innerHTML = `<span class="review-remark-author">${item.author}</span> <span>${item.text}</span>`;
+      remarks.appendChild(remark);
+    });
+    reviewWrap.appendChild(remarks);
+  } else {
+    const empty = document.createElement('div');
+    empty.className = 'review-remarks';
+    empty.textContent = 'No remarks yet. Be the first to rate this service.';
+    reviewWrap.appendChild(empty);
+  }
+
+  const form = document.createElement('form');
+  form.className = 'review-form';
+  form.innerHTML = `
+    <label>${label}
+      <select name="rating" aria-label="Rate this ${label.toLowerCase()}">
+        <option value="5">5 - Excellent</option>
+        <option value="4">4 - Good</option>
+        <option value="3">3 - Fair</option>
+        <option value="2">2 - Poor</option>
+        <option value="1">1 - Very poor</option>
+      </select>
+    </label>
+    <label>Remark
+      <textarea name="remark" rows="2" maxlength="220" placeholder="Share your experience or comments"></textarea>
+    </label>
+    <button type="submit">Submit rating</button>
+  `;
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const rating = Number(formData.get('rating'));
+    const remark = String(formData.get('remark') || '').trim();
+    if (submitReview(targetId, targetType, rating, remark)) {
+      form.reset();
+      renderServices();
+    }
+  });
+
+  reviewWrap.appendChild(form);
+  return reviewWrap;
 }
 
 function makeServiceCard(service) {
@@ -52,6 +155,7 @@ function makeServiceCard(service) {
     phone.textContent = service.phone;
     card.appendChild(phone);
   }
+  card.appendChild(createReviewUI(service.id, 'service', 'Rate this service'));
   return card;
 }
 

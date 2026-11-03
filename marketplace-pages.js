@@ -83,6 +83,10 @@ function createProductCard(listing) {
   const seller = document.createElement('div');
   seller.className = 'market-seller';
   seller.appendChild(createTextElement('strong', '', listing.businessName || listing.sellerName || 'Community seller'));
+  const status = document.createElement('div');
+  status.className = 'market-product-category';
+  status.textContent = listing.sellerVerified || listing.verificationStatus === 'Verified seller' ? '✅ Verified seller' : '⚠ Unverified seller';
+  seller.appendChild(status);
   if (listing.sellerEmail) {
     const email = document.createElement('a');
     email.href = `mailto:${listing.sellerEmail}`;
@@ -104,7 +108,23 @@ function createProductCard(listing) {
   addButton.type = 'button';
   addButton.textContent = 'Add to cart';
   addButton.addEventListener('click', () => addToCart(listing));
-  actions.appendChild(addButton);
+
+  const messageButton = document.createElement('button');
+  messageButton.className = 'market-add-button';
+  messageButton.type = 'button';
+  messageButton.style.background = '#18a999';
+  messageButton.textContent = 'Message seller';
+  messageButton.addEventListener('click', () => {
+    const sellerEmail = listing.sellerEmail || '';
+    if (!sellerEmail) {
+      statusMessage.textContent = 'No seller contact is available for this listing.';
+      return;
+    }
+    const sellerName = listing.businessName || listing.sellerName || 'Seller';
+    window.location.href = `messages.html?contact=${encodeURIComponent(sellerEmail)}&name=${encodeURIComponent(sellerName)}`;
+  });
+
+  actions.append(addButton, messageButton);
   body.appendChild(actions);
   card.append(image, body);
   return card;
