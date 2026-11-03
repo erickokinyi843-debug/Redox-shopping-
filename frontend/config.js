@@ -1,3 +1,4 @@
 window.APP_CONFIG = {
-  apiBaseUrl: 'https://'rodyx.pythonanywhere.com
+ codespace-jubilant-disco-6rgvrrjpqxqf55j7
+  apiBaseUrl: 'https://rodyx.pythonanywhere.com'
 };

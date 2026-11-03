@@ -59,7 +59,7 @@
         <div class="wide student-listing-toggle"><input id="student-marketplace" name="studentMarketplace" type="checkbox"><label for="student-marketplace">Include this item in the Students Marketplace</label></div>
         <div><label for="seller-email">Contact email</label><input id="seller-email" name="sellerEmail" type="email" required></div>
         <div><label for="seller-phone">Contact phone</label><input id="seller-phone" name="sellerPhone" type="tel" required></div>
-        <div class="upload"><div><label for="image">Item image (up to 2 MB)</label><input id="image" name="image" type="file" accept="image/*"></div><img id="preview" alt="Selected item preview"></div>
+        <div class="upload"><div><label for="image">Item image (up to 5 MB)</label><input id="image" name="image" type="file" accept="image/*"></div><img id="preview" alt="Selected item preview"></div>
         <div class="wide"><label for="description">Description</label><textarea id="description" name="description" required placeholder="Describe the condition, size, color, and important details"></textarea></div>
         <button class="wide" type="submit"><i class="fas fa-paper-plane"></i> Post item</button>
         <p class="wide" id="message" role="status"></p>
@@ -73,6 +73,7 @@
     const apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.apiBaseUrl ? window.APP_CONFIG.apiBaseUrl.replace(/\/$/, '') : 'http://localhost:5000');
     const form = document.getElementById('sell-form');
     const imageInput = document.getElementById('image');
+    const maxImageSizeBytes = 5 * 1024 * 1024;
     const preview = document.getElementById('preview');
     const message = document.getElementById('message');
     const verificationBanner = document.getElementById('verification-banner');
@@ -141,11 +142,11 @@
     imageInput.addEventListener('change', () => {
       const file = imageInput.files[0];
       if (!file) { preview.style.display = 'none'; return; }
-      if (file.size > 2 * 1024 * 1024) {
+      if (file.size > maxImageSizeBytes) {
         imageInput.value = '';
         preview.removeAttribute('src');
         preview.style.display = 'none';
-        message.textContent = 'Choose an image smaller than 2 MB.';
+        message.textContent = 'Choose an image no larger than 5 MB.';
         return;
       }
       preview.src = URL.createObjectURL(file);
@@ -157,8 +158,8 @@
       event.preventDefault();
       const data = new FormData(form);
       const imageFile = imageInput.files[0];
-      if (imageFile && imageFile.size > 2 * 1024 * 1024) {
-        message.textContent = 'Choose an image smaller than 2 MB.';
+      if (imageFile && imageFile.size > maxImageSizeBytes) {
+        message.textContent = 'Choose an image no larger than 5 MB.';
         return;
       }
 
