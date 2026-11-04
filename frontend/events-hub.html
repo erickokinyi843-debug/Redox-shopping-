@@ -27,7 +27,8 @@
     <div class="services-layout">
       <section class="service-panel" aria-labelledby="event-form-title">
         <h2 id="event-form-title">Post an event</h2>
-        <form class="service-form" id="event-form">
+        <button class="service-submit post-form-toggle" type="button" data-form-toggle aria-controls="event-form" aria-expanded="false" data-open-label="Create event" data-close-label="Close form">Create event</button>
+        <form class="service-form" id="event-form" hidden>
           <div>
             <label for="event-category">Event category</label>
             <select id="event-category" name="category" required>

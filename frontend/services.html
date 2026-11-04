@@ -28,7 +28,8 @@
     <div class="services-layout">
       <section class="service-panel" aria-labelledby="service-form-title">
         <h2 id="service-form-title">Advertise a service</h2>
-        <form class="service-form" id="service-form">
+        <button class="service-submit post-form-toggle" type="button" data-form-toggle aria-controls="service-form" aria-expanded="false" data-open-label="Advertise a service" data-close-label="Close form">Advertise a service</button>
+        <form class="service-form" id="service-form" hidden>
           <div>
             <label for="service-category">Skill category</label>
             <select id="service-category" name="category" required>

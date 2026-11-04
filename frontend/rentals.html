@@ -27,7 +27,8 @@
     <div class="services-layout">
       <section class="service-panel" aria-labelledby="rental-form-title">
         <h2 id="rental-form-title">Post a rental</h2>
-        <form class="service-form" id="rental-form">
+        <button class="service-submit post-form-toggle" type="button" data-form-toggle aria-controls="rental-form" aria-expanded="false" data-open-label="List a rental" data-close-label="Close form">List a rental</button>
+        <form class="service-form" id="rental-form" hidden>
           <div>
             <label for="rental-category">Category</label>
             <select id="rental-category" name="category" required>

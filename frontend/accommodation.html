@@ -27,7 +27,8 @@
     <div class="services-layout">
       <section class="service-panel" aria-labelledby="accommodation-form-title">
         <h2 id="accommodation-form-title">Post a vacancy</h2>
-        <form class="service-form" id="accommodation-form">
+        <button class="service-submit post-form-toggle" type="button" data-form-toggle aria-controls="accommodation-form" aria-expanded="false" data-open-label="Post a vacancy" data-close-label="Close form">Post a vacancy</button>
+        <form class="service-form" id="accommodation-form" hidden>
           <div>
             <label for="accommodation-type">Accommodation type</label>
             <select id="accommodation-type" name="type" required>

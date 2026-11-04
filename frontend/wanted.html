@@ -95,6 +95,9 @@
       gap: 16px;
     }
 
+    form[hidden] { display: none; }
+    .post-form-toggle { margin-bottom: 14px; }
+
     .wide { grid-column: 1 / -1; }
 
     label {
@@ -237,7 +240,8 @@
 
       <div class="layout">
         <section>
-          <form id="wanted-form">
+          <button class="post-form-toggle" type="button" data-form-toggle aria-controls="wanted-form" aria-expanded="false" data-open-label="Post a wanted item" data-close-label="Close form">Post a wanted item</button>
+          <form id="wanted-form" hidden>
             <div>
               <label for="title">Item name</label>
               <input id="title" name="title" type="text" required maxlength="200" placeholder="e.g. second-hand study desk">

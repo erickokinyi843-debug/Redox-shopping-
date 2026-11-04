@@ -23,6 +23,19 @@ window.postMarketplaceContent = async (contentType, post) => {
   return content;
 };
 
+document.querySelectorAll('[data-form-toggle]').forEach(toggle => {
+  const form = document.getElementById(toggle.getAttribute('aria-controls'));
+  if (!form) return;
+
+  toggle.addEventListener('click', () => {
+    const isOpening = form.hidden;
+    form.hidden = !isOpening;
+    toggle.setAttribute('aria-expanded', String(isOpening));
+    toggle.textContent = isOpening ? toggle.dataset.closeLabel : toggle.dataset.openLabel;
+    if (isOpening) form.querySelector('input, select, textarea')?.focus();
+  });
+});
+
 window.startUserMessage = (email, name) => {
   if (!email) return;
   sessionStorage.setItem('rodyxPendingMessage', JSON.stringify({ email, name }));

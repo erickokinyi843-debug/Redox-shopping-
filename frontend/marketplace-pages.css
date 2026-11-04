@@ -53,7 +53,9 @@ a { color: inherit; }
 .services-layout { display: grid; grid-template-columns: minmax(270px, .75fr) minmax(0, 1.5fr); gap: 20px; align-items: start; }
 .service-panel { padding: 20px; border: 1px solid var(--market-line); border-top: 4px solid var(--market-teal); border-radius: 4px; background: #fff; box-shadow: 0 3px 12px rgba(24,59,86,.06); }
 .service-panel h2 { margin: 0 0 16px; color: var(--market-deep); font-size: 19px; }
+.post-form-toggle { margin: 0 0 12px; }
 .service-form { display: grid; gap: 12px; }
+.service-form[hidden] { display: none; }
 .service-form label { display: block; margin-bottom: 5px; color: var(--market-navy); font-size: 12px; font-weight: 800; }
 .service-form input, .service-form select, .service-form textarea { width: 100%; min-width: 0; border: 1px solid var(--market-line); border-radius: 3px; padding: 10px 11px; background: #fbfdfd; color: var(--market-navy); font: inherit; }
 .service-form textarea { min-height: 100px; resize: vertical; }

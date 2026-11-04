@@ -36,6 +36,8 @@
     button { border: 0; border-radius: 3px; padding: 12px 22px; color: #fff; background: var(--coral); font: inherit; font-weight: 700; cursor: pointer; }
     button:hover { background: #e95334; }
     button:disabled { opacity: .7; cursor: wait; }
+    .post-form-toggle { margin-bottom: 14px; }
+    form[hidden] { display: none; }
     #message { min-height: 20px; margin: 0; color: var(--coral); font-size: 13px; font-weight: 700; }
     @media (max-width: 600px) { main { margin: 20px auto; } .panel { padding: 20px; } form { grid-template-columns: 1fr; } .wide { grid-column: auto; } .upload { align-items: center; } }
   </style>
@@ -50,7 +52,8 @@
       <h1>Sell an item</h1>
       <p class="intro">Add your item details and let shoppers discover it.</p>
       <div class="verification-banner" id="verification-banner"></div>
-      <form id="sell-form">
+      <button class="post-form-toggle" type="button" data-form-toggle aria-controls="sell-form" aria-expanded="false" data-open-label="Post an item" data-close-label="Close form">Post an item</button>
+      <form id="sell-form" hidden>
         <div><label for="title">Item name</label><input id="title" name="title" required maxlength="200" placeholder="e.g. Samsung Galaxy A54"></div>
         <div><label for="price">Price (KES)</label><input id="price" name="price" type="number" min="1" required placeholder="25000"></div>
         <div><label for="category">Category</label><select id="category" name="category" required><option value="">Choose a category</option><optgroup label="Student marketplace"><option>Textbooks &amp; Revision Materials</option><option>Laptops &amp; Phones</option><option>Clothes &amp; Shoes</option><option>Furniture &amp; Hostel Essentials</option><option>Calculators &amp; Supplies</option><option>Other Student Essentials</option></optgroup><optgroup label="Other categories"><option>Fashion</option><option>Electronics</option><option>Home</option><option>Sports</option><option>Gaming</option><option>Beauty</option><option>Books</option><option>Food</option></optgroup></select></div>
