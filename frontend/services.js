@@ -28,6 +28,21 @@ function readServices() {
   }
 }
 
+async function loadServices() {
+  try {
+    const services = await window.getMarketplaceContent('services');
+    try {
+      localStorage.setItem(servicesStorageKey, JSON.stringify(services));
+    } catch (error) {
+      console.warn('Services loaded from the API but could not be cached in this browser:', error);
+    }
+  } catch (error) {
+    console.warn('Could not load shared services; using this browser cache:', error);
+    serviceMessage.textContent = 'Could not load community services from the server. Showing saved services from this browser.';
+  }
+  renderServices();
+}
+
 function readReviews() {
   try {
     const reviews = JSON.parse(localStorage.getItem(reviewsStorageKey) || '[]');
@@ -184,7 +199,7 @@ serviceCategory.addEventListener('change', () => {
 });
 
 serviceSearch.addEventListener('input', renderServices);
-serviceForm.addEventListener('submit', event => {
+serviceForm.addEventListener('submit', async event => {
   event.preventDefault();
   const formData = new FormData(serviceForm);
   const category = formData.get('category');
@@ -201,21 +216,31 @@ serviceForm.addEventListener('submit', event => {
     email: formData.get('email').trim(),
     phone: formData.get('phone').trim()
   };
+  const submitButton = serviceForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  serviceMessage.textContent = 'Publishing service...';
   try {
-    const services = readServices();
-    services.unshift(service);
-    localStorage.setItem(servicesStorageKey, JSON.stringify(services));
+    const savedService = await window.postMarketplaceContent('services', service);
+    const services = readServices().filter(item => item.id !== savedService.id);
+    services.unshift(savedService);
+    try {
+      localStorage.setItem(servicesStorageKey, JSON.stringify(services));
+    } catch (error) {
+      console.warn('Service was published, but could not be cached in this browser:', error);
+    }
     serviceForm.reset();
     document.getElementById('provider-name').value = currentUser.fullname || '';
     document.getElementById('provider-email').value = currentUser.email || '';
     document.getElementById('provider-phone').value = currentUser.phone || '';
     customSkillField.hidden = true;
     customSkillInput.required = false;
-    serviceMessage.textContent = 'Your service has been published on this browser.';
+    serviceMessage.textContent = 'Your service has been published successfully.';
     renderServices();
-  } catch {
-    serviceMessage.textContent = 'Could not save your service in this browser. Check available storage and try again.';
+  } catch (error) {
+    serviceMessage.textContent = `Your service was not published. ${error.message || 'Check the API connection and try again.'}`;
+  } finally {
+    submitButton.disabled = false;
   }
 });
 
-renderServices();
+loadServices();

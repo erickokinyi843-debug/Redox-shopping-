@@ -2,6 +2,27 @@ window.APP_CONFIG = {
   apiBaseUrl: 'https://rodyx.pythonanywhere.com'
 };
 
+window.getMarketplaceContent = async contentType => {
+  const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
+  const response = await fetch(`${apiBaseUrl}/api/content/${encodeURIComponent(contentType)}`);
+  const content = await response.json().catch(() => []);
+  if (!response.ok) throw new Error(content.error || `Could not load ${contentType}.`);
+  if (!Array.isArray(content)) throw new Error(`The ${contentType} API returned an invalid response.`);
+  return content;
+};
+
+window.postMarketplaceContent = async (contentType, post) => {
+  const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
+  const response = await fetch(`${apiBaseUrl}/api/content/${encodeURIComponent(contentType)}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(post)
+  });
+  const content = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(content.error || `Could not publish ${contentType}.`);
+  return content;
+};
+
 window.startUserMessage = (email, name) => {
   if (!email) return;
   sessionStorage.setItem('rodyxPendingMessage', JSON.stringify({ email, name }));

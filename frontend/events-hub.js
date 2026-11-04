@@ -37,6 +37,21 @@ function readEvents() {
   }
 }
 
+async function loadEvents() {
+  try {
+    const events = await window.getMarketplaceContent('events');
+    try {
+      localStorage.setItem(eventsStorageKey, JSON.stringify(events));
+    } catch (error) {
+      console.warn('Events loaded from the API but could not be cached in this browser:', error);
+    }
+  } catch (error) {
+    console.warn('Could not load shared events; using this browser cache:', error);
+    eventMessage.textContent = 'Could not load community events from the server. Showing saved events from this browser.';
+  }
+  renderEvents();
+}
+
 function getEventStart(event) {
   return new Date(`${event.date}T${event.startTime || '00:00'}`);
 }
@@ -218,9 +233,14 @@ eventForm.addEventListener('submit', async event => {
       poster: await readEventPoster(posterFile)
     };
 
-    const events = readEvents();
-    events.unshift(newEvent);
-    localStorage.setItem(eventsStorageKey, JSON.stringify(events));
+    const savedEvent = await window.postMarketplaceContent('events', newEvent);
+    const events = readEvents().filter(item => item.id !== savedEvent.id);
+    events.unshift(savedEvent);
+    try {
+      localStorage.setItem(eventsStorageKey, JSON.stringify(events));
+    } catch (error) {
+      console.warn('Event was published, but could not be cached in this browser:', error);
+    }
     eventForm.reset();
     eventDateInput.min = localDateValue();
     document.getElementById('event-organizer').value = eventUser.fullname || '';
@@ -228,16 +248,16 @@ eventForm.addEventListener('submit', async event => {
     document.getElementById('event-phone').value = eventUser.phone || '';
     eventPosterPreview.hidden = true;
     eventPosterPreview.removeAttribute('src');
-    eventMessage.textContent = 'Your event has been published on this browser.';
+    eventMessage.textContent = 'Your event has been published successfully.';
     renderEvents();
-  } catch {
-    eventMessage.textContent = 'Could not save this event in your browser. Try a smaller image or clear some storage.';
+  } catch (error) {
+    eventMessage.textContent = `Your event was not published. ${error.message || 'Check the API connection and try again.'}`;
   } finally {
     submitButton.disabled = false;
   }
 });
 
-renderEvents();
+loadEvents();
 setInterval(() => {
   cleanupExpiredEvents();
   renderEvents();

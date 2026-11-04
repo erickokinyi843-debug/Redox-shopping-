@@ -28,6 +28,21 @@ function readRentals() {
   }
 }
 
+async function loadRentals() {
+  try {
+    const rentals = await window.getMarketplaceContent('rentals');
+    try {
+      localStorage.setItem(rentalsStorageKey, JSON.stringify(rentals));
+    } catch (error) {
+      console.warn('Rentals loaded from the API but could not be cached in this browser:', error);
+    }
+  } catch (error) {
+    console.warn('Could not load shared rentals; using this browser cache:', error);
+    rentalMessage.textContent = 'Could not load community rentals from the server. Showing saved rentals from this browser.';
+  }
+  renderRentals();
+}
+
 function cleanupUnavailableRentals() {
   const now = Date.now();
   const rentals = readRentals();
@@ -193,25 +208,30 @@ rentalForm.addEventListener('submit', async event => {
       unavailableAt: ''
     };
 
-    const rentals = readRentals();
-    rentals.unshift(rental);
-    localStorage.setItem(rentalsStorageKey, JSON.stringify(rentals));
+    const savedRental = await window.postMarketplaceContent('rentals', rental);
+    const rentals = readRentals().filter(item => item.id !== savedRental.id);
+    rentals.unshift(savedRental);
+    try {
+      localStorage.setItem(rentalsStorageKey, JSON.stringify(rentals));
+    } catch (error) {
+      console.warn('Rental was published, but could not be cached in this browser:', error);
+    }
     rentalForm.reset();
     document.getElementById('rental-owner').value = rentalUser.fullname || '';
     document.getElementById('rental-email').value = rentalUser.email || '';
     document.getElementById('rental-phone').value = rentalUser.phone || '';
     rentalImagePreview.hidden = true;
     rentalImagePreview.removeAttribute('src');
-    rentalMessage.textContent = 'Your rental has been published on this browser.';
+    rentalMessage.textContent = 'Your rental has been published successfully.';
     renderRentals();
-  } catch {
-    rentalMessage.textContent = 'Could not save this rental in your browser. Try a smaller image or clear some storage.';
+  } catch (error) {
+    rentalMessage.textContent = `Your rental was not published. ${error.message || 'Check the API connection and try again.'}`;
   } finally {
     submitButton.disabled = false;
   }
 });
 
-renderRentals();
+loadRentals();
 setInterval(() => {
   cleanupUnavailableRentals();
   renderRentals();

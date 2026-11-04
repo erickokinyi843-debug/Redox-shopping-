@@ -30,6 +30,21 @@ function readAccommodationListings() {
   }
 }
 
+async function loadAccommodationListings() {
+  try {
+    const listings = await window.getMarketplaceContent('accommodation');
+    try {
+      localStorage.setItem(accommodationStorageKey, JSON.stringify(listings));
+    } catch (error) {
+      console.warn('Accommodation loaded from the API but could not be cached in this browser:', error);
+    }
+  } catch (error) {
+    console.warn('Could not load shared accommodation; using this browser cache:', error);
+    accommodationMessage.textContent = 'Could not load community vacancies from the server. Showing saved vacancies from this browser.';
+  }
+  renderAccommodation();
+}
+
 function createAccommodationText(tag, text, className = '') {
   const element = document.createElement(tag);
   element.textContent = text;
@@ -169,21 +184,26 @@ accommodationForm.addEventListener('submit', async event => {
       images: await Promise.all(imageFiles.map(readAccommodationImage))
     };
 
-    const listings = readAccommodationListings();
-    listings.unshift(listing);
-    localStorage.setItem(accommodationStorageKey, JSON.stringify(listings));
+    const savedListing = await window.postMarketplaceContent('accommodation', listing);
+    const listings = readAccommodationListings().filter(item => item.id !== savedListing.id);
+    listings.unshift(savedListing);
+    try {
+      localStorage.setItem(accommodationStorageKey, JSON.stringify(listings));
+    } catch (error) {
+      console.warn('Accommodation vacancy was published, but could not be cached in this browser:', error);
+    }
     accommodationForm.reset();
     document.getElementById('accommodation-contact-name').value = accommodationUser.fullname || '';
     document.getElementById('accommodation-email').value = accommodationUser.email || '';
     document.getElementById('accommodation-phone').value = accommodationUser.phone || '';
     renderAccommodationImagePreviews([]);
-    accommodationMessage.textContent = 'Your accommodation vacancy has been published on this browser.';
+    accommodationMessage.textContent = 'Your accommodation vacancy has been published successfully.';
     renderAccommodation();
-  } catch {
-    accommodationMessage.textContent = 'Could not save this vacancy in your browser. Try fewer or smaller images, or clear some storage.';
+  } catch (error) {
+    accommodationMessage.textContent = `Your vacancy was not published. ${error.message || 'Check the API connection and try again.'}`;
   } finally {
     submitButton.disabled = false;
   }
 });
 
-renderAccommodation();
+loadAccommodationListings();

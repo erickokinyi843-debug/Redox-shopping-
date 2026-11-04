@@ -17,6 +17,18 @@ LISTINGS_FILE = DATA_DIR / 'listings.json'
 WANTED_FILE = DATA_DIR / 'wanted.json'
 ORDERS_FILE = DATA_DIR / 'orders.json'
 SELLER_VERIFICATIONS_FILE = DATA_DIR / 'seller_verifications.json'
+CONTENT_FILES = {
+    'events': DATA_DIR / 'events.json',
+    'rentals': DATA_DIR / 'rentals.json',
+    'services': DATA_DIR / 'services.json',
+    'accommodation': DATA_DIR / 'accommodation.json'
+}
+CONTENT_REQUIRED_FIELDS = {
+    'events': ('title', 'description', 'date', 'startTime', 'venue', 'area', 'organizer', 'email'),
+    'rentals': ('title', 'description', 'price', 'pricePeriod', 'category', 'ownerName', 'email'),
+    'services': ('title', 'description', 'skill', 'providerName', 'email'),
+    'accommodation': ('title', 'details', 'price', 'type', 'location', 'contactName', 'email')
+}
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 8 * 1024 * 1024
@@ -56,6 +68,39 @@ def health():
         'message': 'Marketplace API is online.',
         'timestamp': datetime.now(timezone.utc).isoformat()
     })
+
+
+@app.route('/api/content/<content_type>', methods=['GET', 'POST'])
+def marketplace_content(content_type):
+    if content_type not in CONTENT_FILES:
+        return jsonify({'error': 'Unknown content type.'}), 404
+
+    content_file = CONTENT_FILES[content_type]
+    if request.method == 'GET':
+        content = read_json(content_file, [])
+        return jsonify(content if isinstance(content, list) else [])
+
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({'error': 'A JSON object is required.'}), 400
+    missing_fields = [
+        field for field in CONTENT_REQUIRED_FIELDS[content_type]
+        if not str(payload.get(field) or '').strip()
+    ]
+    if missing_fields:
+        return jsonify({'error': f"Required fields are missing: {', '.join(missing_fields)}."}), 400
+
+    content = read_json(content_file, [])
+    if not isinstance(content, list):
+        content = []
+    post = {
+        **payload,
+        'id': payload.get('id') or f"{content_type}-{int(datetime.now(timezone.utc).timestamp() * 1000)}",
+        'createdAt': datetime.now(timezone.utc).isoformat()
+    }
+    content.insert(0, post)
+    write_json(content_file, content)
+    return jsonify(post), 201
 
 
 @app.get('/api/listings')
