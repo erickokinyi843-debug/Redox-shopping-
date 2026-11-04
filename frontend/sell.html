@@ -75,6 +75,9 @@
     if (!currentUser.email) window.location.href = 'index.html';
     const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const form = document.getElementById('sell-form');
+    if (new URLSearchParams(window.location.search).get('open') === '1') {
+      document.querySelector('[data-form-toggle][aria-controls="sell-form"]')?.click();
+    }
     const imageInput = document.getElementById('image');
     const maxImageSizeBytes = 5 * 1024 * 1024;
     const preview = document.getElementById('preview');

@@ -29,6 +29,9 @@ a { color: inherit; }
 .market-filters { display: flex; flex: 1; gap: 10px; }
 .market-filters input, .market-filters select { min-width: 0; border: 1px solid var(--market-line); border-radius: 3px; padding: 11px 12px; background: #fff; color: var(--market-navy); font: inherit; }
 .market-filters input { flex: 1; }
+.market-post-button { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px; min-height: 42px; border-radius: 3px; padding: 10px 15px; background: var(--market-coral); color: #fff; font-size: 13px; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.market-post-button:hover { filter: brightness(.94); }
+.market-post-button:focus-visible { outline: 2px solid var(--market-deep); outline-offset: 2px; }
 .market-result-count { margin: 0; color: var(--market-muted); font-size: 13px; white-space: nowrap; }
 .market-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
 .market-product { min-width: 0; overflow: hidden; border: 1px solid rgba(15,23,42,.08); border-radius: 4px; background: #fff; box-shadow: 0 3px 12px rgba(24,59,86,.07); }
