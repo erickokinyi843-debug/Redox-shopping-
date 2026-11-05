@@ -53,7 +53,7 @@ gpsLocationStyles.textContent = `
 `;
 document.head.appendChild(gpsLocationStyles);
 
-document.querySelectorAll('[data-gps-location]').forEach(locationInput => {
+document.querySelectorAll('[data-gps-location][data-gps-search]').forEach(locationInput => {
   const control = document.createElement('div');
   control.className = 'gps-location-control';
   locationInput.parentNode.insertBefore(control, locationInput);
@@ -82,9 +82,7 @@ document.querySelectorAll('[data-gps-location]').forEach(locationInput => {
       const longitude = position.coords.longitude.toFixed(6);
       locationInput.value = `GPS ${latitude}, ${longitude}`;
       locationInput.dispatchEvent(new Event('input', { bubbles: true }));
-      status.textContent = locationInput.hasAttribute('data-gps-search')
-        ? 'Your coordinates will be used for nearby results only.'
-        : 'Exact coordinates added. They will be visible on your public listing.';
+      status.textContent = 'Your coordinates stay in this browser and are used for nearby search only.';
       button.disabled = false;
     }, error => {
       status.textContent = error.code === error.PERMISSION_DENIED
