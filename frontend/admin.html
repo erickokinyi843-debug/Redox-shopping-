@@ -3,640 +3,267 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - CHUKA RODYX SHOP</title>
+  <title>Seller Verification Admin - CHUKA RODYX SHOP</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     :root { --navy: #183b56; --deep: #0e273b; --teal: #18a999; --coral: #ff6b4a; --page: #eef5f5; --muted: #607d8b; --line: #dbe8e9; }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--page); color: var(--navy); font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; }
-    header { height: 70px; background: var(--deep); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 max(20px, calc((100% - 1280px) / 2)); }
-    .brand { color: #fff; text-decoration: none; font-size: 24px; font-weight: 900; }.brand i { color: var(--coral); margin-right: 8px; }
-    .admin-badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border: 1px solid rgba(255,255,255,.25); border-radius: 3px; background: var(--coral); color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .08em; }
-    .admin-signout { border: 1px solid rgba(255,255,255,.3); border-radius: 3px; padding: 9px 11px; background: transparent; color: #fff; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-    .admin-signout:hover { background: rgba(255,255,255,.12); }
+    header { min-height: 70px; background: var(--deep); color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px max(20px, calc((100% - 1120px) / 2)); }
+    .brand { color: #fff; text-decoration: none; font-size: 22px; font-weight: 900; }.brand i { color: var(--coral); margin-right: 8px; }
+    .admin-badge { display: inline-flex; align-items: center; gap: 8px; padding: 9px 13px; border-radius: 3px; background: var(--coral); color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .08em; }
     .back-link { color: #bde4df; text-decoration: none; font-size: 13px; }.back-link:hover { color: #fff; }
+    main { max-width: 1120px; margin: 32px auto; padding: 0 20px; }
+    .topline { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 20px; }
+    .topline h1 { margin: 0 0 6px; font-size: 28px; }.topline p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .panel { margin-bottom: 18px; padding: 20px; overflow: hidden; border-radius: 4px; background: #fff; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); }
+    .connection-form { display: flex; flex-wrap: wrap; gap: 9px; }
+    .search { flex: 1 1 250px; min-width: 0; border: 1px solid var(--line); border-radius: 3px; padding: 10px; color: var(--navy); font: inherit; }
+    .button { border: 0; border-radius: 3px; padding: 10px 14px; background: var(--teal); color: #fff; cursor: pointer; font: inherit; font-weight: 800; }
+    .button:hover { background: #128b7e; }.button:disabled { opacity: .6; cursor: wait; }
+    .button.secondary { background: var(--deep); }.button.secondary:hover { background: var(--navy); }
+    .button.reject { background: #b9412b; }.button.reject:hover { background: #96331f; }
+    .connection-note { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    #api-status { min-height: 20px; margin: 12px 0 0; font-size: 13px; line-height: 1.5; }
+    #api-status[data-state="error"] { color: #a63e2c; font-weight: 700; }
+    #api-status[data-state="success"] { color: #08776d; font-weight: 700; }
+    .summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+    .summary-item { min-width: 150px; padding: 13px 16px; border-top: 4px solid var(--teal); border-radius: 3px; background: #fff; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); }
+    .summary-item strong { display: block; font-size: 22px; }.summary-item span { color: var(--muted); font-size: 12px; }
+    .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 14px; }
+    .section-heading h2 { margin: 0; font-size: 18px; }.section-heading h2 i { margin-right: 8px; color: var(--coral); }
+    .table-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+    .table-toolbar .search { flex: 0 1 300px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { padding: 10px 8px; border-bottom: 2px solid var(--line); color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+    td { padding: 11px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: 0; }
+    .empty { padding: 20px 8px; color: var(--muted); text-align: center; }
+    .seller-name { font-weight: 800; }.seller-meta { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .actions { display: flex; gap: 7px; }.actions .button { padding: 7px 9px; font-size: 12px; }
     [hidden] { display: none !important; }
-    main { max-width: 1280px; margin: 30px auto; padding: 0 20px; }
-    .auth-shell { max-width: 500px; margin: 8vh auto; padding: 0 20px; }
-    .auth-card { background: #fff; border-top: 5px solid var(--coral); padding: 30px; box-shadow: 0 8px 28px rgba(24, 59, 86, .12); }
-    .auth-card h1 { margin: 0 0 8px; font-size: 26px; }
-    .auth-card > p { margin: 0 0 22px; color: var(--muted); line-height: 1.55; }
-    .auth-label { display: block; margin: 14px 0 6px; color: var(--navy); font-size: 13px; font-weight: 700; }
-    .auth-input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 3px; color: var(--navy); font: inherit; }
-    .auth-input:focus { outline: 2px solid rgba(24, 169, 153, .25); border-color: var(--teal); }
-    .password-field { display: flex; align-items: stretch; }
-    .password-field .auth-input { min-width: 0; border-radius: 3px 0 0 3px; }
-    .password-toggle { flex: 0 0 44px; border: 1px solid var(--line); border-left: 0; border-radius: 0 3px 3px 0; background: #f7fafb; color: var(--navy); cursor: pointer; }
-    .password-toggle:hover { background: #e8f1f2; }
-    .password-toggle:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-    .auth-submit { width: 100%; margin-top: 20px; border: 0; border-radius: 3px; padding: 12px; background: var(--deep); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
-    .auth-submit:hover { background: var(--navy); }
-    .auth-message { min-height: 20px; margin: 14px 0 0; color: #a63e2c; font-size: 13px; font-weight: 700; }
-    .auth-warning { margin-top: 16px; padding: 11px 12px; background: #fff2de; color: #79500f; font-size: 12px; line-height: 1.5; }
-    .topline { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 22px; }.topline h1 { margin: 0 0 5px; font-size: 28px; }.topline p { margin: 0; color: var(--muted); }.refresh { border: 0; background: var(--teal); color: #fff; padding: 10px 14px; border-radius: 3px; cursor: pointer; font: inherit; font-weight: 700; }.refresh:hover { background: #128b7e; }
-    .admin-kicker { display: block; margin-bottom: 7px; color: #b9412b; font-size: 11px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-    .notice { background: #fff2de; color: #97510e; border-left: 4px solid var(--coral); padding: 12px 15px; margin-bottom: 18px; font-size: 13px; }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 25px; }.stat { background: #fff; border-radius: 4px; padding: 17px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); border-top: 4px solid var(--teal); }.stat:nth-child(2n) { border-top-color: var(--coral); }.stat i { color: var(--teal); font-size: 19px; }.stat:nth-child(2n) i { color: var(--coral); }.stat strong { display: block; font-size: 25px; margin: 9px 0 2px; }.stat span { color: var(--muted); font-size: 12px; }
-    .grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; }.panel { background: #fff; border-radius: 4px; padding: 20px; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); margin-bottom: 18px; overflow: hidden; }.panel h2 { font-size: 18px; margin: 0 0 14px; }.panel h2 i { color: var(--coral); margin-right: 8px; }
-    .table-wrap { overflow-x: auto; } table { width: 100%; border-collapse: collapse; font-size: 12px; } th { color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 2px solid var(--line); padding: 9px 8px; } td { border-bottom: 1px solid var(--line); padding: 11px 8px; white-space: nowrap; } tr:last-child td { border-bottom: 0; }.empty { color: var(--muted); padding: 18px 0; font-size: 13px; }.status-select, .search { border: 1px solid var(--line); border-radius: 3px; background: #fff; color: var(--navy); font: inherit; padding: 8px 10px; }.search { width: min(100%, 260px); }.table-toolbar { display: flex; justify-content: flex-end; margin: -4px 0 12px; }.remove-listing, .remove-user { border: 0; background: transparent; color: #b9412b; font: inherit; font-weight: 700; cursor: pointer; }.shortcuts { display: flex; flex-wrap: wrap; gap: 10px; }.shortcuts a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 3px; color: var(--navy); text-decoration: none; font-size: 13px; font-weight: 700; }.shortcuts a:hover { border-color: var(--teal); color: #08776d; }
-    .content-cell { min-width: 240px; max-width: 420px; white-space: normal; overflow-wrap: anywhere; }
-    .content-cell strong { display: block; color: var(--deep); }
-    .content-cell span { display: block; margin-top: 4px; color: var(--muted); line-height: 1.45; }
-    .content-status { white-space: normal; }
-    .admin-action { display: block; margin: 3px 0; border: 0; padding: 3px 0; background: transparent; color: #08776d; font: inherit; font-weight: 800; cursor: pointer; }
-    .admin-action:hover, .remove-listing:hover { text-decoration: underline; }
-    .support-inbox { display: grid; grid-template-columns: minmax(210px, .7fr) minmax(0, 1.5fr); min-height: 380px; border: 1px solid var(--line); }
-    .support-threads { min-width: 0; overflow-y: auto; border-right: 1px solid var(--line); background: #f7fafb; }
-    .support-thread { display: block; width: 100%; padding: 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--navy); text-align: left; cursor: pointer; }
-    .support-thread[aria-current="true"] { background: #e5f5f2; }
-    .support-thread strong, .support-thread span { display: block; overflow-wrap: anywhere; }
-    .support-thread span { margin-top: 5px; color: var(--muted); font-size: 12px; }
-    .support-unread { display: inline-block !important; width: fit-content; padding: 2px 6px; border-radius: 10px; background: var(--coral); color: #fff !important; font-weight: 800; }
-    .support-conversation { display: flex; min-width: 0; flex-direction: column; }
-    .support-chat-title { padding: 12px 15px; border-bottom: 1px solid var(--line); font-weight: 800; overflow-wrap: anywhere; }
-    .support-chat-messages { flex: 1; min-height: 240px; max-height: 480px; overflow-y: auto; padding: 14px; }
-    .support-message { width: fit-content; max-width: min(85%, 620px); margin: 0 0 10px; padding: 9px 11px; background: #edf4f5; overflow-wrap: anywhere; white-space: pre-wrap; }
-    .support-message.from-admin { margin-left: auto; background: #e5f5f2; }
-    .support-message small { display: block; margin-top: 5px; color: var(--muted); font-size: 10px; }
-    .support-empty { padding: 18px; color: var(--muted); font-size: 13px; }
-    .support-reply-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
-    .support-reply-form input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 3px; padding: 10px; font: inherit; }
-    .support-reply-form button { border: 0; border-radius: 3px; padding: 0 16px; background: var(--teal); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
-    @media (max-width: 620px) { .support-inbox { grid-template-columns: 1fr; }.support-threads { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--line); }.support-chat-messages { min-height: 200px; } }
-    @media (max-width: 950px) { .stats { grid-template-columns: repeat(3, 1fr); }.grid { grid-template-columns: 1fr; } }
-    @media (max-width: 700px) { header { height: auto; min-height: 60px; padding: 12px 16px; flex-wrap: wrap; gap: 10px; }.brand { font-size: 18px; }.admin-badge { order: 3; }.back-link { margin-left: auto; } }
-    @media (max-width: 560px) { .topline { align-items: start; flex-direction: column; }.stats { grid-template-columns: repeat(2, 1fr); }.stat { padding: 13px; } main { margin-top: 22px; padding: 0 12px; }.auth-shell { margin-top: 32px; padding: 0 12px; }.auth-card { padding: 22px; }.panel { padding: 15px; } }
+    @media (max-width: 620px) {
+      header { flex-wrap: wrap; padding: 12px 16px; }.brand { font-size: 18px; }.admin-badge { order: 3; }
+      main { margin-top: 22px; padding: 0 12px; }.topline { align-items: start; flex-direction: column; }.panel { padding: 15px; }
+      .table-toolbar { justify-content: stretch; }.table-toolbar .search { flex-basis: 100%; }
+    }
   </style>
 </head>
 <body>
-  <header><a class="brand" href="homepage.html"><i class="fas fa-shopping-bag"></i>CHUKA RODYX SHOP</a><span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN PANEL</span><button class="admin-signout" id="admin-signout" type="button" hidden><i class="fas fa-sign-out-alt"></i> Sign out</button><a class="back-link" href="homepage.html"><i class="fas fa-arrow-left"></i> Back to store</a></header>
-  <main class="auth-shell" id="admin-auth" hidden>
-    <section class="auth-card">
-      <span class="admin-kicker">ADMIN ACCESS</span>
-      <h1 id="auth-heading">Set up administrator</h1>
-      <p id="auth-description">Create the one admin account for this browser. Once created, setup is disabled and admin sign-in is required.</p>
-      <form id="admin-setup-form">
-        <label class="auth-label" for="setup-email">Admin email</label>
-        <input class="auth-input" id="setup-email" name="email" type="email" autocomplete="username" required>
-        <label class="auth-label" for="setup-password">Password (at least 10 characters)</label>
-        <div class="password-field"><input class="auth-input" id="setup-password" name="password" type="password" autocomplete="new-password" minlength="10" required><button class="password-toggle" type="button" data-password-toggle="setup-password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="fas fa-eye" aria-hidden="true"></i></button></div>
-        <label class="auth-label" for="setup-confirm-password">Confirm password</label>
-        <div class="password-field"><input class="auth-input" id="setup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="10" required><button class="password-toggle" type="button" data-password-toggle="setup-confirm-password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="fas fa-eye" aria-hidden="true"></i></button></div>
-        <button class="auth-submit" type="submit"><i class="fas fa-user-shield"></i> Set up admin account</button>
-      </form>
-      <form id="admin-login-form" hidden>
-        <label class="auth-label" for="login-email">Admin email</label>
-        <input class="auth-input" id="login-email" name="email" type="email" autocomplete="username" required>
-        <label class="auth-label" for="login-password">Password</label>
-        <div class="password-field"><input class="auth-input" id="login-password" name="password" type="password" autocomplete="current-password" required><button class="password-toggle" type="button" data-password-toggle="login-password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="fas fa-eye" aria-hidden="true"></i></button></div>
-        <button class="auth-submit" type="submit"><i class="fas fa-lock"></i> Sign in to admin panel</button>
-      </form>
-      <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
-      <div class="auth-warning">This browser-only admin setup is just a local fallback. For a production deployment, move admin authentication and data to the PythonAnywhere backend.</div>
-    </section>
-  </main>
-  <main id="admin-dashboard" hidden>
-    <div class="topline"><div><span class="admin-kicker">CHUKA RODYX SHOP MANAGEMENT CONSOLE</span><h1>Dashboard Overview</h1><p>Manage orders, customers, and marketplace listings.</p></div><button class="refresh" type="button" onclick="loadDashboard()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-    <div class="notice" id="notice">Most dashboard data is local to this browser. Seller verification requests are shared and require the server admin API key.</div>
-    <section class="stats">
-      <div class="stat"><i class="fas fa-users"></i><strong id="users-count">0</strong><span>Customers</span></div>
-      <div class="stat"><i class="fas fa-box-open"></i><strong id="products-count">0</strong><span>Product listings</span></div>
-      <div class="stat"><i class="fas fa-receipt"></i><strong id="orders-count">0</strong><span>Demo orders</span></div>
-      <div class="stat"><i class="fas fa-coins"></i><strong id="revenue-count">KES 0</strong><span>Demo order value</span></div>
-      <div class="stat"><i class="fas fa-clipboard-list"></i><strong id="posts-count">0</strong><span>Wants and services</span></div>
-      <div class="stat"><i class="fas fa-house"></i><strong id="rental-count">0</strong><span>Rentals and accommodation</span></div>
-      <div class="stat"><i class="fas fa-calendar-days"></i><strong id="events-count">0</strong><span>Events</span></div>
-      <div class="stat"><i class="fas fa-star"></i><strong id="reviews-count">0</strong><span>Ratings and remarks</span></div>
-      <div class="stat"><i class="fas fa-user-check"></i><strong id="verification-count">0</strong><span>Pending seller checks</span></div>
-      <div class="stat"><i class="fas fa-clock"></i><strong id="stock-count">0</strong><span>Open orders</span></div>
-    </section>
-    <div class="grid">
+  <header>
+    <a class="brand" href="homepage.html"><i class="fas fa-shopping-bag" aria-hidden="true"></i>CHUKA RODYX SHOP</a>
+    <span class="admin-badge"><i class="fas fa-shield-alt" aria-hidden="true"></i> ADMIN PANEL</span>
+    <a class="back-link" href="homepage.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to store</a>
+  </header>
+  <main>
+    <div class="topline">
       <div>
-        <section class="panel"><h2><i class="fas fa-receipt"></i>Recent orders</h2><div class="table-toolbar"><input class="search" id="order-search" type="search" placeholder="Search orders or customers" aria-label="Search orders or customers"></div><div class="table-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Total</th><th>Fulfillment</th><th>Status</th><th>Date</th></tr></thead><tbody id="orders-table"></tbody></table></div></section>
-        <section class="panel"><h2><i class="fas fa-box-open"></i>Marketplace inventory</h2><div class="table-toolbar"><input class="search" id="listing-search" type="search" placeholder="Search listings" aria-label="Search listings"></div><div class="table-wrap"><table><thead><tr><th>Product</th><th>Category</th><th>Seller</th><th>Price</th><th>Added</th><th>Action</th></tr></thead><tbody id="products-table"></tbody></table></div></section>
-        <section class="panel"><h2><i class="fas fa-shield-alt"></i>All marketplace content</h2><div class="table-toolbar"><input class="search" id="content-search" type="search" placeholder="Search posts, owners, or details" aria-label="Search marketplace content"></div><div class="table-wrap"><table><thead><tr><th>Type</th><th>Post and details</th><th>Owner</th><th>Created</th><th>Status</th><th>Admin actions</th></tr></thead><tbody id="content-table"></tbody></table></div></section>
+        <h1>Seller verification</h1>
+        <p>Review submitted documents and approve or reject seller applications.</p>
       </div>
-      <div>
-        <section class="panel"><h2><i class="fas fa-users"></i>Customers</h2><div class="table-toolbar"><input class="search" id="customer-search" type="search" placeholder="Search customers" aria-label="Search customers"></div><div class="table-wrap"><table><thead><tr><th>Username</th><th>Email</th><th>Phone</th><th>Joined</th><th>Action</th></tr></thead><tbody id="users-table"></tbody></table></div></section>
-        <section class="panel">
-          <h2><i class="fas fa-user-check"></i>Seller verification requests</h2>
-          <form id="verification-api-form" class="table-toolbar">
-            <input class="search" id="verification-api-key" type="password" autocomplete="off" placeholder="Server admin API key" aria-label="Server admin API key" required>
-            <button class="refresh" type="submit">Connect</button>
-          </form>
-          <p id="verification-api-status" role="status" aria-live="polite"></p>
-          <div class="table-toolbar"><input class="search" id="verification-search" type="search" placeholder="Search verification requests" aria-label="Search verification requests"></div>
-          <div class="table-wrap"><table><thead><tr><th>Seller</th><th>Email</th><th>Phone</th><th>Document</th><th>Status</th><th>Action</th></tr></thead><tbody id="seller-verification-table"></tbody></table></div>
-        </section>
-        <section class="panel"><h2><i class="fas fa-bolt"></i>Quick links</h2><div class="shortcuts"><a href="homepage.html"><i class="fas fa-store"></i>Storefront</a><a href="sell.html"><i class="fas fa-plus"></i>Post a listing</a></div></section>
-      </div>
+      <button class="button secondary" id="refresh-button" type="button" disabled><i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh</button>
     </div>
-    <section class="panel" aria-labelledby="support-inbox-title">
-      <h2 id="support-inbox-title"><i class="fas fa-headset"></i>Customer support inbox</h2>
-      <div class="support-inbox">
-        <div class="support-threads" id="support-thread-list" aria-label="Support conversations"></div>
-        <div class="support-conversation">
-          <div class="support-chat-title" id="support-chat-title">Select a support conversation</div>
-          <div class="support-chat-messages" id="support-chat-messages" aria-live="polite"><div class="support-empty">Help conversations started from the storefront will appear here.</div></div>
-          <form class="support-reply-form" id="support-reply-form">
-            <input id="support-reply-input" type="text" maxlength="500" required placeholder="Reply to the customer" aria-label="Support reply">
-            <button type="submit">Send</button>
-          </form>
-        </div>
+    <section class="panel" aria-label="Connect to seller verification service">
+      <form class="connection-form" id="verification-api-form">
+        <input class="search" id="verification-api-key" type="password" autocomplete="off" placeholder="Server admin API key" aria-label="Server admin API key" required>
+        <button class="button" id="connect-button" type="submit">Connect</button>
+        <button class="button secondary" id="signout-button" type="button" hidden>Disconnect</button>
+      </form>
+      <p class="connection-note">The API key is kept only for this browser tab session and is sent only to the configured marketplace API.</p>
+      <p id="api-status" role="status" aria-live="polite"></p>
+    </section>
+    <section class="summary" aria-label="Application totals">
+      <div class="summary-item"><strong id="pending-count">-</strong><span>Pending review</span></div>
+      <div class="summary-item"><strong id="total-count">-</strong><span>Total applications</span></div>
+    </section>
+    <section class="panel">
+      <div class="section-heading">
+        <h2><i class="fas fa-user-check" aria-hidden="true"></i>Applications</h2>
+      </div>
+      <div class="table-toolbar">
+        <input class="search" id="verification-search" type="search" placeholder="Search applications" aria-label="Search applications" disabled>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Seller</th><th>Email</th><th>Phone</th><th>Document</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="seller-verification-table"><tr><td class="empty" colspan="6">Connect to the verification service to view applications.</td></tr></tbody>
+        </table>
       </div>
     </section>
   </main>
   <script src="config.js"></script>
   <script>
-    const adminAccountKey = 'rodyxAdminAccount';
-    const adminSessionKey = 'rodyxAdminSession';
-    const accountsKey = 'rodyxAccounts';
-    const listingsKey = 'rodyxListings';
-    const sellerVerificationKey = 'rodyxSellerVerification';
-    const sellerVerificationApplicationsKey = 'rodyxSellerVerificationApplications';
     const sellerVerificationAdminKey = 'rodyxSellerVerificationAdminKey';
     const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
-    const managedCollections = [
-      { type: 'Product', key: 'rodyxListings', title: item => item.title, owner: item => item.sellerName || 'Seller', details: item => `${item.category || ''} ${item.description || ''} Email ${item.sellerEmail || ''} Phone ${item.sellerPhone || ''}` },
-      { type: 'Wanted', key: 'rodyxWantedPosts', title: item => item.title, owner: item => item.buyerName || 'Buyer', details: item => `${item.category || ''} ${item.town || ''} ${item.description || ''} Budget ${item.budget || ''} Email ${item.buyerEmail || ''} Phone ${item.buyerPhone || ''}` },
-      { type: 'Service', key: 'rodyxServices', title: item => item.title, owner: item => item.providerName || 'Provider', details: item => `${item.skill || ''} ${item.area || ''} ${item.description || ''} ${item.rate || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
-      { type: 'Rental', key: 'rodyxRentals', title: item => item.title, owner: item => item.ownerName || 'Owner', details: item => `${item.category || ''} ${item.area || ''} ${item.duration || ''} KES ${item.price || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
-      { type: 'Accommodation', key: 'rodyxAccommodation', title: item => item.title, owner: item => item.contactName || 'Contact', details: item => `${item.type || ''} ${item.location || ''} ${item.address || ''} KES ${item.price || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
-      { type: 'Event', key: 'rodyxEvents', title: item => item.title, owner: item => item.organizer || 'Organizer', details: item => `${item.category || ''} ${item.area || ''} ${item.venue || ''} ${item.date || ''} ${item.description || ''} Email ${item.email || ''} Phone ${item.phone || ''}` },
-      { type: 'Review', key: 'rodyxReviews', title: item => `${item.rating || 0}-star review of ${item.targetType || 'listing'} ${item.targetId || ''}`, owner: item => item.author, details: item => item.remark || '' }
-    ];
-    const orderStatuses = ['Placed', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
-    const money = value => `KES ${Number(value || 0).toLocaleString()}`;
-    const formatDate = value => value && !Number.isNaN(new Date(value).getTime()) ? new Date(value).toLocaleDateString() : '-';
-    const adminAuth = document.getElementById('admin-auth');
-    const adminDashboard = document.getElementById('admin-dashboard');
-    const setupForm = document.getElementById('admin-setup-form');
-    const loginForm = document.getElementById('admin-login-form');
-    const authMessage = document.getElementById('auth-message');
-    let activeSupportThreadId = '';
+    const form = document.getElementById('verification-api-form');
+    const keyInput = document.getElementById('verification-api-key');
+    const connectButton = document.getElementById('connect-button');
+    const signoutButton = document.getElementById('signout-button');
+    const refreshButton = document.getElementById('refresh-button');
+    const statusMessage = document.getElementById('api-status');
+    const applicationsTable = document.getElementById('seller-verification-table');
+    const searchInput = document.getElementById('verification-search');
+    let applications = [];
 
-    document.querySelectorAll('[data-password-toggle]').forEach(button => {
-      button.addEventListener('click', () => {
-        const passwordInput = document.getElementById(button.dataset.passwordToggle);
-        const showPassword = passwordInput.type === 'password';
-        passwordInput.type = showPassword ? 'text' : 'password';
-        button.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
-        button.setAttribute('aria-pressed', String(showPassword));
-        button.title = showPassword ? 'Hide password' : 'Show password';
-        button.innerHTML = `<i class="fas fa-${showPassword ? 'eye-slash' : 'eye'}" aria-hidden="true"></i>`;
-      });
-    });
-
-    function bytesToHex(bytes) {
-      return Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+    function setStatus(message, state = '') {
+      statusMessage.textContent = message;
+      statusMessage.dataset.state = state;
     }
 
-    async function hashAdminPassword(password, saltHex) {
-      const salt = Uint8Array.from(saltHex.match(/.{2}/g), byte => parseInt(byte, 16));
-      const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
-      const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: 120000, hash: 'SHA-256' }, key, 256);
-      return bytesToHex(new Uint8Array(bits));
+    function setConnected(connected) {
+      signoutButton.hidden = !connected;
+      refreshButton.disabled = !connected;
+      searchInput.disabled = !connected;
     }
 
-    function showAdminAccess(message = '') {
-      const hasAdmin = Boolean(readJSON(adminAccountKey, null));
-      adminDashboard.hidden = true;
-      adminAuth.hidden = false;
-      document.getElementById('admin-signout').hidden = true;
-      setupForm.hidden = hasAdmin;
-      loginForm.hidden = !hasAdmin;
-      document.getElementById('auth-heading').textContent = hasAdmin ? 'Admin sign in' : 'Set up administrator';
-      document.getElementById('auth-description').textContent = hasAdmin
-        ? 'Sign in with the admin account created during the one-time setup.'
-        : 'Create the one admin account for this browser. Once created, setup is disabled and admin sign-in is required.';
-      authMessage.textContent = message;
-    }
-
-    function openAdminDashboard() {
-      adminAuth.hidden = true;
-      adminDashboard.hidden = false;
-      document.getElementById('admin-signout').hidden = false;
-      loadDashboard();
-    }
-
-    document.getElementById('admin-signout').addEventListener('click', () => {
-      sessionStorage.removeItem(adminSessionKey);
-      sessionStorage.removeItem(sellerVerificationAdminKey);
-      showAdminAccess('You have signed out of the admin panel.');
-    });
-
-    setupForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      if (readJSON(adminAccountKey, null)) {
-        showAdminAccess('Admin setup is already complete. Sign in instead.');
-        return;
-      }
-      const email = document.getElementById('setup-email').value.trim().toLowerCase();
-      const password = document.getElementById('setup-password').value;
-      const confirmation = document.getElementById('setup-confirm-password').value;
-      if (password !== confirmation) {
-        authMessage.textContent = 'The passwords do not match.';
-        return;
-      }
-      const salt = bytesToHex(crypto.getRandomValues(new Uint8Array(16)));
-      try {
-        const passwordHash = await hashAdminPassword(password, salt);
-        localStorage.setItem(adminAccountKey, JSON.stringify({ email, salt, passwordHash, createdAt: new Date().toISOString() }));
-        setupForm.reset();
-        document.getElementById('login-email').value = email;
-        showAdminAccess('Admin setup complete. Sign in with your new credentials.');
-      } catch {
-        authMessage.textContent = 'Secure password setup is unavailable in this browser. Open this page over localhost or HTTPS.';
-      }
-    });
-
-    loginForm.addEventListener('submit', async event => {
-      event.preventDefault();
-      const account = readJSON(adminAccountKey, null);
-      const email = document.getElementById('login-email').value.trim().toLowerCase();
-      const password = document.getElementById('login-password').value;
-      if (!account || email !== account.email) {
-        authMessage.textContent = 'Incorrect admin email or password.';
-        return;
-      }
-      try {
-        const passwordHash = await hashAdminPassword(password, account.salt);
-        if (passwordHash !== account.passwordHash) {
-          authMessage.textContent = 'Incorrect admin email or password.';
-          return;
-        }
-        sessionStorage.setItem(adminSessionKey, 'authenticated');
-        loginForm.reset();
-        openAdminDashboard();
-      } catch {
-        authMessage.textContent = 'Could not verify credentials in this browser. Open this page over localhost or HTTPS.';
-      }
-    });
-
-    function readJSON(key, fallback) {
-      try {
-        const value = JSON.parse(localStorage.getItem(key) || 'null');
-        return value ?? fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function cell(row, value) {
-      const item = document.createElement('td');
-      item.textContent = value ?? '-';
-      row.appendChild(item);
-      return item;
-    }
-
-    function emptyRow(target, columns, text = 'No records found') {
+    function showEmpty(message) {
       const row = document.createElement('tr');
-      const item = document.createElement('td');
-      item.colSpan = columns;
-      item.className = 'empty';
-      item.textContent = text;
-      row.appendChild(item);
-      target.appendChild(row);
+      const cell = document.createElement('td');
+      cell.className = 'empty';
+      cell.colSpan = 6;
+      cell.textContent = message;
+      row.appendChild(cell);
+      applicationsTable.replaceChildren(row);
     }
 
-    function getCustomers() {
-      const accounts = readJSON(accountsKey, {});
-      const customers = Object.entries(accounts).map(([email, account]) => ({ ...account, email }));
-      const currentUser = readJSON('currentUser', null);
-      if (currentUser?.email && !customers.some(customer => customer.email === currentUser.email)) customers.push(currentUser);
-      return customers;
+    function appendCell(row, value) {
+      const cell = document.createElement('td');
+      cell.textContent = value || '-';
+      row.appendChild(cell);
+      return cell;
     }
 
-    function getOrders() {
-      const orders = [];
-      for (let index = 0; index < localStorage.length; index += 1) {
-        const key = localStorage.key(index);
-        if (!key?.startsWith('rodyx:') || !key.endsWith(':orders')) continue;
-        const email = decodeURIComponent(key.slice('rodyx:'.length, -':orders'.length));
-        readJSON(key, []).forEach(order => orders.push({ ...order, email, storageKey: key }));
-      }
-      return orders.sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0));
-    }
+    function renderApplications() {
+      applicationsTable.replaceChildren();
+      const query = searchInput.value.trim().toLowerCase();
+      const visibleApplications = applications.filter(application => (
+        `${application.fullName || ''} ${application.email || ''} ${application.phone || ''} ${application.status || ''}`
+      ).toLowerCase().includes(query));
 
-    function getCartCount() {
-      let count = 0;
-      for (let index = 0; index < localStorage.length; index += 1) {
-        const key = localStorage.key(index);
-        if (!key?.startsWith('rodyx:') || !key.endsWith(':cart')) continue;
-        count += readJSON(key, []).reduce((total, item) => total + Number(item.quantity || 0), 0);
-      }
-      return count;
-    }
-
-    function renderOrders(orders) {
-      const target = document.getElementById('orders-table');
-      target.replaceChildren();
-      orders.forEach(order => {
+      visibleApplications.forEach(application => {
         const row = document.createElement('tr');
-        cell(row, order.id || 'Order');
-        cell(row, order.email);
-        cell(row, (order.items || []).map(item => `${item.name} x${item.quantity || 1}`).join(', ') || '-');
-        cell(row, money(order.total));
-        const fulfillmentNames = { rider: 'Local rider', pickup: 'Seller pickup', meetup: 'Public meetup' };
-        const fulfillment = [fulfillmentNames[order.fulfillmentMethod] || 'Not specified', order.fulfillmentLocation || order.address].filter(Boolean).join(': ');
-        cell(row, fulfillment || '-');
-        const statusCell = cell(row, '');
-        const status = document.createElement('select');
-        status.className = 'status-select';
-        status.setAttribute('aria-label', `Update status for ${order.id || 'order'}`);
-        orderStatuses.forEach(value => {
-          const option = document.createElement('option');
-          option.value = value;
-          option.textContent = value;
-          option.selected = value === order.status;
-          status.appendChild(option);
-        });
-        status.addEventListener('change', () => updateOrderStatus(order, status.value));
-        statusCell.appendChild(status);
-        cell(row, formatDate(order.createdAt));
-        row.dataset.search = `${order.id || ''} ${order.email || ''} ${(order.items || []).map(item => item.name).join(' ')} ${fulfillment}`.toLowerCase();
-        target.appendChild(row);
-      });
-      if (!target.children.length) emptyRow(target, 7, 'No demo orders yet. Orders placed from the storefront will appear here.');
-      filterRows('order-search', target);
-    }
+        const sellerCell = appendCell(row, '');
+        const sellerName = document.createElement('strong');
+        sellerName.className = 'seller-name';
+        sellerName.textContent = application.fullName || application.email || 'Seller';
+        const sellerMeta = document.createElement('span');
+        sellerMeta.className = 'seller-meta';
+        sellerMeta.textContent = application.shopName || '';
+        sellerCell.append(sellerName, sellerMeta);
+        appendCell(row, application.email);
+        appendCell(row, application.phone);
 
-    function renderSupportInbox() {
-      const threadList = document.getElementById('support-thread-list');
-      const messageList = document.getElementById('support-chat-messages');
-      const replyForm = document.getElementById('support-reply-form');
-      const adminEmail = String(readJSON(adminAccountKey, {})?.email || '').toLowerCase();
-      const threads = readJSON('rodyxMessages', [])
-        .filter(thread => thread.support === true && Array.isArray(thread.participants))
-        .sort((first, second) => new Date(second.lastUpdated || 0) - new Date(first.lastUpdated || 0));
-
-      threadList.replaceChildren();
-      if (!threads.length) {
-        const empty = document.createElement('div');
-        empty.className = 'support-empty';
-        empty.textContent = 'No support conversations yet.';
-        threadList.appendChild(empty);
-      }
-
-      if (!threads.some(thread => thread.id === activeSupportThreadId)) activeSupportThreadId = threads[0]?.id || '';
-      threads.forEach(thread => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'support-thread';
-        button.setAttribute('aria-current', String(thread.id === activeSupportThreadId));
-        const participant = thread.participants.find(email => email !== adminEmail) || 'Customer';
-        const participantName = thread.names?.[participant] || participant;
-        const title = document.createElement('strong');
-        title.textContent = participantName;
-        const preview = document.createElement('span');
-        preview.textContent = thread.messages?.slice(-1)[0]?.text || 'No messages yet';
-        const unreadCount = (thread.messages || []).filter(message => message.sender !== adminEmail && !(message.readBy || []).includes(adminEmail)).length;
-        button.append(title, preview);
-        if (unreadCount) {
-          const unread = document.createElement('span');
-          unread.className = 'support-unread';
-          unread.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
-          button.appendChild(unread);
-        }
-        button.addEventListener('click', () => {
-          activeSupportThreadId = thread.id;
-          renderSupportInbox();
-        });
-        threadList.appendChild(button);
-      });
-
-      const activeThread = threads.find(thread => thread.id === activeSupportThreadId);
-      messageList.replaceChildren();
-      replyForm.querySelector('button').disabled = !activeThread;
-      document.getElementById('support-reply-input').disabled = !activeThread;
-      if (!activeThread) {
-        document.getElementById('support-chat-title').textContent = 'Select a support conversation';
-        const empty = document.createElement('div');
-        empty.className = 'support-empty';
-        empty.textContent = 'Help conversations started from the storefront will appear here.';
-        messageList.appendChild(empty);
-        return;
-      }
-
-      document.getElementById('support-chat-title').textContent = activeThread.names?.[activeThread.participants.find(email => email !== adminEmail)] || 'Customer support chat';
-      (activeThread.messages || []).forEach(message => {
-        const bubble = document.createElement('div');
-        bubble.className = `support-message${message.sender.toLowerCase() === adminEmail ? ' from-admin' : ''}`;
-        bubble.appendChild(document.createTextNode(message.text));
-        const meta = document.createElement('small');
-        meta.textContent = `${message.sender.toLowerCase() === adminEmail ? 'Admin' : 'Customer'} · ${new Date(message.createdAt).toLocaleString()}`;
-        bubble.appendChild(meta);
-        messageList.appendChild(bubble);
-        if (message.sender.toLowerCase() !== adminEmail) {
-          if (!Array.isArray(message.readBy)) message.readBy = [];
-          if (!message.readBy.includes(adminEmail)) message.readBy.push(adminEmail);
-        }
-      });
-      localStorage.setItem('rodyxMessages', JSON.stringify(threads));
-      messageList.scrollTop = messageList.scrollHeight;
-    }
-
-    document.getElementById('support-reply-form').addEventListener('submit', event => {
-      event.preventDefault();
-      const adminEmail = String(readJSON(adminAccountKey, {})?.email || '').toLowerCase();
-      const input = document.getElementById('support-reply-input');
-      const text = input.value.trim();
-      if (!adminEmail || !activeSupportThreadId || !text) return;
-      const threads = readJSON('rodyxMessages', []);
-      const thread = threads.find(item => item.id === activeSupportThreadId && item.support === true);
-      if (!thread) return;
-      thread.messages = Array.isArray(thread.messages) ? thread.messages : [];
-      thread.messages.push({ sender: adminEmail, text, createdAt: new Date().toISOString(), readBy: [adminEmail] });
-      thread.lastUpdated = new Date().toISOString();
-      localStorage.setItem('rodyxMessages', JSON.stringify(threads));
-      input.value = '';
-      renderSupportInbox();
-    });
-
-    window.addEventListener('storage', event => {
-      if (event.key === 'rodyxMessages') renderSupportInbox();
-    });
-
-    function updateOrderStatus(order, status) {
-      const storedOrders = readJSON(order.storageKey, []);
-      const updatedOrders = storedOrders.map(item => item.id === order.id ? { ...item, status } : item);
-      localStorage.setItem(order.storageKey, JSON.stringify(updatedOrders));
-      loadDashboard();
-    }
-
-    function renderListings(listings) {
-      const target = document.getElementById('products-table');
-      target.replaceChildren();
-      listings.forEach(listing => {
-        const row = document.createElement('tr');
-        cell(row, listing.title);
-        cell(row, listing.category);
-        cell(row, listing.sellerName || listing.sellerEmail || 'Seller');
-        cell(row, money(listing.price));
-        cell(row, formatDate(listing.createdAt));
-        const actionCell = cell(row, '');
-        const remove = document.createElement('button');
-        remove.className = 'remove-listing';
-        remove.type = 'button';
-        remove.textContent = 'Remove';
-        remove.setAttribute('aria-label', `Remove listing ${listing.title}`);
-        remove.addEventListener('click', () => removeListing(listing.id));
-        actionCell.appendChild(remove);
-        row.dataset.search = `${listing.title || ''} ${listing.category || ''} ${listing.sellerName || ''} ${listing.sellerEmail || ''}`.toLowerCase();
-        target.appendChild(row);
-      });
-      if (!target.children.length) emptyRow(target, 6, 'No community listings yet.');
-      filterRows('listing-search', target);
-    }
-
-    function renderSellerVerificationRequests(requests) {
-      const target = document.getElementById('seller-verification-table');
-      target.replaceChildren();
-
-      requests.forEach(request => {
-        const row = document.createElement('tr');
-        cell(row, request.fullName || request.email || 'Seller');
-        cell(row, request.email || '-');
-        cell(row, request.phone || '-');
-        const docCell = cell(row, '');
-        if (request.documentData) {
+        const documentCell = appendCell(row, '');
+        if (application.documentData) {
           const documentLink = document.createElement('a');
-          documentLink.href = request.documentData;
+          documentLink.href = application.documentData;
           documentLink.target = '_blank';
           documentLink.rel = 'noopener';
-          documentLink.textContent = request.documentName || 'View document';
-          docCell.appendChild(documentLink);
+          documentLink.textContent = application.documentName || 'View document';
+          documentCell.appendChild(documentLink);
         } else {
-          docCell.textContent = request.documentName || 'No document';
+          documentCell.textContent = application.documentName || 'No document';
         }
-        const statusCell = cell(row, request.status || 'pending');
+
+        appendCell(row, application.status || 'pending');
         const actions = document.createElement('td');
-        const approve = document.createElement('button');
-        approve.type = 'button';
-        approve.className = 'remove-listing';
-        approve.textContent = 'Approve';
-        approve.disabled = request.status === 'approved';
-        approve.addEventListener('click', () => updateSellerVerification(request.email, 'approved'));
-
-        const reject = document.createElement('button');
-        reject.type = 'button';
-        reject.className = 'remove-user';
-        reject.textContent = 'Reject';
-        reject.style.marginLeft = '10px';
-        reject.disabled = request.status === 'rejected';
-        reject.addEventListener('click', () => updateSellerVerification(request.email, 'rejected'));
-
-        actions.append(approve, reject);
+        actions.className = 'actions';
+        const approveButton = document.createElement('button');
+        approveButton.className = 'button';
+        approveButton.type = 'button';
+        approveButton.textContent = 'Approve';
+        approveButton.disabled = application.status === 'approved';
+        approveButton.addEventListener('click', () => updateApplication(application.email, 'approved'));
+        const rejectButton = document.createElement('button');
+        rejectButton.className = 'button reject';
+        rejectButton.type = 'button';
+        rejectButton.textContent = 'Reject';
+        rejectButton.disabled = application.status === 'rejected';
+        rejectButton.addEventListener('click', () => updateApplication(application.email, 'rejected'));
+        actions.append(approveButton, rejectButton);
         row.appendChild(actions);
-        row.dataset.search = `${request.fullName || ''} ${request.email || ''} ${request.phone || ''} ${request.status || ''}`.toLowerCase();
-        target.appendChild(row);
+        applicationsTable.appendChild(row);
       });
 
-      if (!target.children.length) emptyRow(target, 6, 'No seller verification requests yet.');
-      target.querySelectorAll('tr[data-search]').forEach(row => {
-        row.dataset.search = `${row.dataset.search} ${row.textContent}`.toLowerCase();
-      });
-      filterRows('verification-search', target);
+      if (!visibleApplications.length) {
+        showEmpty(applications.length ? 'No applications match your search.' : 'No seller verification applications yet.');
+      }
+      document.getElementById('pending-count').textContent = applications.filter(item => item.status === 'pending').length;
+      document.getElementById('total-count').textContent = applications.length;
     }
 
-    async function loadSellerVerificationRequests() {
-      const status = document.getElementById('verification-api-status');
+    async function readResponse(response) {
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 401) throw new Error('The server rejected this admin API key. Check that it matches ADMIN_API_KEY on the backend.');
+        if (response.status === 404) throw new Error('The deployed API does not have the seller-verification admin route. Deploy the current backend/app.py to PythonAnywhere, then reload the web app.');
+        if (response.status === 503) throw new Error(result.error || 'Seller verification administration is not configured on the server.');
+        throw new Error(result.error || `The API returned HTTP ${response.status}.`);
+      }
+      return result;
+    }
+
+    async function diagnoseConnectionFailure() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/health`, { cache: 'no-store' });
+        if (response.ok) {
+          return `The API health check passed, but the browser could not reach its admin endpoint. Deploy the current backend/app.py to PythonAnywhere and reload the web app; also confirm CORS_ORIGINS includes ${location.origin}.`;
+        }
+      } catch {
+        return `Could not reach the API at ${apiBaseUrl}. Check that the backend is online and its CORS_ORIGINS includes ${location.origin}.`;
+      }
+      return `The API health check failed at ${apiBaseUrl}. Check the backend deployment and CORS_ORIGINS for ${location.origin}.`;
+    }
+
+    async function loadApplications() {
       const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
       if (!apiBaseUrl) {
-        status.textContent = 'The API URL is not configured.';
-        renderSellerVerificationRequests([]);
+        setConnected(false);
+        setStatus('The API URL is not configured in frontend/config.js.', 'error');
+        showEmpty('The verification service is not configured.');
         return;
       }
       if (!adminKey) {
-        status.textContent = 'Enter the server ADMIN_API_KEY to load shared applications.';
-        renderSellerVerificationRequests([]);
+        setConnected(false);
+        setStatus('Enter the server ADMIN_API_KEY to connect.');
+        showEmpty('Connect to the verification service to view applications.');
         return;
       }
+
+      connectButton.disabled = true;
+      refreshButton.disabled = true;
+      setStatus('Connecting to the seller verification service...');
       try {
         const response = await fetch(`${apiBaseUrl}/api/admin/seller-verifications`, {
-          headers: { 'X-Admin-Key': adminKey }
+          headers: { 'X-Admin-Key': adminKey },
+          cache: 'no-store'
         });
-        let applications = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(applications.error || `The API returned ${response.status}.`);
-        if (!Array.isArray(applications)) throw new Error('The API returned an invalid application list.');
-
-        const migration = await migrateLegacySellerVerifications(applications, adminKey);
-        if (migration.migrated || migration.failed) {
-          const refreshedResponse = await fetch(`${apiBaseUrl}/api/admin/seller-verifications`, {
-            headers: { 'X-Admin-Key': adminKey }
-          });
-          applications = await refreshedResponse.json().catch(() => ({}));
-          if (!refreshedResponse.ok || !Array.isArray(applications)) {
-            throw new Error(applications.error || `The API returned ${refreshedResponse.status}.`);
-          }
-          status.textContent = migration.failed
-            ? `Connected; migrated ${migration.migrated} old request(s), but ${migration.failed} could not be migrated.`
-            : `Connected; migrated ${migration.migrated} old browser-saved request(s).`;
-        } else {
-          status.textContent = 'Connected to the shared seller verification service.';
-        }
-        document.getElementById('verification-api-key').value = adminKey;
-        renderSellerVerificationRequests(applications);
-        document.getElementById('verification-count').textContent = applications.filter(item => item.status === 'pending').length;
+        const result = await readResponse(response);
+        if (!Array.isArray(result)) throw new Error('The API returned an invalid application list.');
+        applications = result;
+        keyInput.value = adminKey;
+        searchInput.value = '';
+        setConnected(true);
+        renderApplications();
+        setStatus('Connected to the shared seller verification service.', 'success');
       } catch (error) {
-        status.textContent = `Could not load shared verification requests. ${error.message}`;
-        renderSellerVerificationRequests([]);
-        console.error('Seller verification requests could not be loaded:', error);
-      }
-    }
-
-    async function migrateLegacySellerVerifications(serverApplications, adminKey) {
-      const localApplications = readJSON(sellerVerificationApplicationsKey, []);
-      if (!Array.isArray(localApplications) || !localApplications.length) return { migrated: 0, failed: 0 };
-      const localStatuses = readJSON(sellerVerificationKey, {});
-      const knownEmails = new Set(serverApplications.map(item => String(item.email || '').toLowerCase()));
-      const localStatusFor = email => Object.entries(localStatuses)
-        .find(([storedEmail]) => storedEmail.toLowerCase() === email)?.[1]?.status;
-      let migrated = 0;
-      let failed = 0;
-
-      for (const application of localApplications) {
-        const email = String(application.email || '').trim().toLowerCase();
-        if (!email || knownEmails.has(email)) continue;
-        try {
-          const createResponse = await fetch(`${apiBaseUrl}/api/seller-verifications`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email,
-              fullName: application.fullName || '',
-              shopName: application.shopName || '',
-              phone: application.phone || '',
-              notes: application.notes || '',
-              documentName: application.documentName || 'Supporting document',
-              documentType: application.documentType || '',
-              documentData: application.documentData || ''
-            })
-          });
-          const created = await createResponse.json().catch(() => ({}));
-          if (!createResponse.ok) throw new Error(created.error || `The API returned ${createResponse.status}.`);
-
-          knownEmails.add(email);
-          migrated += 1;
-          const oldStatus = String(localStatusFor(email) || application.status || 'pending').toLowerCase();
-          if (oldStatus === 'approved' || oldStatus === 'rejected') {
-            const decisionResponse = await fetch(`${apiBaseUrl}/api/admin/seller-verifications/${encodeURIComponent(email)}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
-              body: JSON.stringify({ status: oldStatus })
-            });
-            const decision = await decisionResponse.json().catch(() => ({}));
-            if (!decisionResponse.ok) throw new Error(decision.error || `The API returned ${decisionResponse.status}.`);
-          }
-        } catch (error) {
-          failed += 1;
-          console.error(`Could not migrate the old seller verification request for ${email}:`, error);
+        applications = [];
+        setConnected(false);
+        renderApplications();
+        if (error instanceof TypeError) {
+          setStatus(await diagnoseConnectionFailure(), 'error');
+        } else {
+          setStatus(error.message, 'error');
         }
+        console.error('Seller verification requests could not be loaded:', error);
+      } finally {
+        connectButton.disabled = false;
+        refreshButton.disabled = signoutButton.hidden;
       }
-      return { migrated, failed };
     }
 
-    async function updateSellerVerification(email, decision) {
+    async function updateApplication(email, decision) {
       const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
       try {
         const response = await fetch(`${apiBaseUrl}/api/admin/seller-verifications/${encodeURIComponent(email)}`, {
@@ -644,226 +271,41 @@
           headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
           body: JSON.stringify({ status: decision })
         });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(result.error || `The API returned ${response.status}.`);
-        document.getElementById('verification-api-status').textContent = `Seller ${email} marked ${decision}.`;
-        await loadSellerVerificationRequests();
+        await readResponse(response);
+        setStatus(`Seller ${email} marked ${decision}.`, 'success');
+        await loadApplications();
       } catch (error) {
-        document.getElementById('verification-api-status').textContent = `Could not update seller verification. ${error.message}`;
+        if (error instanceof TypeError) {
+          setStatus(await diagnoseConnectionFailure(), 'error');
+        } else {
+          setStatus(`Could not update seller verification. ${error.message}`, 'error');
+        }
         console.error('Seller verification decision failed:', error);
       }
     }
 
-    function getManagedContent() {
-      return managedCollections.flatMap(collection => readJSON(collection.key, []).map((item, index) => {
-        let status = 'Published';
-        if (collection.type === 'Rental') status = item.available === false ? 'Unavailable' : 'Available';
-        if (collection.type === 'Accommodation') status = 'Vacancy';
-        if (collection.type === 'Wanted') status = item.urgency || 'Open request';
-        if (collection.type === 'Review') status = 'Customer feedback';
-        if (collection.type === 'Event') {
-          const starts = new Date(`${item.date}T${item.startTime || '00:00'}`);
-          const ends = item.endTime ? new Date(`${item.date}T${item.endTime}`) : new Date(starts.getTime() + 2 * 60 * 60 * 1000);
-          const now = new Date();
-          status = now < starts ? 'Upcoming' : now <= ends ? 'On now' : 'Expired';
-        }
-        return {
-          ...item,
-          type: collection.type,
-          storageKey: collection.key,
-          sourceIndex: index,
-          managedTitle: collection.title(item) || 'Untitled',
-          managedOwner: collection.owner(item) || 'Unknown',
-          managedDetails: collection.details(item) || '',
-          managedStatus: status
-        };
-      })).sort((first, second) => new Date(second.createdAt || 0) - new Date(first.createdAt || 0));
-    }
-
-    function renderMarketplaceContent() {
-      const target = document.getElementById('content-table');
-      target.replaceChildren();
-      getManagedContent().forEach(record => {
-        const row = document.createElement('tr');
-        cell(row, record.type);
-        const contentCell = cell(row, '');
-        contentCell.className = 'content-cell';
-        const title = document.createElement('strong');
-        title.textContent = record.managedTitle;
-        const details = document.createElement('span');
-        details.textContent = record.managedDetails;
-        contentCell.append(title, details);
-        cell(row, record.managedOwner);
-        cell(row, formatDate(record.createdAt));
-        const statusCell = cell(row, record.managedStatus);
-        statusCell.className = 'content-status';
-        const actions = document.createElement('td');
-
-        if (record.type === 'Rental') {
-          const availability = document.createElement('button');
-          availability.type = 'button';
-          availability.className = 'admin-action';
-          availability.textContent = record.available === false ? 'Mark available' : 'Mark unavailable';
-          availability.addEventListener('click', () => toggleManagedRental(record));
-          actions.appendChild(availability);
-        }
-
-        const remove = document.createElement('button');
-        remove.type = 'button';
-        remove.className = 'remove-listing';
-        remove.textContent = 'Delete post';
-        remove.addEventListener('click', () => removeManagedContent(record));
-        actions.appendChild(remove);
-        row.dataset.search = `${record.type} ${record.managedTitle} ${record.managedOwner} ${record.managedDetails} ${record.managedStatus}`.toLowerCase();
-        row.appendChild(actions);
-        target.appendChild(row);
-      });
-      if (!target.children.length) emptyRow(target, 6, 'No community content has been posted yet.');
-      filterRows('content-search', target);
-    }
-
-    function removeListing(id) {
-      if (!window.confirm('Remove this marketplace listing?')) return;
-      const listings = readJSON(listingsKey, []).filter(listing => listing.id !== id);
-      localStorage.setItem(listingsKey, JSON.stringify(listings));
-      loadDashboard();
-    }
-
-    function removeManagedContent(record) {
-      if (!window.confirm(`Permanently delete this ${record.type.toLowerCase()} post?`)) return;
-      const items = readJSON(record.storageKey, []);
-      const remaining = items.filter((item, index) => record.id !== undefined ? item.id !== record.id : index !== record.sourceIndex);
-      localStorage.setItem(record.storageKey, JSON.stringify(remaining));
-      loadDashboard();
-    }
-
-    function toggleManagedRental(record) {
-      const rentals = readJSON('rodyxRentals', []);
-      const rental = record.id !== undefined ? rentals.find(item => item.id === record.id) : rentals[record.sourceIndex];
-      if (!rental) return;
-      rental.available = rental.available === false;
-      rental.unavailableAt = rental.available ? '' : new Date().toISOString();
-      localStorage.setItem('rodyxRentals', JSON.stringify(rentals));
-      loadDashboard();
-    }
-
-    function removeCustomer(email) {
-      const accounts = readJSON(accountsKey, {});
-      const account = accounts[email] || {};
-      const confirmed = window.confirm(`Delete ${email} and their local carts, orders, messages, marketplace posts, reviews, and verification records from this browser? Any server-side account is not affected.`);
-      if (!confirmed) return;
-
-      delete accounts[email];
-      localStorage.setItem(accountsKey, JSON.stringify(accounts));
-
-      const storagePrefix = `rodyx:${encodeURIComponent(email)}`;
-      ['cart', 'wishlist', 'orders'].forEach(type => localStorage.removeItem(`${storagePrefix}:${type}`));
-
-      const ownedContent = [
-        ['rodyxListings', item => item.sellerEmail],
-        ['rodyxWantedPosts', item => item.buyerEmail],
-        ['rodyxServices', item => item.email],
-        ['rodyxRentals', item => item.ownerEmail || item.email],
-        ['rodyxAccommodation', item => item.email],
-        ['rodyxEvents', item => item.email],
-        ['rodyxReviews', item => item.author]
-      ];
-      ownedContent.forEach(([key, getOwner]) => {
-        const remaining = readJSON(key, []).filter(item => {
-          const owner = String(getOwner(item) || '').toLowerCase();
-          return owner !== email.toLowerCase() && !(account.fullname && owner === account.fullname.toLowerCase());
-        });
-        localStorage.setItem(key, JSON.stringify(remaining));
-      });
-
-      localStorage.setItem('rodyxMessages', JSON.stringify(readJSON('rodyxMessages', []).filter(thread => !thread.participants?.some(participant => participant.toLowerCase() === email.toLowerCase()))));
-      localStorage.setItem(sellerVerificationApplicationsKey, JSON.stringify(readJSON(sellerVerificationApplicationsKey, []).filter(application => application.email.toLowerCase() !== email.toLowerCase())));
-      const verificationState = readJSON(sellerVerificationKey, {});
-      delete verificationState[email];
-      localStorage.setItem(sellerVerificationKey, JSON.stringify(verificationState));
-
-      const currentUser = readJSON('currentUser', null);
-      if (currentUser?.email?.toLowerCase() === email.toLowerCase()) {
-        ['currentUser', 'user_email', 'access_token', 'refresh_token'].forEach(key => localStorage.removeItem(key));
-      }
-
-      loadDashboard();
-    }
-
-    function filterRows(inputId, target) {
-      const query = document.getElementById(inputId).value.trim().toLowerCase();
-      target.querySelectorAll('tr[data-search]').forEach(row => {
-        row.hidden = !row.dataset.search.includes(query);
-      });
-    }
-
-    function loadDashboard() {
-      const customers = getCustomers();
-      const listings = readJSON(listingsKey, []);
-      const wanted = readJSON('rodyxWantedPosts', []);
-      const services = readJSON('rodyxServices', []);
-      const rentals = readJSON('rodyxRentals', []);
-      const accommodation = readJSON('rodyxAccommodation', []);
-      const events = readJSON('rodyxEvents', []);
-      const reviews = readJSON('rodyxReviews', []);
-      const orders = getOrders();
-      const openOrders = orders.filter(order => !['Delivered', 'Cancelled'].includes(order.status));
-      const revenue = orders.filter(order => order.status !== 'Cancelled').reduce((total, order) => total + Number(order.total || 0), 0);
-
-      document.getElementById('users-count').textContent = customers.length;
-      document.getElementById('products-count').textContent = listings.length;
-      document.getElementById('orders-count').textContent = orders.length;
-      document.getElementById('posts-count').textContent = wanted.length + services.length;
-      document.getElementById('rental-count').textContent = rentals.length + accommodation.length;
-      document.getElementById('events-count').textContent = events.length;
-      document.getElementById('reviews-count').textContent = reviews.length;
-      document.getElementById('verification-count').textContent = '…';
-      document.getElementById('revenue-count').textContent = money(revenue);
-      document.getElementById('stock-count').textContent = openOrders.length;
-
-      renderOrders(orders);
-      renderListings(listings);
-      renderMarketplaceContent();
-      loadSellerVerificationRequests();
-      renderSupportInbox();
-
-      const users = document.getElementById('users-table');
-      users.replaceChildren();
-      customers.forEach(customer => {
-        const row = document.createElement('tr');
-        cell(row, customer.fullname || customer.email.split('@')[0]);
-        cell(row, customer.email);
-        cell(row, customer.phone || '');
-        cell(row, formatDate(customer.createdAt));
-        row.dataset.search = `${customer.fullname || ''} ${customer.email || ''} ${customer.phone || ''}`.toLowerCase();
-        const actionCell = cell(row, '');
-        const remove = document.createElement('button');
-        remove.className = 'remove-user';
-        remove.type = 'button';
-        remove.textContent = 'Delete';
-        remove.setAttribute('aria-label', `Delete customer ${customer.email}`);
-        remove.addEventListener('click', () => removeCustomer(customer.email));
-        actionCell.appendChild(remove);
-        users.appendChild(row);
-      });
-      if (!users.children.length) emptyRow(users, 5, 'No local customer accounts found.');
-      filterRows('customer-search', users);
-    }
-
-    document.getElementById('order-search').addEventListener('input', () => filterRows('order-search', document.getElementById('orders-table')));
-    document.getElementById('listing-search').addEventListener('input', () => filterRows('listing-search', document.getElementById('products-table')));
-    document.getElementById('content-search').addEventListener('input', () => filterRows('content-search', document.getElementById('content-table')));
-    document.getElementById('customer-search').addEventListener('input', () => filterRows('customer-search', document.getElementById('users-table')));
-    document.getElementById('verification-search').addEventListener('input', () => filterRows('verification-search', document.getElementById('seller-verification-table')));
-    document.getElementById('verification-api-form').addEventListener('submit', event => {
+    form.addEventListener('submit', event => {
       event.preventDefault();
-      const adminKey = document.getElementById('verification-api-key').value.trim();
+      const adminKey = keyInput.value.trim();
       if (!adminKey) return;
       sessionStorage.setItem(sellerVerificationAdminKey, adminKey);
-      loadSellerVerificationRequests();
+      loadApplications();
     });
-    if (readJSON(adminAccountKey, null) && sessionStorage.getItem(adminSessionKey) === 'authenticated') openAdminDashboard();
-    else showAdminAccess();
+
+    searchInput.addEventListener('input', renderApplications);
+    refreshButton.addEventListener('click', loadApplications);
+    signoutButton.addEventListener('click', () => {
+      sessionStorage.removeItem(sellerVerificationAdminKey);
+      keyInput.value = '';
+      applications = [];
+      setConnected(false);
+      setStatus('Disconnected from the seller verification service.');
+      showEmpty('Connect to the verification service to view applications.');
+      document.getElementById('pending-count').textContent = '-';
+      document.getElementById('total-count').textContent = '-';
+    });
+
+    if (sessionStorage.getItem(sellerVerificationAdminKey)) loadApplications();
   </script>
 </body>
 </html>

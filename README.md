@@ -6,7 +6,7 @@ Redox Shopping is a static HTML/CSS/JavaScript marketplace with a Flask API. The
 
 The Flask API stores marketplace listings, wanted posts, orders, and seller verification requests as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, order submission, and seller verification. Listing images and seller verification documents can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
 
-Other features—including sign-in, account records, most of the admin dashboard, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. Seller verification requests and decisions are shared through the API. The admin dashboard requires the server's `ADMIN_API_KEY` to view and decide those requests.
+Other features—including sign-in, account records, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. The admin page is limited to seller verification requests and decisions, which are shared through the API and require the server's `ADMIN_API_KEY`.
 
 The JSON-file storage is a small-project starting point, not a production database. Back up `backend/data/`; use a database and server-side authentication before handling real accounts, sensitive data, payments, or high traffic.
 
@@ -78,9 +78,9 @@ The JSON-file storage is a small-project starting point, not a production databa
    - `Sell an item`: post a listing, then confirm it appears on another browser/device.
    - `Wanted`: create and view a post.
    - Add an item to the cart and submit an order. Orders are recorded by the API, but the site does not process payments.
-   - Submit a seller verification request. In the admin dashboard, sign in, enter the server `ADMIN_API_KEY` in the seller verification panel, and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically. Previously saved applications in that admin browser are migrated to the API the first time it connects.
+   - Submit a seller verification request. On the admin page, enter the server `ADMIN_API_KEY` and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically. Only applications submitted to the API are available there.
 
-If requests fail, first open the PythonAnywhere `/api/health` URL. A working health route alongside a 404 for `/api/seller-verifications/status` or a POST route usually means the deployed web app is running older backend code: confirm its Source code and Working directory point to the current `backend/` folder, then reload the PythonAnywhere Web app. Also check that the frontend's `config.js` has the correct API URL, `CORS_ORIGINS` exactly matches the Vercel origin, and `ADMIN_API_KEY` is set for verification administration. The PythonAnywhere **Error log** is available from the Web tab.
+If seller verification fails, first open the PythonAnywhere `/api/health` URL. A working health route alongside a 404 for `/api/admin/seller-verifications` means the deployed web app is running older backend code. After publishing the update, run `cd ~/Redox-shopping- && git pull` in the PythonAnywhere Bash console (or upload the updated `backend/app.py` if the project was uploaded manually), then click **Reload** in the PythonAnywhere Web tab. If the admin page reports that its request was blocked but health succeeds, deploy/reload the current backend and confirm `CORS_ORIGINS` includes the exact frontend origin (including any custom domain). Also check that the frontend's `config.js` has the correct API URL and `ADMIN_API_KEY` is set for verification administration. The PythonAnywhere **Error log** is available from the Web tab.
 
 ## Local development
 
