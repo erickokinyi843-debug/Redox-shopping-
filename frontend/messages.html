@@ -275,157 +275,65 @@
     </div>
   </main>
 
+  <script src="config.js"></script>
   <script>
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    if (!currentUser.email) window.location.href = 'index.html';
+    if (!currentUser.email || !currentUser.token) window.location.href = 'index.html';
 
-    const storageKey = 'rodyxMessages';
+    const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
     const threadsEl = document.getElementById('threads');
     const messagesEl = document.getElementById('messages');
     const chatHeaderEl = document.getElementById('chat-header');
     const composer = document.getElementById('composer');
     const input = document.getElementById('message-input');
+    let threads = [];
+    let activeThreadId = '';
 
-    function readMessages() {
-      try {
-        const data = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        return Array.isArray(data) ? data : [];
-      } catch {
-        return [];
-      }
+    async function requestMessages(path, options = {}) {
+      const response = await fetch(`${apiBaseUrl}${path}`, {
+        ...options,
+        headers: {
+          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          Authorization: `Bearer ${currentUser.token}`,
+          ...options.headers
+        },
+        cache: 'no-store'
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || `The message service returned HTTP ${response.status}.`);
+      return result;
     }
 
-    function saveMessages(threads) {
-      localStorage.setItem(storageKey, JSON.stringify(threads));
-    }
-
-    function getThreadId(emailA, emailB) {
-      return [emailA, emailB].slice().sort().join('|');
+    function emptyState(text) {
+      const state = document.createElement('div');
+      state.className = 'empty-state';
+      state.textContent = text;
+      return state;
     }
 
     function getOtherParticipant(thread) {
       return thread.participants.find(email => email !== currentUser.email) || 'Unknown person';
     }
 
-    function formatName(email) {
-      if (!email) return 'Unknown user';
-      if (email === currentUser.email) return currentUser.fullname || 'You';
-      return 'Community member';
-    }
-
     function participantName(thread, email) {
+      if (email === currentUser.email) return currentUser.fullname || 'You';
       const name = thread.names?.[email];
-      return name && !name.includes('@') ? name : formatName(email);
+      if (name && !name.includes('@')) return name;
+      return email === 'support@rodyx.local' ? 'CHUKA RODYX SHOP Support' : 'Community member';
     }
 
-    function getThreadLabel(thread) {
-      const otherEmail = getOtherParticipant(thread);
-      return participantName(thread, otherEmail);
-    }
-
-    function getUnreadCountForThread(thread) {
-      if (!thread || !Array.isArray(thread.messages)) return 0;
-      return thread.messages.filter(message => {
-        return message.sender !== currentUser.email && !(Array.isArray(message.readBy) && message.readBy.includes(currentUser.email));
-      }).length;
-    }
-
-    function updateGlobalBadge() {
-      const badge = document.getElementById('nav-message-badge');
-      if (!badge) return;
-      const threads = readMessages();
-      const unreadCount = threads.reduce((count, thread) => count + getUnreadCountForThread(thread), 0);
-      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
-      badge.hidden = unreadCount === 0;
-      if (window.updateMessageNotificationBadge) window.updateMessageNotificationBadge();
-    }
-
-    window.addEventListener('storage', event => {
-      if (event.key === storageKey) renderThreads();
-    });
-
-    function markThreadAsRead(threadId) {
-      const threads = readMessages();
-      const thread = threads.find(item => item.id === threadId);
-      if (!thread || !Array.isArray(thread.messages)) return;
-
-      let changed = false;
-      thread.messages.forEach(message => {
-        if (message.sender === currentUser.email) return;
-        if (!Array.isArray(message.readBy)) message.readBy = [];
-        if (!message.readBy.includes(currentUser.email)) {
-          message.readBy.push(currentUser.email);
-          changed = true;
-        }
-      });
-
-      if (changed) {
-        saveMessages(threads);
-      }
-      updateGlobalBadge();
-    }
-
-    function renderThreads() {
-      const threads = readMessages();
-      if (!threads.length) {
-        threadsEl.innerHTML = '<div class="empty-state">No conversations yet. Message a seller from a listing to start chatting.</div>';
-        return;
-      }
-
-      const sorted = threads
-        .filter(thread => Array.isArray(thread.participants) && thread.participants.includes(currentUser.email))
-        .sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
-
-      const activeThreadId = document.body.dataset.activeThread || sorted[0]?.id;
-      threadsEl.innerHTML = '';
-
-      if (!sorted.length) {
-        threadsEl.innerHTML = '<div class="empty-state">No conversations yet. Message a seller from a listing to start chatting.</div>';
-        return;
-      }
-
-      sorted.forEach(thread => {
-        const unreadCount = getUnreadCountForThread(thread);
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'thread' + (thread.id === activeThreadId ? ' active' : '');
-        button.innerHTML = `
-          <div class="thread-name">${getThreadLabel(thread)}${unreadCount ? `<span class="thread-unread">${unreadCount > 9 ? '9+' : unreadCount}</span>` : ''}</div>
-          <div class="thread-preview">${thread.messages?.slice(-1)[0]?.text || 'No messages yet'}</div>
-        `;
-        button.addEventListener('click', () => {
-          document.body.dataset.activeThread = thread.id;
-          markThreadAsRead(thread.id);
-          renderThreads();
-          renderMessages(thread.id);
-        });
-        threadsEl.appendChild(button);
-      });
-
-      if (!sorted.some(thread => thread.id === activeThreadId)) {
-        document.body.dataset.activeThread = sorted[0].id;
-      }
-
-      renderMessages(document.body.dataset.activeThread);
-      updateGlobalBadge();
-    }
-
-    function renderMessages(threadId) {
-      const threads = readMessages();
-      const thread = threads.find(item => item.id === threadId);
+    function renderMessages(thread) {
+      messagesEl.replaceChildren();
       if (!thread) {
-        messagesEl.innerHTML = '<div class="empty-state">Choose a thread to start messaging.</div>';
         chatHeaderEl.textContent = 'Select a conversation';
+        messagesEl.appendChild(emptyState('Choose a conversation or contact support for help.'));
         return;
       }
 
-      markThreadAsRead(threadId);
       const otherEmail = getOtherParticipant(thread);
       chatHeaderEl.textContent = participantName(thread, otherEmail);
-      messagesEl.innerHTML = '';
-
-      if (!thread.messages || !thread.messages.length) {
-        messagesEl.innerHTML = '<div class="empty-state">Say hello and start the conversation.</div>';
+      if (!thread.messages?.length) {
+        messagesEl.appendChild(emptyState('Say hello and start the conversation.'));
         return;
       }
 
@@ -435,101 +343,117 @@
         row.className = `message-row ${isMine ? 'me' : 'other'}`;
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.innerHTML = `${message.text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}<div class="message-meta">${participantName(thread, message.sender)} · ${new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
+        const text = document.createElement('div');
+        text.textContent = message.text;
+        const meta = document.createElement('div');
+        meta.className = 'message-meta';
+        meta.textContent = `${participantName(thread, message.sender)} · ${new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        bubble.append(text, meta);
         row.appendChild(bubble);
         messagesEl.appendChild(row);
       });
-
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function openOrCreateThread(contactEmail, contactName, isSupport = false) {
-      const threads = readMessages();
-      const threadId = getThreadId(currentUser.email, contactEmail);
-      let thread = threads.find(item => item.id === threadId);
-
-      if (!thread) {
-        thread = {
-          id: threadId,
-          participants: [currentUser.email, contactEmail],
-          names: { [currentUser.email]: currentUser.fullname || 'You', [contactEmail]: contactName || formatName(contactEmail) },
-          messages: [],
-          lastUpdated: new Date().toISOString(),
-          support: isSupport
-        };
-        threads.push(thread);
-      }
-
-      if (isSupport) thread.support = true;
-
-      if (contactName) {
-        thread.names = thread.names || {};
-        thread.names[contactEmail] = contactName;
-      }
-
-      saveMessages(threads);
-      document.body.dataset.activeThread = thread.id;
-      renderThreads();
-    }
-
-    composer.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      const threads = readMessages();
-      const threadId = document.body.dataset.activeThread;
-      const thread = threads.find(item => item.id === threadId);
-
-      if (!thread) {
-        input.value = '';
+    function renderThreads() {
+      threadsEl.replaceChildren();
+      if (!threads.length) {
+        threadsEl.appendChild(emptyState('No conversations yet. Contact a seller or ask support for help.'));
+        renderMessages(null);
         return;
       }
 
-      thread.messages.push({
-        sender: currentUser.email,
-        text,
-        createdAt: new Date().toISOString(),
-        readBy: [currentUser.email]
+      if (!threads.some(thread => thread.id === activeThreadId)) activeThreadId = threads[0].id;
+      threads.forEach(thread => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `thread${thread.id === activeThreadId ? ' active' : ''}`;
+        const name = document.createElement('div');
+        name.className = 'thread-name';
+        name.textContent = participantName(thread, getOtherParticipant(thread));
+        const preview = document.createElement('div');
+        preview.className = 'thread-preview';
+        preview.textContent = thread.messages?.slice(-1)[0]?.text || 'No messages yet';
+        button.append(name, preview);
+        button.addEventListener('click', () => {
+          activeThreadId = thread.id;
+          loadThreads().catch(error => {
+            chatHeaderEl.textContent = `Could not load conversation: ${error.message}`;
+          });
+        });
+        threadsEl.appendChild(button);
       });
-      thread.lastUpdated = new Date().toISOString();
-      saveMessages(threads);
-      input.value = '';
-      renderThreads();
-      updateGlobalBadge();
-    });
+      renderMessages(threads.find(thread => thread.id === activeThreadId));
+    }
 
-    const params = new URLSearchParams(window.location.search);
-    const pendingContact = (() => {
-      try {
-        return JSON.parse(sessionStorage.getItem('rodyxPendingMessage') || 'null');
-      } catch {
-        return null;
+    async function loadThreads() {
+      threads = await requestMessages('/api/messages');
+      if (!threads.some(thread => thread.id === activeThreadId)) activeThreadId = threads[0]?.id || '';
+      const activeThread = threads.find(thread => thread.id === activeThreadId);
+      if (activeThread) {
+        const updatedThread = await requestMessages(`/api/messages/${encodeURIComponent(activeThread.id)}/read`, { method: 'POST' });
+        threads = threads.map(thread => thread.id === updatedThread.id ? updatedThread : thread);
       }
-    })();
-    sessionStorage.removeItem('rodyxPendingMessage');
-    const contactEmail = params.get('contact') || pendingContact?.email || '';
-    const contactName = params.get('name') || pendingContact?.name || '';
-
-    if (contactEmail === 'support') {
-      let supportEmail = 'support@rodyx.local';
-      try {
-        const adminAccount = JSON.parse(localStorage.getItem('rodyxAdminAccount') || 'null');
-        if (adminAccount?.email) supportEmail = adminAccount.email.toLowerCase();
-      } catch {
-        // Keep the support inbox available before admin setup.
-      }
-      openOrCreateThread(supportEmail, 'CHUKA RODYX SHOP Support', true);
-    } else if (contactEmail) {
-      openOrCreateThread(contactEmail, contactName || '');
-    } else {
-      const threads = readMessages();
-      const forUser = threads.filter(thread => Array.isArray(thread.participants) && thread.participants.includes(currentUser.email));
-      if (forUser.length) {
-        document.body.dataset.activeThread = forUser[0].id;
-      }
-      updateGlobalBadge();
       renderThreads();
     }
+
+    async function openThread(contactEmail, isSupport) {
+      const body = isSupport ? { support: true, text: '' } : { recipient: contactEmail, text: '' };
+      const thread = await requestMessages('/api/messages', {
+        method: 'POST',
+        body: JSON.stringify(body)
+      });
+      activeThreadId = thread.id;
+      await loadThreads();
+    }
+
+    composer.addEventListener('submit', async event => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      const thread = threads.find(item => item.id === activeThreadId);
+      if (!thread) return;
+      const payload = thread.support
+        ? { support: true, text }
+        : { recipient: getOtherParticipant(thread), text };
+      const sendButton = composer.querySelector('button');
+      sendButton.disabled = true;
+      try {
+        await requestMessages('/api/messages', { method: 'POST', body: JSON.stringify(payload) });
+        input.value = '';
+        await loadThreads();
+      } catch (error) {
+        chatHeaderEl.textContent = `Message could not be sent: ${error.message}`;
+      } finally {
+        sendButton.disabled = false;
+      }
+    });
+
+    (async () => {
+      const params = new URLSearchParams(window.location.search);
+      const pendingContact = (() => {
+        try {
+          return JSON.parse(sessionStorage.getItem('rodyxPendingMessage') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      sessionStorage.removeItem('rodyxPendingMessage');
+      const contactEmail = params.get('contact') || pendingContact?.email || '';
+      try {
+        if (contactEmail) {
+          await openThread(contactEmail, contactEmail === 'support');
+        } else {
+          await loadThreads();
+        }
+      } catch (error) {
+        threadsEl.replaceChildren(emptyState(`Could not load messages. ${error.message}`));
+        renderMessages(null);
+      }
+      window.setInterval(() => loadThreads().catch(error => {
+        chatHeaderEl.textContent = `Could not refresh messages: ${error.message}`;
+      }), 5000);
+    })();
   </script>
 </body>
 </html>

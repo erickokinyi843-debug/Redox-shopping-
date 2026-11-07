@@ -42,11 +42,34 @@
     .empty { padding: 20px 8px; color: var(--muted); text-align: center; }
     .seller-name { font-weight: 800; }.seller-meta { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
     .actions { display: flex; gap: 7px; }.actions .button { padding: 7px 9px; font-size: 12px; }
+    .admin-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .admin-form label { display: grid; gap: 5px; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .admin-form input, .admin-form select, .admin-form textarea { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 3px; padding: 10px; color: var(--navy); font: inherit; }
+    .admin-form textarea { min-height: 100px; resize: vertical; }
+    .admin-form .wide { grid-column: 1 / -1; }
+    .admin-form button { justify-self: start; }
+    .support-layout { display: grid; grid-template-columns: minmax(210px, .7fr) 1.3fr; min-height: 300px; border: 1px solid var(--line); }
+    .support-threads { border-right: 1px solid var(--line); overflow-y: auto; }
+    .support-thread { width: 100%; padding: 12px; border: 0; border-bottom: 1px solid var(--line); background: #fff; color: var(--navy); text-align: left; cursor: pointer; }
+    .support-thread.active, .support-thread:hover { background: #edf9f8; }
+    .support-thread strong, .support-thread span { display: block; }.support-thread span { margin-top: 5px; overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .support-chat { display: flex; min-width: 0; flex-direction: column; }
+    .support-chat-header { padding: 12px; border-bottom: 1px solid var(--line); font-weight: 800; }
+    .support-chat-messages { display: flex; flex: 1; min-height: 180px; flex-direction: column; gap: 8px; overflow-y: auto; padding: 12px; background: #fbfdfd; }
+    .support-message { max-width: 85%; padding: 8px 10px; border-radius: 4px; background: #edf4f5; overflow-wrap: anywhere; }
+    .support-message.admin { align-self: flex-end; background: #e4f6f2; }
+    .support-message small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .support-reply { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); }
+    .support-reply input { flex: 1; min-width: 0; padding: 9px; border: 1px solid var(--line); border-radius: 3px; font: inherit; }
+    .section-status { min-height: 18px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+    .section-status[data-state="error"] { color: #a63e2c; font-weight: 700; }
+    .section-status[data-state="success"] { color: #08776d; font-weight: 700; }
     [hidden] { display: none !important; }
     @media (max-width: 620px) {
       header { flex-wrap: wrap; padding: 12px 16px; }.brand { font-size: 18px; }.admin-badge { order: 3; }
       main { margin-top: 22px; padding: 0 12px; }.topline { align-items: start; flex-direction: column; }.panel { padding: 15px; }
       .table-toolbar { justify-content: stretch; }.table-toolbar .search { flex-basis: 100%; }
+      .admin-form, .support-layout { grid-template-columns: 1fr; }.support-threads { max-height: 220px; border-right: 0; border-bottom: 1px solid var(--line); }.admin-form .wide { grid-column: auto; }
     }
   </style>
 </head>
@@ -91,6 +114,60 @@
         </table>
       </div>
     </section>
+    <section class="panel">
+      <div class="section-heading">
+        <h2><i class="fas fa-users" aria-hidden="true"></i>Registered accounts</h2>
+        <button class="button secondary" id="accounts-refresh" type="button" disabled>Refresh accounts</button>
+      </div>
+      <div class="table-toolbar">
+        <input class="search" id="accounts-search" type="search" placeholder="Search accounts" aria-label="Search accounts" disabled>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="accounts-table"><tr><td class="empty" colspan="6">Connect to view registered accounts.</td></tr></tbody>
+        </table>
+      </div>
+      <p class="section-status" id="accounts-status" role="status"></p>
+    </section>
+    <section class="panel">
+      <div class="section-heading">
+        <h2><i class="fas fa-bullhorn" aria-hidden="true"></i>Publish as admin</h2>
+      </div>
+      <form class="admin-form" id="admin-publish-form">
+        <label class="wide">Post type
+          <select id="publish-type"><option value="product">Product</option><option value="service">Service</option></select>
+        </label>
+        <label>Title<input id="publish-title" required maxlength="200"></label>
+        <label id="product-category-field">Category<input id="publish-category" value="General" maxlength="80"></label>
+        <label id="product-price-field">Price (KES)<input id="publish-price" type="number" min="1"></label>
+        <label id="service-skill-field" hidden>Service / skill<input id="publish-skill" maxlength="100"></label>
+        <label id="service-provider-field" hidden>Provider name<input id="publish-provider" maxlength="120"></label>
+        <label>Contact email<input id="publish-email" type="email" maxlength="200"></label>
+        <label id="product-phone-field">Contact phone<input id="publish-phone" type="tel" maxlength="40"></label>
+        <label class="wide">Description<textarea id="publish-description" required maxlength="3000"></textarea></label>
+        <button class="button" type="submit" disabled id="publish-button">Publish post</button>
+      </form>
+      <p class="section-status" id="publish-status" role="status"></p>
+    </section>
+    <section class="panel">
+      <div class="section-heading">
+        <h2><i class="fas fa-comments" aria-hidden="true"></i>Help inbox</h2>
+        <button class="button secondary" id="support-refresh" type="button" disabled>Refresh inbox</button>
+      </div>
+      <div class="support-layout">
+        <div class="support-threads" id="support-threads"><div class="empty">Connect to view support requests.</div></div>
+        <div class="support-chat">
+          <div class="support-chat-header" id="support-chat-header">Select a support conversation</div>
+          <div class="support-chat-messages" id="support-chat-messages"><div class="empty">User help requests will appear here.</div></div>
+          <form class="support-reply" id="support-reply-form">
+            <input id="support-reply-input" maxlength="500" placeholder="Reply to user..." aria-label="Reply to user" disabled>
+            <button class="button" type="submit" id="support-send" disabled>Send</button>
+          </form>
+        </div>
+      </div>
+      <p class="section-status" id="support-status" role="status"></p>
+    </section>
   </main>
   <script src="config.js"></script>
   <script>
@@ -105,6 +182,10 @@
     const applicationsTable = document.getElementById('seller-verification-table');
     const searchInput = document.getElementById('verification-search');
     let applications = [];
+    let accounts = [];
+    let supportThreads = [];
+    let activeSupportThreadId = '';
+    let adminRefreshTimer = null;
 
     function setStatus(message, state = '') {
       statusMessage.textContent = message;
@@ -115,6 +196,14 @@
       signoutButton.hidden = !connected;
       refreshButton.disabled = !connected;
       searchInput.disabled = !connected;
+      document.getElementById('accounts-refresh').disabled = !connected;
+      document.getElementById('accounts-search').disabled = !connected;
+      document.getElementById('publish-button').disabled = !connected;
+      document.getElementById('support-refresh').disabled = !connected;
+      if (!connected) {
+        document.getElementById('support-reply-input').disabled = true;
+        document.getElementById('support-send').disabled = true;
+      }
     }
 
     function showEmpty(message) {
@@ -197,11 +286,191 @@
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         if (response.status === 401) throw new Error('The server rejected this admin API key. Check that it matches ADMIN_API_KEY on the backend.');
-        if (response.status === 404) throw new Error('The deployed API does not have the seller-verification admin route. Deploy the current backend/app.py to PythonAnywhere, then reload the web app.');
-        if (response.status === 503) throw new Error(result.error || 'Seller verification administration is not configured on the server.');
+        if (response.status === 404) throw new Error('The deployed API is missing this admin route. Deploy the current backend/app.py to PythonAnywhere, then reload the web app.');
+        if (response.status === 503) throw new Error(result.error || 'Admin API access is not configured on the server.');
         throw new Error(result.error || `The API returned HTTP ${response.status}.`);
       }
       return result;
+    }
+
+    async function adminRequest(path, options = {}) {
+      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      const response = await fetch(`${apiBaseUrl}${path}`, {
+        ...options,
+        headers: {
+          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          'X-Admin-Key': adminKey,
+          ...options.headers
+        },
+        cache: 'no-store'
+      });
+      return readResponse(response);
+    }
+
+    function renderAccounts() {
+      const table = document.getElementById('accounts-table');
+      table.replaceChildren();
+      const query = document.getElementById('accounts-search').value.trim().toLowerCase();
+      const visibleAccounts = accounts.filter(account => (
+        `${account.fullname || ''} ${account.email || ''} ${account.phone || ''} ${account.status || ''}`
+      ).toLowerCase().includes(query));
+      visibleAccounts.forEach(account => {
+        const row = document.createElement('tr');
+        appendCell(row, account.fullname || 'User');
+        appendCell(row, account.email);
+        appendCell(row, account.phone);
+        appendCell(row, account.createdAt ? new Date(account.createdAt).toLocaleDateString() : '-');
+        appendCell(row, account.status || 'active');
+        const actions = document.createElement('td');
+        actions.className = 'actions';
+        const statusButton = document.createElement('button');
+        statusButton.type = 'button';
+        statusButton.className = 'button secondary';
+        statusButton.textContent = account.status === 'suspended' ? 'Restore' : 'Suspend';
+        statusButton.addEventListener('click', () => updateAccount(account.email, account.status === 'suspended' ? 'active' : 'suspended'));
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'button reject';
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+          if (window.confirm(`Permanently delete the account for ${account.email}?`)) deleteAccount(account.email);
+        });
+        actions.append(statusButton, deleteButton);
+        row.appendChild(actions);
+        table.appendChild(row);
+      });
+      if (!visibleAccounts.length) showTableEmpty(table, accounts.length ? 'No accounts match your search.' : 'No registered accounts yet.', 6);
+    }
+
+    function showTableEmpty(table, message, columnCount) {
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.className = 'empty';
+      cell.colSpan = columnCount;
+      cell.textContent = message;
+      row.appendChild(cell);
+      table.appendChild(row);
+    }
+
+    async function loadAccounts() {
+      try {
+        const result = await adminRequest('/api/admin/accounts');
+        if (!Array.isArray(result)) throw new Error('The API returned an invalid account list.');
+        accounts = result;
+        renderAccounts();
+        setSectionStatus('accounts-status', `${accounts.length} registered account${accounts.length === 1 ? '' : 's'}.`, 'success');
+      } catch (error) {
+        setSectionStatus('accounts-status', error.message, 'error');
+        console.error('Admin account list could not be loaded:', error);
+      }
+    }
+
+    async function updateAccount(email, status) {
+      try {
+        await adminRequest(`/api/admin/accounts/${encodeURIComponent(email)}`, {
+          method: 'PATCH',
+          body: JSON.stringify({ status })
+        });
+        setSectionStatus('accounts-status', `${email} is now ${status}.`, 'success');
+        await loadAccounts();
+      } catch (error) {
+        setSectionStatus('accounts-status', `Could not update account. ${error.message}`, 'error');
+      }
+    }
+
+    async function deleteAccount(email) {
+      try {
+        await adminRequest(`/api/admin/accounts/${encodeURIComponent(email)}`, { method: 'DELETE' });
+        setSectionStatus('accounts-status', `${email} was deleted.`, 'success');
+        await loadAccounts();
+      } catch (error) {
+        setSectionStatus('accounts-status', `Could not delete account. ${error.message}`, 'error');
+      }
+    }
+
+    function setSectionStatus(id, message, state = '') {
+      const element = document.getElementById(id);
+      element.textContent = message;
+      element.dataset.state = state;
+    }
+
+    function renderSupportMessages(thread) {
+      const messages = document.getElementById('support-chat-messages');
+      messages.replaceChildren();
+      if (!thread?.messages?.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No messages in this conversation yet.';
+        messages.appendChild(empty);
+        return;
+      }
+      thread.messages.forEach(message => {
+        const bubble = document.createElement('div');
+        bubble.className = `support-message${message.sender === 'support@rodyx.local' ? ' admin' : ''}`;
+        bubble.append(document.createTextNode(message.text));
+        const meta = document.createElement('small');
+        meta.textContent = `${message.sender === 'support@rodyx.local' ? 'Admin' : thread.names?.[message.sender] || message.sender} · ${new Date(message.createdAt).toLocaleString()}`;
+        bubble.appendChild(meta);
+        messages.appendChild(bubble);
+      });
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function renderSupportThreads() {
+      const list = document.getElementById('support-threads');
+      list.replaceChildren();
+      if (!supportThreads.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'No user support conversations yet.';
+        list.appendChild(empty);
+        activeSupportThreadId = '';
+        renderSupportMessages(null);
+        document.getElementById('support-chat-header').textContent = 'Select a support conversation';
+        document.getElementById('support-reply-input').disabled = true;
+        document.getElementById('support-send').disabled = true;
+        return;
+      }
+      if (!supportThreads.some(thread => thread.id === activeSupportThreadId)) activeSupportThreadId = supportThreads[0].id;
+      supportThreads.forEach(thread => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `support-thread${thread.id === activeSupportThreadId ? ' active' : ''}`;
+        const userEmail = thread.participants.find(email => email !== 'support@rodyx.local') || 'Unknown user';
+        const name = document.createElement('strong');
+        name.textContent = thread.names?.[userEmail] || userEmail;
+        const preview = document.createElement('span');
+        preview.textContent = thread.messages?.slice(-1)[0]?.text || 'New support conversation';
+        button.append(name, preview);
+        button.addEventListener('click', () => {
+          activeSupportThreadId = thread.id;
+          renderSupportThreads();
+        });
+        list.appendChild(button);
+      });
+      const activeThread = supportThreads.find(thread => thread.id === activeSupportThreadId);
+      const userEmail = activeThread.participants.find(email => email !== 'support@rodyx.local') || 'Unknown user';
+      document.getElementById('support-chat-header').textContent = `${activeThread.names?.[userEmail] || userEmail} (${userEmail})`;
+      document.getElementById('support-reply-input').disabled = false;
+      document.getElementById('support-send').disabled = false;
+      renderSupportMessages(activeThread);
+    }
+
+    async function loadSupportThreads() {
+      try {
+        const result = await adminRequest('/api/admin/support');
+        if (!Array.isArray(result)) throw new Error('The API returned an invalid support inbox.');
+        supportThreads = result;
+        renderSupportThreads();
+        setSectionStatus('support-status', `${supportThreads.length} support conversation${supportThreads.length === 1 ? '' : 's'}.`, 'success');
+      } catch (error) {
+        setSectionStatus('support-status', error.message, 'error');
+        console.error('Admin support inbox could not be loaded:', error);
+      }
+    }
+
+    async function refreshAdminPanels() {
+      await Promise.all([loadAccounts(), loadSupportThreads()]);
     }
 
     async function diagnoseConnectionFailure() {
@@ -247,6 +516,8 @@
         setConnected(true);
         renderApplications();
         setStatus('Connected to the shared seller verification service.', 'success');
+        await refreshAdminPanels();
+        if (!adminRefreshTimer) adminRefreshTimer = window.setInterval(refreshAdminPanels, 15000);
       } catch (error) {
         applications = [];
         setConnected(false);
@@ -293,14 +564,115 @@
     });
 
     searchInput.addEventListener('input', renderApplications);
-    refreshButton.addEventListener('click', loadApplications);
+    refreshButton.addEventListener('click', async () => {
+      await loadApplications();
+      await refreshAdminPanels();
+    });
+    document.getElementById('accounts-refresh').addEventListener('click', loadAccounts);
+    document.getElementById('accounts-search').addEventListener('input', renderAccounts);
+    document.getElementById('support-refresh').addEventListener('click', loadSupportThreads);
+    document.getElementById('support-reply-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const input = document.getElementById('support-reply-input');
+      const text = input.value.trim();
+      if (!text || !activeSupportThreadId) return;
+      document.getElementById('support-send').disabled = true;
+      try {
+        await adminRequest(`/api/admin/support/${encodeURIComponent(activeSupportThreadId)}/messages`, {
+          method: 'POST',
+          body: JSON.stringify({ text })
+        });
+        input.value = '';
+        await loadSupportThreads();
+        setSectionStatus('support-status', 'Reply sent.', 'success');
+      } catch (error) {
+        setSectionStatus('support-status', `Could not send reply. ${error.message}`, 'error');
+      } finally {
+        document.getElementById('support-send').disabled = !activeSupportThreadId;
+      }
+    });
+
+    const publishType = document.getElementById('publish-type');
+    function updatePublishFields() {
+      const isService = publishType.value === 'service';
+      document.getElementById('product-category-field').hidden = isService;
+      document.getElementById('product-price-field').hidden = isService;
+      document.getElementById('product-phone-field').hidden = isService;
+      document.getElementById('service-skill-field').hidden = !isService;
+      document.getElementById('service-provider-field').hidden = !isService;
+      document.getElementById('publish-category').required = !isService;
+      document.getElementById('publish-price').required = !isService;
+      document.getElementById('publish-skill').required = isService;
+      document.getElementById('publish-provider').required = isService;
+      document.getElementById('publish-email').required = isService;
+    }
+    publishType.addEventListener('change', updatePublishFields);
+    updatePublishFields();
+    document.getElementById('admin-publish-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const type = publishType.value;
+      const title = document.getElementById('publish-title').value.trim();
+      const description = document.getElementById('publish-description').value.trim();
+      const email = document.getElementById('publish-email').value.trim();
+      const button = document.getElementById('publish-button');
+      button.disabled = true;
+      try {
+        if (type === 'product') {
+          const price = Number(document.getElementById('publish-price').value);
+          if (!Number.isFinite(price) || price <= 0) throw new Error('Enter a price greater than zero.');
+          await adminRequest('/api/admin/listings', {
+            method: 'POST',
+            body: JSON.stringify({
+              title,
+              price,
+              category: document.getElementById('publish-category').value.trim(),
+              description,
+              sellerName: 'CHUKA RODYX SHOP',
+              sellerEmail: email,
+              sellerPhone: document.getElementById('publish-phone').value.trim(),
+              verificationStatus: 'Official marketplace post'
+            })
+          });
+        } else {
+          await adminRequest('/api/admin/content/services', {
+            method: 'POST',
+            body: JSON.stringify({
+              title,
+              description,
+              skill: document.getElementById('publish-skill').value.trim(),
+              providerName: document.getElementById('publish-provider').value.trim(),
+              email
+            })
+          });
+        }
+        event.target.reset();
+        updatePublishFields();
+        setSectionStatus('publish-status', `${type === 'product' ? 'Product' : 'Service'} published successfully.`, 'success');
+      } catch (error) {
+        setSectionStatus('publish-status', `Could not publish post. ${error.message}`, 'error');
+      } finally {
+        button.disabled = signoutButton.hidden;
+      }
+    });
+
     signoutButton.addEventListener('click', () => {
       sessionStorage.removeItem(sellerVerificationAdminKey);
       keyInput.value = '';
       applications = [];
+      accounts = [];
+      supportThreads = [];
+      activeSupportThreadId = '';
+      if (adminRefreshTimer) {
+        window.clearInterval(adminRefreshTimer);
+        adminRefreshTimer = null;
+      }
       setConnected(false);
       setStatus('Disconnected from the seller verification service.');
       showEmpty('Connect to the verification service to view applications.');
+      showTableEmpty(document.getElementById('accounts-table'), 'Connect to view registered accounts.', 6);
+      document.getElementById('support-threads').replaceChildren();
+      document.getElementById('support-chat-messages').replaceChildren();
+      document.getElementById('support-chat-header').textContent = 'Select a support conversation';
       document.getElementById('pending-count').textContent = '-';
       document.getElementById('total-count').textContent = '-';
     });
