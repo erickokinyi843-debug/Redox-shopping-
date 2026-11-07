@@ -33,6 +33,7 @@ function getUsername(email) {
 }
 
 const LOCAL_ACCOUNTS_KEY = 'rodyxAccounts';
+const apiBaseUrl = (window.APP_CONFIG?.apiBaseUrl || '').replace(/\/$/, '');
 
 async function hashPassword(password, salt) {
   const encoder = new TextEncoder();
@@ -54,10 +55,27 @@ function saveCurrentUser(user) {
     fullname: user.fullname || [user.first_name, user.last_name].filter(Boolean).join(' ') || getUsername(user.email),
     email: user.email,
     phone: user.phone || '',
-    createdAt: user.createdAt || new Date().toISOString()
+    createdAt: user.createdAt || new Date().toISOString(),
+    token: user.token || ''
   };
   localStorage.setItem('currentUser', JSON.stringify(currentUser));
   localStorage.setItem('user_email', currentUser.email);
+}
+
+async function requestAccount(path, payload) {
+  if (!apiBaseUrl) throw new Error('The shared account service is not configured.');
+  const response = await fetch(`${apiBaseUrl}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(result.error || `The account service returned HTTP ${response.status}.`);
+    error.status = response.status;
+    throw error;
+  }
+  return result;
 }
 
 // Validate email format
@@ -187,35 +205,17 @@ signupForm.addEventListener('submit', async (e) => {
     return;
   }
   
-  const accounts = getLocalAccounts();
-  if (accounts[email]) {
-    showMessage('An account with this email already exists on this device. Sign in instead.', 'error');
-    signupButton.disabled = false;
-    signupButton.textContent = 'Sign Up';
-    return;
-  }
-
   try {
-    const salt = crypto.getRandomValues(new Uint8Array(16));
-    const saltValue = Array.from(salt, byte => byte.toString(16).padStart(2, '0')).join('');
-    accounts[email] = {
-      fullname: fullname,
-      email: email,
-      phone: phone,
-      createdAt: new Date().toISOString(),
-      salt: saltValue,
-      passwordHash: await hashPassword(password, salt)
-    };
-    localStorage.setItem(LOCAL_ACCOUNTS_KEY, JSON.stringify(accounts));
-    saveCurrentUser(accounts[email]);
-    showMessage('Account saved on this device only. Redirecting to the homepage...', 'success');
+    const result = await requestAccount('/api/auth/register', { fullname, email, phone, password });
+    saveCurrentUser({ ...result.account, token: result.token });
+    showMessage('Account created. Redirecting to the homepage...', 'success');
     signupForm.reset();
     setTimeout(() => {
       window.location.href = 'homepage.html';
     }, 1000);
   } catch (error) {
-    console.error('Could not save the local account:', error);
-    showMessage('Could not save the account in this browser. Check browser storage and try again.', 'error');
+    console.error('Could not create the shared account:', error);
+    showMessage(error.message || 'Could not create the account. Check your connection and try again.', 'error');
     signupButton.disabled = false;
     signupButton.textContent = 'Sign Up';
   }
@@ -233,28 +233,30 @@ loginForm.addEventListener('submit', async (e) => {
     return;
   }
   
-  const account = getLocalAccounts()[email];
-  if (!account) {
-    showMessage('No account for this email exists in this browser. Create an account on this device first.', 'error');
-    return;
-  }
-
   try {
-    const salt = Uint8Array.from(account.salt.match(/.{2}/g), byte => parseInt(byte, 16));
-    const passwordHash = await hashPassword(password, salt);
-    if (passwordHash !== account.passwordHash) {
-      showMessage('Invalid email or password. Please try again.', 'error');
-      return;
+    let result;
+    try {
+      result = await requestAccount('/api/auth/login', { email, password });
+    } catch (error) {
+      if (error.status !== 404) throw error;
+      const legacyAccount = getLocalAccounts()[email];
+      if (!legacyAccount) throw error;
+      const salt = Uint8Array.from(legacyAccount.salt.match(/.{2}/g), byte => parseInt(byte, 16));
+      const passwordHash = await hashPassword(password, salt);
+      if (passwordHash !== legacyAccount.passwordHash) {
+        showMessage('Invalid email or password. Please try again.', 'error');
+        return;
+      }
+      result = await requestAccount('/api/auth/import', { ...legacyAccount, password });
     }
-
-    saveCurrentUser(account);
-    showMessage('Signed in on this device. Redirecting...', 'success');
+    saveCurrentUser({ ...result.account, token: result.token });
+    showMessage('Signed in. Redirecting...', 'success');
     loginForm.reset();
     setTimeout(() => {
       window.location.href = 'homepage.html';
     }, 1000);
   } catch (error) {
-    console.error('Could not verify the local account:', error);
-    showMessage('Could not verify this account in the browser. Try again using HTTPS.', 'error');
+    console.error('Could not authenticate the account:', error);
+    showMessage(error.message || 'Could not verify this account. Check your connection and try again.', 'error');
   }
 });
