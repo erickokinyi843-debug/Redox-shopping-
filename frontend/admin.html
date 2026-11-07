@@ -294,22 +294,16 @@
     }
 
     async function adminRequest(path, options = {}) {
-      const adminKey = localStorage.getItem(sellerVerificationAdminKey) || '';
-      let response;
-      try {
-        response = await fetch(`${apiBaseUrl}${path}`, {
-          ...options,
-          headers: {
-            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-            'X-Admin-Key': adminKey,
-            ...options.headers
-          },
-          cache: 'no-store'
-        });
-      } catch (error) {
-        if (error instanceof TypeError) throw new Error(await diagnoseConnectionFailure());
-        throw error;
-      }
+      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      const response = await fetch(`${apiBaseUrl}${path}`, {
+        ...options,
+        headers: {
+          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+          'X-Admin-Key': adminKey,
+          ...options.headers
+        },
+        cache: 'no-store'
+      });
       return readResponse(response);
     }
 
