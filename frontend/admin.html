@@ -30,10 +30,15 @@
     .summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
     .summary-item { min-width: 150px; padding: 13px 16px; border-top: 4px solid var(--teal); border-radius: 3px; background: #fff; box-shadow: 0 2px 8px rgba(24, 59, 86, .08); }
     .summary-item strong { display: block; font-size: 22px; }.summary-item span { color: var(--muted); font-size: 12px; }
+    .summary-item.alert { border-top-color: var(--coral); }
+    .dashboard-toolbar, .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .dashboard-toolbar { flex-basis: 100%; justify-content: space-between; margin: 0; color: var(--muted); font-size: 12px; }
+    .table-toolbar { justify-content: flex-end; margin-bottom: 12px; }
+    .toolbar-control { min-width: 145px; border: 1px solid var(--line); border-radius: 3px; padding: 9px; color: var(--navy); background: #fff; font: inherit; }
+    .table-toolbar .search { flex: 0 1 260px; }
+    .table-toolbar .button { padding: 9px 11px; font-size: 12px; }
     .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 14px; }
     .section-heading h2 { margin: 0; font-size: 18px; }.section-heading h2 i { margin-right: 8px; color: var(--coral); }
-    .table-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
-    .table-toolbar .search { flex: 0 1 300px; }
     .table-wrap { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
     th { padding: 10px 8px; border-bottom: 2px solid var(--line); color: var(--muted); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
@@ -61,6 +66,15 @@
     .support-message small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
     .support-reply { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); }
     .support-reply input { flex: 1; min-width: 0; padding: 9px; border: 1px solid var(--line); border-radius: 3px; font: inherit; }
+    .support-reply-tools { display: flex; gap: 8px; padding: 0 10px 10px; }
+    body.dark-theme { --navy: #e6f0f3; --deep: #101e2b; --page: #152633; --muted: #a7bdc5; --line: #334955; }
+    body.dark-theme .panel, body.dark-theme .summary-item, body.dark-theme .support-thread,
+    body.dark-theme .toolbar-control, body.dark-theme .admin-form input, body.dark-theme .admin-form select,
+    body.dark-theme .admin-form textarea, body.dark-theme .support-reply input { background: #203643; color: var(--navy); }
+    body.dark-theme .support-thread.active, body.dark-theme .support-thread:hover { background: #294b54; }
+    body.dark-theme .support-chat-messages { background: #1a2e3a; }
+    body.dark-theme .support-message { background: #2b414d; }
+    body.dark-theme .support-message.admin { background: #244b46; }
     .section-status { min-height: 18px; margin: 10px 0 0; color: var(--muted); font-size: 12px; }
     .section-status[data-state="error"] { color: #a63e2c; font-weight: 700; }
     .section-status[data-state="success"] { color: #08776d; font-weight: 700; }
@@ -68,8 +82,9 @@
     @media (max-width: 620px) {
       header { flex-wrap: wrap; padding: 12px 16px; }.brand { font-size: 18px; }.admin-badge { order: 3; }
       main { margin-top: 22px; padding: 0 12px; }.topline { align-items: start; flex-direction: column; }.panel { padding: 15px; }
-      .table-toolbar { justify-content: stretch; }.table-toolbar .search { flex-basis: 100%; }
+      .table-toolbar { justify-content: stretch; }.table-toolbar .search { flex: 1 1 100%; }.table-toolbar .toolbar-control { flex: 1 1 100%; }
       .admin-form, .support-layout { grid-template-columns: 1fr; }.support-threads { max-height: 220px; border-right: 0; border-bottom: 1px solid var(--line); }.admin-form .wide { grid-column: auto; }
+      .support-reply-tools { flex-direction: column; }
     }
   </style>
 </head>
@@ -82,10 +97,13 @@
   <main>
     <div class="topline">
       <div>
-        <h1>Seller verification</h1>
-        <p>Review submitted documents and approve or reject seller applications.</p>
+        <h1>Admin dashboard</h1>
+        <p>Monitor marketplace accounts, seller applications, and user support.</p>
       </div>
-      <button class="button secondary" id="refresh-button" type="button" disabled><i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh</button>
+      <div class="actions">
+        <button class="button secondary" id="theme-toggle" type="button" aria-pressed="false">Dark mode</button>
+        <button class="button secondary" id="refresh-button" type="button" disabled><i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh all</button>
+      </div>
     </div>
     <section class="panel" aria-label="Connect to seller verification service">
       <form class="connection-form" id="verification-api-form">
@@ -96,9 +114,13 @@
       <p class="connection-note">The API key is saved in this browser until you disconnect and is sent only to the configured marketplace API.</p>
       <p id="api-status" role="status" aria-live="polite"></p>
     </section>
-    <section class="summary" aria-label="Application totals">
-      <div class="summary-item"><strong id="pending-count">-</strong><span>Pending review</span></div>
-      <div class="summary-item"><strong id="total-count">-</strong><span>Total applications</span></div>
+    <section class="summary" aria-label="Admin dashboard overview">
+      <div class="summary-item"><strong id="account-count">-</strong><span>Registered accounts</span></div>
+      <div class="summary-item"><strong id="active-account-count">-</strong><span>Active accounts</span></div>
+      <div class="summary-item alert"><strong id="suspended-account-count">-</strong><span>Suspended accounts</span></div>
+      <div class="summary-item"><strong id="pending-count">-</strong><span>Pending seller review</span></div>
+      <div class="summary-item alert"><strong id="support-needs-reply-count">-</strong><span>Support needs reply</span></div>
+      <div class="dashboard-toolbar"><span id="last-refreshed">Not connected</span></div>
     </section>
     <section class="panel">
       <div class="section-heading">
@@ -106,6 +128,10 @@
       </div>
       <div class="table-toolbar">
         <input class="search" id="verification-search" type="search" placeholder="Search applications" aria-label="Search applications" disabled>
+        <select class="toolbar-control" id="verification-status-filter" aria-label="Filter applications by status" disabled>
+          <option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option>
+        </select>
+        <button class="button secondary" id="export-applications" type="button" disabled>Export CSV</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -121,6 +147,13 @@
       </div>
       <div class="table-toolbar">
         <input class="search" id="accounts-search" type="search" placeholder="Search accounts" aria-label="Search accounts" disabled>
+        <select class="toolbar-control" id="accounts-status-filter" aria-label="Filter accounts by status" disabled>
+          <option value="all">All statuses</option><option value="active">Active</option><option value="suspended">Suspended</option>
+        </select>
+        <select class="toolbar-control" id="accounts-sort" aria-label="Sort accounts" disabled>
+          <option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="name">Name A–Z</option>
+        </select>
+        <button class="button secondary" id="export-accounts" type="button" disabled>Export CSV</button>
       </div>
       <div class="table-wrap">
         <table>
@@ -155,6 +188,12 @@
         <h2><i class="fas fa-comments" aria-hidden="true"></i>Help inbox</h2>
         <button class="button secondary" id="support-refresh" type="button" disabled>Refresh inbox</button>
       </div>
+      <div class="table-toolbar">
+        <input class="search" id="support-search" type="search" placeholder="Search conversations" aria-label="Search support conversations" disabled>
+        <select class="toolbar-control" id="support-filter" aria-label="Filter support conversations" disabled>
+          <option value="all">All conversations</option><option value="unanswered">Needs a reply</option>
+        </select>
+      </div>
       <div class="support-layout">
         <div class="support-threads" id="support-threads"><div class="empty">Connect to view support requests.</div></div>
         <div class="support-chat">
@@ -164,6 +203,14 @@
             <input id="support-reply-input" maxlength="500" placeholder="Reply to user..." aria-label="Reply to user" disabled>
             <button class="button" type="submit" id="support-send" disabled>Send</button>
           </form>
+          <div class="support-reply-tools">
+            <select class="toolbar-control" id="support-quick-reply" aria-label="Insert a quick reply" disabled>
+              <option value="">Insert a quick reply…</option>
+              <option value="Thanks for contacting us. We are looking into this and will get back to you shortly.">We’re looking into it</option>
+              <option value="Could you please share a little more detail so we can help you?">Ask for more details</option>
+              <option value="This has been resolved. Please let us know if you need anything else.">Issue resolved</option>
+            </select>
+          </div>
         </div>
       </div>
       <p class="section-status" id="support-status" role="status"></p>
@@ -200,6 +247,14 @@
       document.getElementById('accounts-search').disabled = !connected;
       document.getElementById('publish-button').disabled = !connected;
       document.getElementById('support-refresh').disabled = !connected;
+      document.getElementById('verification-status-filter').disabled = !connected;
+      document.getElementById('export-applications').disabled = !connected;
+      document.getElementById('accounts-status-filter').disabled = !connected;
+      document.getElementById('accounts-sort').disabled = !connected;
+      document.getElementById('export-accounts').disabled = !connected;
+      document.getElementById('support-search').disabled = !connected;
+      document.getElementById('support-filter').disabled = !connected;
+      document.getElementById('support-quick-reply').disabled = !connected;
       if (!connected) {
         document.getElementById('support-reply-input').disabled = true;
         document.getElementById('support-send').disabled = true;
@@ -226,9 +281,10 @@
     function renderApplications() {
       applicationsTable.replaceChildren();
       const query = searchInput.value.trim().toLowerCase();
+      const status = document.getElementById('verification-status-filter').value;
       const visibleApplications = applications.filter(application => (
         `${application.fullName || ''} ${application.email || ''} ${application.phone || ''} ${application.status || ''}`
-      ).toLowerCase().includes(query));
+      ).toLowerCase().includes(query) && (status === 'all' || (application.status || 'pending') === status));
 
       visibleApplications.forEach(application => {
         const row = document.createElement('tr');
@@ -278,8 +334,7 @@
       if (!visibleApplications.length) {
         showEmpty(applications.length ? 'No applications match your search.' : 'No seller verification applications yet.');
       }
-      document.getElementById('pending-count').textContent = applications.filter(item => item.status === 'pending').length;
-      document.getElementById('total-count').textContent = applications.length;
+      updateDashboardSummary();
     }
 
     async function readResponse(response) {
@@ -294,26 +349,38 @@
     }
 
     async function adminRequest(path, options = {}) {
-      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
-      const response = await fetch(`${apiBaseUrl}${path}`, {
-        ...options,
-        headers: {
-          ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-          'X-Admin-Key': adminKey,
-          ...options.headers
-        },
-        cache: 'no-store'
-      });
-      return readResponse(response);
+      const adminKey = localStorage.getItem(sellerVerificationAdminKey) || '';
+      try {
+        const response = await fetch(`${apiBaseUrl}${path}`, {
+          ...options,
+          headers: {
+            ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+            'X-Admin-Key': adminKey,
+            ...options.headers
+          },
+          cache: 'no-store'
+        });
+        return await readResponse(response);
+      } catch (error) {
+        if (error instanceof TypeError) throw new Error(await diagnoseConnectionFailure());
+        throw error;
+      }
     }
 
     function renderAccounts() {
       const table = document.getElementById('accounts-table');
       table.replaceChildren();
       const query = document.getElementById('accounts-search').value.trim().toLowerCase();
+      const status = document.getElementById('accounts-status-filter').value;
+      const sort = document.getElementById('accounts-sort').value;
       const visibleAccounts = accounts.filter(account => (
         `${account.fullname || ''} ${account.email || ''} ${account.phone || ''} ${account.status || ''}`
-      ).toLowerCase().includes(query));
+      ).toLowerCase().includes(query) && (status === 'all' || (account.status || 'active') === status));
+      visibleAccounts.sort((left, right) => {
+        if (sort === 'name') return (left.fullname || left.email || '').localeCompare(right.fullname || right.email || '');
+        const difference = Date.parse(right.createdAt || 0) - Date.parse(left.createdAt || 0);
+        return sort === 'oldest' ? -difference : difference;
+      });
       visibleAccounts.forEach(account => {
         const row = document.createElement('tr');
         appendCell(row, account.fullname || 'User');
@@ -340,6 +407,7 @@
         table.appendChild(row);
       });
       if (!visibleAccounts.length) showTableEmpty(table, accounts.length ? 'No accounts match your search.' : 'No registered accounts yet.', 6);
+      updateDashboardSummary();
     }
 
     function showTableEmpty(table, message, columnCount) {
@@ -416,23 +484,35 @@
       messages.scrollTop = messages.scrollHeight;
     }
 
+    function needsSupportReply(thread) {
+      return thread.messages?.slice(-1)[0]?.sender !== 'support@rodyx.local';
+    }
+
     function renderSupportThreads() {
       const list = document.getElementById('support-threads');
       list.replaceChildren();
-      if (!supportThreads.length) {
+      const query = document.getElementById('support-search').value.trim().toLowerCase();
+      const filter = document.getElementById('support-filter').value;
+      const visibleThreads = supportThreads.filter(thread => {
+        const userEmail = thread.participants.find(email => email !== 'support@rodyx.local') || '';
+        const searchText = `${thread.names?.[userEmail] || ''} ${userEmail} ${thread.messages?.map(message => message.text).join(' ') || ''}`;
+        return searchText.toLowerCase().includes(query) && (filter !== 'unanswered' || needsSupportReply(thread));
+      });
+      if (!visibleThreads.length) {
         const empty = document.createElement('div');
         empty.className = 'empty';
-        empty.textContent = 'No user support conversations yet.';
+        empty.textContent = supportThreads.length ? 'No conversations match these filters.' : 'No user support conversations yet.';
         list.appendChild(empty);
         activeSupportThreadId = '';
         renderSupportMessages(null);
         document.getElementById('support-chat-header').textContent = 'Select a support conversation';
         document.getElementById('support-reply-input').disabled = true;
         document.getElementById('support-send').disabled = true;
+        updateDashboardSummary();
         return;
       }
-      if (!supportThreads.some(thread => thread.id === activeSupportThreadId)) activeSupportThreadId = supportThreads[0].id;
-      supportThreads.forEach(thread => {
+      if (!visibleThreads.some(thread => thread.id === activeSupportThreadId)) activeSupportThreadId = visibleThreads[0].id;
+      visibleThreads.forEach(thread => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `support-thread${thread.id === activeSupportThreadId ? ' active' : ''}`;
@@ -441,6 +521,7 @@
         name.textContent = thread.names?.[userEmail] || userEmail;
         const preview = document.createElement('span');
         preview.textContent = thread.messages?.slice(-1)[0]?.text || 'New support conversation';
+        if (needsSupportReply(thread)) preview.textContent = `Needs reply · ${preview.textContent}`;
         button.append(name, preview);
         button.addEventListener('click', () => {
           activeSupportThreadId = thread.id;
@@ -448,12 +529,13 @@
         });
         list.appendChild(button);
       });
-      const activeThread = supportThreads.find(thread => thread.id === activeSupportThreadId);
+      const activeThread = visibleThreads.find(thread => thread.id === activeSupportThreadId);
       const userEmail = activeThread.participants.find(email => email !== 'support@rodyx.local') || 'Unknown user';
       document.getElementById('support-chat-header').textContent = `${activeThread.names?.[userEmail] || userEmail} (${userEmail})`;
       document.getElementById('support-reply-input').disabled = false;
       document.getElementById('support-send').disabled = false;
       renderSupportMessages(activeThread);
+      updateDashboardSummary();
     }
 
     async function loadSupportThreads() {
@@ -471,13 +553,37 @@
 
     async function refreshAdminPanels() {
       await Promise.all([loadAccounts(), loadSupportThreads()]);
+      document.getElementById('last-refreshed').textContent = `Last refreshed: ${new Date().toLocaleTimeString()}`;
+    }
+
+    function updateDashboardSummary() {
+      document.getElementById('account-count').textContent = accounts.length;
+      document.getElementById('active-account-count').textContent = accounts.filter(account => (account.status || 'active') === 'active').length;
+      document.getElementById('suspended-account-count').textContent = accounts.filter(account => account.status === 'suspended').length;
+      document.getElementById('pending-count').textContent = applications.filter(application => (application.status || 'pending') === 'pending').length;
+      document.getElementById('support-needs-reply-count').textContent = supportThreads.filter(needsSupportReply).length;
+    }
+
+    function exportCsv(filename, headers, rows) {
+      const escapeCell = value => {
+        let text = String(value ?? '');
+        if (/^\s*[=+\-@]/.test(text)) text = `'${text}`;
+        return `"${text.replaceAll('"', '""')}"`;
+      };
+      const csv = [headers, ...rows].map(row => row.map(escapeCell).join(',')).join('\r\n');
+      const url = URL.createObjectURL(new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     async function diagnoseConnectionFailure() {
       try {
         const response = await fetch(`${apiBaseUrl}/api/health`, { cache: 'no-store' });
         if (response.ok) {
-          return `The API health check passed, but the browser could not reach its admin endpoint. Deploy the current backend/app.py to PythonAnywhere and reload the web app; also confirm CORS_ORIGINS includes ${location.origin}.`;
+          return `The API is online, but the browser cannot reach its admin endpoint. Confirm the current backend is deployed, CORS_ORIGINS includes ${location.origin}, and the server admin routes accept the X-Admin-Key header.`;
         }
       } catch {
         return `Could not reach the API at ${apiBaseUrl}. Check that the backend is online and its CORS_ORIGINS includes ${location.origin}.`;
@@ -516,6 +622,7 @@
         setConnected(true);
         renderApplications();
         setStatus('Connected to the shared seller verification service.', 'success');
+        updateDashboardSummary();
         await refreshAdminPanels();
         if (!adminRefreshTimer) adminRefreshTimer = window.setInterval(refreshAdminPanels, 15000);
       } catch (error) {
@@ -564,6 +671,26 @@
     });
 
     searchInput.addEventListener('input', renderApplications);
+    document.getElementById('verification-status-filter').addEventListener('change', renderApplications);
+    document.getElementById('accounts-status-filter').addEventListener('change', renderAccounts);
+    document.getElementById('accounts-sort').addEventListener('change', renderAccounts);
+    document.getElementById('support-search').addEventListener('input', renderSupportThreads);
+    document.getElementById('support-filter').addEventListener('change', renderSupportThreads);
+    document.getElementById('support-quick-reply').addEventListener('change', event => {
+      if (!event.target.value) return;
+      const input = document.getElementById('support-reply-input');
+      input.value = event.target.value;
+      input.focus();
+      event.target.value = '';
+    });
+    document.getElementById('export-accounts').addEventListener('click', () => exportCsv('marketplace-accounts.csv',
+      ['Name', 'Email', 'Phone', 'Joined', 'Status'],
+      accounts.map(account => [account.fullname, account.email, account.phone, account.createdAt, account.status || 'active'])
+    ));
+    document.getElementById('export-applications').addEventListener('click', () => exportCsv('seller-applications.csv',
+      ['Name', 'Email', 'Phone', 'Shop', 'Status', 'Submitted'],
+      applications.map(application => [application.fullName, application.email, application.phone, application.shopName, application.status || 'pending', application.submittedAt])
+    ));
     refreshButton.addEventListener('click', async () => {
       await loadApplications();
       await refreshAdminPanels();
@@ -593,6 +720,15 @@
     });
 
     const publishType = document.getElementById('publish-type');
+    const themeToggle = document.getElementById('theme-toggle');
+    function setTheme(isDark) {
+      document.body.classList.toggle('dark-theme', isDark);
+      themeToggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+      themeToggle.setAttribute('aria-pressed', String(isDark));
+      localStorage.setItem('rodyxAdminDarkMode', String(isDark));
+    }
+    themeToggle.addEventListener('click', () => setTheme(!document.body.classList.contains('dark-theme')));
+    setTheme(localStorage.getItem('rodyxAdminDarkMode') === 'true');
     function updatePublishFields() {
       const isService = publishType.value === 'service';
       document.getElementById('product-category-field').hidden = isService;
@@ -674,7 +810,11 @@
       document.getElementById('support-chat-messages').replaceChildren();
       document.getElementById('support-chat-header').textContent = 'Select a support conversation';
       document.getElementById('pending-count').textContent = '-';
-      document.getElementById('total-count').textContent = '-';
+      document.getElementById('account-count').textContent = '-';
+      document.getElementById('active-account-count').textContent = '-';
+      document.getElementById('suspended-account-count').textContent = '-';
+      document.getElementById('support-needs-reply-count').textContent = '-';
+      document.getElementById('last-refreshed').textContent = 'Not connected';
     });
 
     if (localStorage.getItem(sellerVerificationAdminKey)) loadApplications();
