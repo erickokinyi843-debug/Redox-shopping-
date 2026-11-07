@@ -93,7 +93,7 @@
         <button class="button" id="connect-button" type="submit">Connect</button>
         <button class="button secondary" id="signout-button" type="button" hidden>Disconnect</button>
       </form>
-      <p class="connection-note">The API key is kept only for this browser tab session and is sent only to the configured marketplace API.</p>
+      <p class="connection-note">The API key is saved in this browser until you disconnect and is sent only to the configured marketplace API.</p>
       <p id="api-status" role="status" aria-live="polite"></p>
     </section>
     <section class="summary" aria-label="Application totals">
@@ -486,7 +486,7 @@
     }
 
     async function loadApplications() {
-      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      const adminKey = localStorage.getItem(sellerVerificationAdminKey) || '';
       if (!apiBaseUrl) {
         setConnected(false);
         setStatus('The API URL is not configured in frontend/config.js.', 'error');
@@ -535,7 +535,7 @@
     }
 
     async function updateApplication(email, decision) {
-      const adminKey = sessionStorage.getItem(sellerVerificationAdminKey) || '';
+      const adminKey = localStorage.getItem(sellerVerificationAdminKey) || '';
       try {
         const response = await fetch(`${apiBaseUrl}/api/admin/seller-verifications/${encodeURIComponent(email)}`, {
           method: 'PATCH',
@@ -559,7 +559,7 @@
       event.preventDefault();
       const adminKey = keyInput.value.trim();
       if (!adminKey) return;
-      sessionStorage.setItem(sellerVerificationAdminKey, adminKey);
+      localStorage.setItem(sellerVerificationAdminKey, adminKey);
       loadApplications();
     });
 
@@ -656,7 +656,7 @@
     });
 
     signoutButton.addEventListener('click', () => {
-      sessionStorage.removeItem(sellerVerificationAdminKey);
+      localStorage.removeItem(sellerVerificationAdminKey);
       keyInput.value = '';
       applications = [];
       accounts = [];
@@ -677,7 +677,7 @@
       document.getElementById('total-count').textContent = '-';
     });
 
-    if (sessionStorage.getItem(sellerVerificationAdminKey)) loadApplications();
+    if (localStorage.getItem(sellerVerificationAdminKey)) loadApplications();
   </script>
 </body>
 </html>
