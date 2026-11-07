@@ -4,11 +4,11 @@ Redox Shopping is a static HTML/CSS/JavaScript marketplace with a Flask API. The
 
 ## What is shared by the API
 
-The Flask API stores marketplace listings, wanted posts, orders, and seller verification requests as JSON files under `backend/data/`. The frontend uses those API routes for listing creation and browsing, wanted-post creation and browsing, order submission, and seller verification. Listing images and seller verification documents can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
+The Flask API stores marketplace listings, wanted posts, orders, seller verification requests, registered accounts, and support conversations as JSON files under `backend/data/`. Account registration and sign-in use the shared API; older browser-only accounts are imported the next time their owner signs in. Signed-in users can chat with sellers and support across devices.
 
-Other features—including sign-in, account records, messages, accommodation, rentals, events, and services—still use the current browser's `localStorage`. They are not shared across browsers or devices and are not protected by server-side accounts. The admin page is limited to seller verification requests and decisions, which are shared through the API and require the server's `ADMIN_API_KEY`.
+The admin page uses the server `ADMIN_API_KEY` to review seller verification requests, view and suspend or delete accounts, publish products and services, and reply to user support chats. Sellers can continue publishing listings and services through the marketplace. Accommodation, rentals, and events still use the current browser's `localStorage` and are not shared across devices. Listing images and seller verification documents can be up to 5 MB; they are sent as base64 data, so the API allows an 8 MB request body to accommodate the encoding overhead.
 
-The JSON-file storage is a small-project starting point, not a production database. Back up `backend/data/`; use a database and server-side authentication before handling real accounts, sensitive data, payments, or high traffic.
+The JSON-file storage and bearer sessions are a small-project starting point, not a production identity system or database. Back up `backend/data/`; use a database and hardened server-side authentication before handling real accounts, sensitive data, payments, or high traffic.
 
 ## Deploy the backend to PythonAnywhere
 
@@ -78,7 +78,8 @@ The JSON-file storage is a small-project starting point, not a production databa
    - `Sell an item`: post a listing, then confirm it appears on another browser/device.
    - `Wanted`: create and view a post.
    - Add an item to the cart and submit an order. Orders are recorded by the API, but the site does not process payments.
-   - Submit a seller verification request. On the admin page, enter the server `ADMIN_API_KEY` and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically. Only applications submitted to the API are available there.
+   - Submit a seller verification request. On the admin page, enter the server `ADMIN_API_KEY` and connect. Approval or rejection is saved by the API; the seller status page refreshes automatically.
+   - Create a user account, then use the admin page to view, suspend, or delete it. Try publishing a product and service, and send a help message from the user dashboard to test the admin support inbox.
 
 If seller verification fails, first open the PythonAnywhere `/api/health` URL. A working health route alongside a 404 for `/api/admin/seller-verifications` means the deployed web app is running older backend code. After publishing the update, run `cd ~/Redox-shopping- && git pull` in the PythonAnywhere Bash console (or upload the updated `backend/app.py` if the project was uploaded manually), then click **Reload** in the PythonAnywhere Web tab. If the admin page reports that its request was blocked but health succeeds, deploy/reload the current backend and confirm `CORS_ORIGINS` includes the exact frontend origin (including any custom domain). Also check that the frontend's `config.js` has the correct API URL and `ADMIN_API_KEY` is set for verification administration. The PythonAnywhere **Error log** is available from the Web tab.
 
